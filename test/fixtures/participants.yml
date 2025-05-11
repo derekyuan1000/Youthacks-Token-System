@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  participant_id: 1
+  name: MyString
+  pronouns: MyString
+  date_of_birth: 2025-05-10
+  email: MyString
+  balance: 9.99
+
+two:
+  participant_id: 1
+  name: MyString
+  pronouns: MyString
+  date_of_birth: 2025-05-10
+  email: MyString
+  balance: 9.99
