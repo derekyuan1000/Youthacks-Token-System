@@ -2,9 +2,16 @@ require 'airtable'
 require 'dotenv/load'
 
 class Participant < ApplicationRecord
-    def increase_balance!(amount = 1)
+    def earn!(amount = 1)
         new_balance = balance + amount
         update!(balance: new_balance)
+        Activity.create!(
+            participant_id: id,
+            activity_type: 'earn',
+            amount: amount,
+            balance: new_balance,
+            
+        )
     end
 
     def set_balance!(amount)
@@ -22,7 +29,7 @@ class Participant < ApplicationRecord
                 # Mark the product as sold
                 product.update!(quantity: product.quantity - 1)
 
-                Transaction.create! (
+                Transaction.create!(
                     participant_id: id,
                     product_id: product.id,
                     price: product.price
@@ -71,6 +78,7 @@ class Participant < ApplicationRecord
             pronouns: participant['pronouns'],
             date_of_birth: participant['date_of_birth'],
             email: participant['attendee_email']
+            # balance = existing_participant.balance
           )
         else
           # If the participant doesn't exist, create a new entry

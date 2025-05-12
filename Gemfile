@@ -7,7 +7,6 @@ gem "propshaft"
 # Use postgresql as the database for Active Record
 gem "pg", "~> 1.1"
 
-gem "airtable"
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
 # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
@@ -21,7 +20,7 @@ gem "jbuilder"
 
 gem 'airtable', require: 'airtable'
 
-
+gem 'bcrypt', '~> 3.1.7'
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 # gem "bcrypt", "~> 3.1.7"
 

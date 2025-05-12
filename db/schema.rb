@@ -10,9 +10,27 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_10_192229) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_12_174837) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "activities", force: :cascade do |t|
+    t.bigint "participant_id", null: false
+    t.string "action"
+    t.json "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "admin_id", null: false
+    t.index ["admin_id"], name: "index_activities_on_admin_id"
+    t.index ["participant_id"], name: "index_activities_on_participant_id"
+  end
+
+  create_table "admins", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "password_digest"
+  end
 
   create_table "participants", force: :cascade do |t|
     t.integer "participant_id"
@@ -44,6 +62,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_10_192229) do
     t.index ["product_id"], name: "index_transactions_on_product_id"
   end
 
+  add_foreign_key "activities", "admins"
+  add_foreign_key "activities", "participants"
   add_foreign_key "transactions", "participants"
   add_foreign_key "transactions", "products"
 end
