@@ -7,10 +7,9 @@ class Participant < ApplicationRecord
         update!(balance: new_balance)
         Activity.create!(
             participant_id: id,
-            activity_type: 'earn',
-            amount: amount,
+            metadata: { description: "earn" , amount:amount}.to_json,
             balance: new_balance,
-            
+            admin_id: @admin.id,
         )
     end
 
