@@ -4,13 +4,15 @@ class SessionsController < ApplicationController
   end
 
   def create
-    admin = Admin.find_by(email: params[:email])
-    if admin&.authenticate(params[:password])
-      session[:admin_id] = admin.id
-      redirect_to root_path, notice: "Logged in successfully"
+    session_params = params.permit(:name, :password)
+    @admin = Admin.find_by(name: session_params[:name])
+    if @admin && @admin.authenticate(session_params[:password])
+      session[:admin_id] = @admin.id
+      redirect_to @admin
+      puts "Admin authenticated successfully."
     else
-      flash.now[:alert] = "Invalid email or password"
-      render :new
+      flash[:notice] = "Login is invalid!"
+      redirect_to login_path
     end
   end
 

@@ -1,8 +1,7 @@
-<!-- filepath: c:\Users\mrsoh\OneDrive - The Perse School\Youthacks\aha\app\views\home\index.html.erb -->
 <h1>Welcome to the Website</h1>
 
 <% if @admin %>
-  <p>Logged in as <%= @admin.email %></p>
+  <p>Logged in as <%= @admin.name %></p>
   <%= link_to "Logout", logout_path, method: :delete %>
 <% else %>
   <p>You are not logged in.</p>
