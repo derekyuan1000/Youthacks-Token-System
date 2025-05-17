@@ -1,19 +1,27 @@
 require 'airtable'
 require 'dotenv/load'
 
+
+
 class Participant < ApplicationRecord
     def earn!(amount = 1)
         new_balance = balance + amount
-        update!(balance: new_balance)
         Activity.create!(
             participant_id: id,
-            metadata: { description: "earn" , amount:amount}.to_json,
-            balance: new_balance,
-            admin_id: @admin.id,
+            action: "earn",
+            metadata: {amount:amount, old_balance: balance, new_balance:new_balance}.to_json,
+            admin_id: admin.id,
         )
+        update!(balance: new_balance)
     end
 
     def set_balance!(amount)
+        Activity.create!(
+          participant_id: id,
+          action: "set_balance",
+          metadata: { amount: amount, old_balance:balance, new_balance:amount}.to_json,
+          admin_id: admin.id,
+        )
         update!(balance: amount)
     end
 
@@ -23,17 +31,24 @@ class Participant < ApplicationRecord
             # Check if the participant has enough balance
             if balance >= product.price
                 # Deduct the product price from the participant's balance
-                update!(balance: balance - product.price)
                 
                 # Mark the product as sold
                 product.update!(quantity: product.quantity - 1)
-
-                Transaction.create!(
-                    participant_id: id,
-                    product_id: product.id,
-                    price: product.price
-                )
                 
+                transaction = Transaction.create!(
+                  participant_id: id,
+                  product_id: product.id,
+                  price: product.price,
+                  admin_id: admin.id
+                )
+                Activity.create!(
+                  participant_id: id,
+                  action: "buy",
+                  metadata: { product_id: product.id, price: product.price, transaction_id: transaction.id, old_balance:balance, new_balance:balance-product.price}.to_json,
+                  admin_id: admin.id
+                )
+                  
+                update!(balance: balance - product.price)
                 # Return success message
                 { success: true, message: "Purchase successful!" }
             else

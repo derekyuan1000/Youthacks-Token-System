@@ -1,0 +1,30 @@
+<h1>Dashboard</h1>
+<%= link_to "Back to Home", root_path %>
+<%= form_with url: dashboard_path, method: :get, local: true do %>
+  <%= text_field_tag :query, params[:query], placeholder: "Search by name" %>
+  <%= submit_tag "Search" %>
+<% end %>
+
+<div class="participants-grid">
+<% @participants.each do |participant| %>
+  <div class="participant-card">
+    <p>ID: <%= participant.participant_id %></p>
+    <p>Name: <%= participant.name %></p>
+    <p>Balance: <%= participant.balance %></p>
+  </div>
+<% end %>
+</div>
+
+<style>
+  .participants-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  .participant-card {
+    border: 1px solid #ccc;
+    padding: 1rem;
+    background-color: #f9f9f9;
+  }
+</style>
