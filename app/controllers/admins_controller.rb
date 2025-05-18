@@ -11,4 +11,11 @@ class AdminsController < ApplicationController
             Participant.all
         end
     end
+
+    def set_balance
+        participant = Participant.find( params[:id])
+        # participant.set_balance(params[:balance]) # If you have a set_balance method in the model
+        participant.set_balance!(params[:balance]) # or just directly update
+        redirect_to dashboard_path, notice: "Balance updated for #{participant.name}"
+    end
 end

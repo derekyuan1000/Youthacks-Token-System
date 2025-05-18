@@ -7,14 +7,58 @@
 
 <div class="participants-grid">
 <% @participants.each do |participant| %>
-  <div class="participant-card">
+  <div class="participant-card" onclick="showModal(<%= participant.id %>)">
     <p>ID: <%= participant.participant_id %></p>
     <p>Name: <%= participant.name %></p>
     <p>Balance: <%= participant.balance %></p>
   </div>
+  
+  <!-- Main detail modal -->
+  <div id="modal-<%= participant.id %>" class="modal" style="display:none;">
+    <div class="modal-content">
+      <span class="close" onclick="hideModal(<%= participant.id %>)">&times;</span>
+      <h3>Extra Details for <%= participant.name %></h3>
+      <p>Pronouns: <%= participant.pronouns %></p>
+      <p>Email: <%= participant.email %></p>
+      <!-- Buttons to open secondary modals -->
+      <button onclick="showBuyModal(<%= participant.id %>)">Buy</button>
+      <button onclick="showSetBalanceModal(<%= participant.id %>)">Set Balance</button>
+    </div>
+  </div>
+  x
+  <!-- Buy modal -->
+  <div id="buyModal-<%= participant.id %>" class="modal" style="display:none;">
+    <div class="modal-content">
+      <span class="close" onclick="hideBuyModal(<%= participant.id %>)">&times;</span>
+      <h4>Buy for <%= participant.name %></h4>
+      <form action="#" method="POST">
+        <!-- Your product/quantity fields go here -->
+        <label>Quantity:</label>
+        <input type="number" name="quantity" min="1">
+        <button type="submit">Confirm Purchase</button>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Set Balance modal -->
+  <div id="setBalanceModal-<%= participant.id %>" class="modal" style="display:none;">
+    <div class="modal-content">
+      <span class="close" onclick="hideSetBalanceModal(<%= participant.id %>)">&times;</span>
+      <h4>Set Balance for <%= participant.name %></h4>
+      <form action="<%= set_balance_path(participant.id) %>" method="POST">
+        <!-- Rails needs authenticity token -->
+        <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+
+        <label>New Balance:</label>
+        <input type="number" name="balance" min="0">
+        <button type="submit">Update Balance</button>
+      </form>
+    </div>
+  </div>
 <% end %>
 </div>
 
+<!-- Basic modal styling/JS -->
 <style>
   .participants-grid {
     display: grid;
@@ -26,5 +70,67 @@
     border: 1px solid #ccc;
     padding: 1rem;
     background-color: #f9f9f9;
+    cursor: pointer;
   }
-</style>
+  .modal {
+    position: fixed; 
+    z-index: 999; 
+    left: 0; top: 0;
+    width: 100%; height: 100%; 
+    background-color: rgba(0,0,0,0.5);
+  }
+  .modal-content {
+    background-color: #fff; 
+    margin: 10% auto; 
+    padding: 1rem; 
+    width: 50%;
+  }
+  .close {
+    float: right; 
+    font-size: 1.2rem;
+    cursor: pointer;
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>  }    document.getElementById('setBalanceModal-' + id).style.display = 'none';  function hideSetBalanceModal(id) {  }    document.getElementById('setBalanceModal-' + id).style.display = 'block';  function showSetBalanceModal(id) {  }    document.getElementById('buyModal-' + id).style.display = 'none';  function hideBuyModal(id) {  }    document.getElementById('buyModal-' + id).style.display = 'block';  function showBuyModal(id) {  }    document.getElementById('modal-' + id).style.display = 'none';  function hideModal(id) {  }    document.getElementById('modal-' + id).style.display = 'block';  function showModal(id) {<script></style></style>
+
+<script>
+  function showModal(id) {
+    document.getElementById('modal-' + id).style.display = 'block';
+  }
+  function hideModal(id) {
+    document.getElementById('modal-' + id).style.display = 'none';
+  }
+  function showBuyModal(id) {
+    document.getElementById('buyModal-' + id).style.display = 'block';
+  }
+  function hideBuyModal(id) {
+    document.getElementById('buyModal-' + id).style.display = 'none';
+  }
+  function showSetBalanceModal(id) {
+    document.getElementById('setBalanceModal-' + id).style.display = 'block';
+  }
+  function hideSetBalanceModal(id) {
+    document.getElementById('setBalanceModal-' + id).style.display = 'none';
+  }
+</script>
