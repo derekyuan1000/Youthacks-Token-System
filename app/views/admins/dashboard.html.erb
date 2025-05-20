@@ -6,13 +6,12 @@
 <% end %>
 
 <div class="participants-grid">
-<% @participants.each do |participant| %>
+<% @participants.sort.each do |participant| %>
   <div class="participant-card" onclick="showModal(<%= participant.id %>)">
     <p>ID: <%= participant.participant_id %></p>
     <p>Name: <%= participant.name %></p>
     <p>Balance: <%= participant.balance %></p>
   </div>
-  
   <!-- Main detail modal -->
   <div id="modal-<%= participant.id %>" class="modal" style="display:none;">
     <div class="modal-content">
@@ -25,7 +24,6 @@
       <button onclick="showSetBalanceModal(<%= participant.id %>)">Set Balance</button>
     </div>
   </div>
-  x
   <!-- Buy modal -->
   <div id="buyModal-<%= participant.id %>" class="modal" style="display:none;">
     <div class="modal-content">
