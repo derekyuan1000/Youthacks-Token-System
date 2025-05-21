@@ -69,10 +69,10 @@ class Participant < ApplicationRecord
         table_name = 'participants'
       # Initialize Airtable client
       client = Airtable::Client.new(api_key)
-
-      # Get all records from the Airtable table
-      records = client.table(base_id, table_name).all
-      puts records
+      if client.nil?
+              raise "Invalid API key, base ID, table name, etc. Check env variables and internet connection."
+            # Get all records from the Airtable table
+            records = client.table(base_id, table_name).all
       # Sync each Airtable record with the local database
       records.each do |record|
         participant = record.fields
