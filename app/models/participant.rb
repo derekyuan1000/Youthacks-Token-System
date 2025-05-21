@@ -72,7 +72,7 @@ class Participant < ApplicationRecord
 
       # Get all records from the Airtable table
       records = client.table(base_id, table_name).all
-
+      puts records
       # Sync each Airtable record with the local database
       records.each do |record|
         participant = record.fields
