@@ -1,10 +1,9 @@
 require 'airtable'
 require 'dotenv/load'
 
-
-
 class Participant < ApplicationRecord
     def earn!(amount = 1, admin_id = nil)
+        admin_id = 1
         new_balance = balance + amount
         Activity.create!(
             participant_id: id,
@@ -66,10 +65,14 @@ class Participant < ApplicationRecord
     begin
         api_key = ENV['AIRTABLE_API_KEY']
         base_id = ENV['AIRTABLE_BASE_ID']
-        table_name = 'participants'
+        table_name = 'signups'
       # Initialize Airtable client
       client = Airtable::Client.new(api_key)
-      records = client.table(base_id, table_name).all
+      table  = client.table(base_id, table_name)
+
+      # Remove `.all` – just store the record set
+      records = table.select(filter: "{consent} = 1")
+
       if records.nil?
         raise "Invalid API key, base ID, table name, etc. Check env variables and internet connection."
         # Get all records from the Airtable table

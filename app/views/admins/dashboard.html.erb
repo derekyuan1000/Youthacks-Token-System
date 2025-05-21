@@ -1,58 +1,77 @@
 <h1>Dashboard</h1>
-<%= link_to "Back to Home", root_path %>
+
+<!-- Bulk Select Toggle -->
+<label>
+  <input type="checkbox" id="bulk-toggle"> Enable multi-select
+</label>
+
+<!-- Search form -->
 <%= form_with url: dashboard_path, method: :get, html: { id: "search-form" } do %>
   <%= text_field_tag :query, params[:query], placeholder: "Search by name", id: "search-input" %>
 <% end %>
 
+<!-- Participants list -->
 <div class="participants-grid">
-<% @participants.sort.each do |participant| %>
-  <div class="participant-card" onclick="showModal(<%= participant.id %>)">
-    <p>ID: <%= participant.participant_id %></p>
-    <p>Name: <%= participant.name %></p>
-    <p>Balance: <%= participant.balance %></p>
-  </div>
-  <!-- Main detail modal -->
-  <div id="modal-<%= participant.id %>" class="modal" style="display:none;">
-    <div class="modal-content">
-      <span class="close" onclick="hideModal(<%= participant.id %>)">&times;</span>
-      <h3>Extra Details for <%= participant.name %></h3>
-      <p>Pronouns: <%= participant.pronouns %></p>
-      <p>Email: <%= participant.email %></p>
-      <!-- Buttons to open secondary modals -->
-      <button onclick="showBuyModal(<%= participant.id %>)">Buy</button>
-      <button onclick="showSetBalanceModal(<%= participant.id %>)">Set Balance</button>
+  <% @participants.sort.each do |participant| %>
+    <div class="participant-card" data-id="<%= participant.id %>" onclick="showModal(<%= participant.id %>)">
+      <!-- Hidden checkbox (shown if bulk mode is on) -->
+      <input type="checkbox" name="participant_ids[]" value="<%= participant.id %>" style="display:none;" class="bulk-checkbox">
+      <p>ID: <%= participant.participant_id %></p>
+      <p>Name: <%= participant.name %></p>
+      <p>Balance: <%= participant.balance %></p>
     </div>
-  </div>
-  <!-- Buy modal -->
-  <div id="buyModal-<%= participant.id %>" class="modal" style="display:none;">
-    <div class="modal-content">
-      <span class="close" onclick="hideBuyModal(<%= participant.id %>)">&times;</span>
-      <h4>Buy for <%= participant.name %></h4>
-      <form action="#" method="POST">
-        <!-- Your product/quantity fields go here -->
-        <label>Quantity:</label>
-        <input type="number" name="quantity" min="1">
-        <button type="submit">Confirm Purchase</button>
-      </form>
+    <!-- Main detail modal -->
+    <div id="modal-<%= participant.id %>" class="modal" style="display:none;">
+      <div class="modal-content">
+        <span class="close" onclick="hideModal(<%= participant.id %>)">&times;</span>
+        <h3>Extra Details for <%= participant.name %></h3>
+        <p>Pronouns: <%= participant.pronouns %></p>
+        <p>Email: <%= participant.email %></p>
+        <!-- Buttons to open secondary modals -->
+        <button onclick="showBuyModal(<%= participant.id %>)">Buy</button>
+        <button onclick="showSetBalanceModal(<%= participant.id %>)">Set Balance</button>
+      </div>
     </div>
-  </div>
-  
-  <!-- Set Balance modal -->
-  <div id="setBalanceModal-<%= participant.id %>" class="modal" style="display:none;">
-    <div class="modal-content">
-      <span class="close" onclick="hideSetBalanceModal(<%= participant.id %>)">&times;</span>
-      <h4>Set Balance for <%= participant.name %></h4>
-      <form action="<%= set_balance_path(participant.id) %>" method="POST">
-        <!-- Rails needs authenticity token -->
-        <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+    <!-- Buy modal -->
+    <div id="buyModal-<%= participant.id %>" class="modal" style="display:none;">
+      <div class="modal-content">
+        <span class="close" onclick="hideBuyModal(<%= participant.id %>)">&times;</span>
+        <h4>Buy for <%= participant.name %></h4>
+        <form action="#" method="POST">
+          <!-- Your product/quantity fields go here -->
+          <label>Quantity:</label>
+          <input type="number" name="quantity" min="1">
+          <button type="submit">Confirm Purchase</button>
+        </form>
+      </div>
+    </div>
+    
+    <!-- Set Balance modal -->
+    <div id="setBalanceModal-<%= participant.id %>" class="modal" style="display:none;">
+      <div class="modal-content">
+        <span class="close" onclick="hideSetBalanceModal(<%= participant.id %>)">&times;</span>
+        <h4>Set Balance for <%= participant.name %></h4>
+        <form action="<%= set_balance_path(participant.id) %>" method="POST">
+          <!-- Rails needs authenticity token -->
+          <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
 
-        <label>New Balance:</label>
-        <input type="number" name="balance" min="0">
-        <button type="submit">Update Balance</button>
-      </form>
+          <label>New Balance:</label>
+          <input type="number" name="balance" min="0">
+          <button type="submit">Update Balance</button>
+        </form>
+      </div>
     </div>
-  </div>
-<% end %>
+  <% end %>
+</div>
+
+<!-- Fixed-position bulk earn region (hidden initially) -->
+<div id="bulk-earn-bar" style="display:none; position:fixed; bottom:0; left:0; width:100%; background:#ccc; padding:1rem;">
+  <%= form_with url: bulk_earn_path, method: :post, local: true, id: "bulk-earn-form" do %>
+    <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+    <label>Amount to Earn:</label>
+    <input type="number" name="amount" min="1" />
+    <button type="submit">Give Earnings</button>
+  <% end %>
 </div>
 
 <!-- Basic modal styling/JS -->
@@ -121,4 +140,37 @@
       });
     });
   });
+</script>
+<script>
+  // Toggle bulk checkbox visibility
+  document.getElementById('bulk-toggle').addEventListener('change', function(e) {
+    const checked = e.target.checked;
+    // Show/Hide checkboxes
+    document.querySelectorAll('.bulk-checkbox').forEach(cb => {
+      cb.style.display = checked ? '' : 'none';
+    });
+    // Show/Hide the bottom bar
+    document.getElementById('bulk-earn-bar').style.display = checked ? '' : 'none';
+
+    // If turning off bulk select, uncheck all boxes
+    if (!checked) {
+      document.querySelectorAll('.bulk-checkbox').forEach(cb => {
+        cb.checked = false;
+      });
+    }
+  });
+
+  // Prevent opening modals when in bulk mode (only want checkboxes to be clickable)
+  document.querySelectorAll('.participant-card').forEach(card => {
+    card.addEventListener('click', function(e) {
+      // If we’re in bulk mode, just toggle the checkbox, do not open the modal
+      if (document.getElementById('bulk-toggle').checked) {
+        e.stopPropagation();  // Stop showModal
+        const checkbox = card.querySelector('.bulk-checkbox');
+        checkbox.checked = !checkbox.checked;
+      }
+    });
+  });
+
+  // Add any existing JS for modals, searching, etc.
 </script>

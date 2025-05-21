@@ -20,6 +20,19 @@ class AdminsController < ApplicationController
         redirect_to dashboard_path, notice: "Balance updated for #{participant.name}"
     end
 
+    def bulk_earn
+      # Example: params[:participant_ids] is an array of IDs from the checkboxes
+      # params[:amount] is the quantity to earn
+      participant_ids = params[:participant_ids] || []
+      amount_to_earn  = params[:amount].to_i
+
+      Participant.where(id: participant_ids).each do |p|
+        p.earn!(amount_to_earn, @admin.id) # or session[:admin_id]
+      end
+
+      redirect_to dashboard_path, notice: "#{participant_ids.size} participants earned #{amount_to_earn}"
+    end
+
     private
 
     def require_admin
