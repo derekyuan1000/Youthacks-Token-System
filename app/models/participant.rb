@@ -4,28 +4,28 @@ require 'dotenv/load'
 
 
 class Participant < ApplicationRecord
-    def earn!(amount = 1)
+    def earn!(amount = 1, admin_id = nil)
         new_balance = balance + amount
         Activity.create!(
             participant_id: id,
             action: "earn",
             metadata: {amount:amount, old_balance: balance, new_balance:new_balance}.to_json,
-            admin_id: @admin.id,
+            admin_id: admin_id,
         )
         update!(balance: new_balance)
     end
 
-    def set_balance!(amount)
+    def set_balance!(amount, admin_id = nil)
         Activity.create!(
           participant_id: id,
           action: "set_balance",
           metadata: { amount: amount, old_balance:balance, new_balance:amount}.to_json,
-          admin_id: @admin.id,
+          admin_id: admin_id,
         )
         update!(balance: amount)
     end
 
-    def buy!(product)
+    def buy!(product, admin_id = nil)
         # Check if the product is available
         if product.available?
             # Check if the participant has enough balance
@@ -39,13 +39,13 @@ class Participant < ApplicationRecord
                   participant_id: id,
                   product_id: product.id,
                   price: product.price,
-                  admin_id: @admin.id
+                  admin_id: admin_id
                 )
                 Activity.create!(
                   participant_id: id,
                   action: "buy",
                   metadata: { product_id: product.id, price: product.price, transaction_id: transaction.id, old_balance:balance, new_balance:balance-product.price}.to_json,
-                  admin_id: @admin.id
+                  admin_id: admin_id
                 )
                   
                 update!(balance: balance - product.price)
