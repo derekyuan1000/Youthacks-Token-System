@@ -1,8 +1,7 @@
 <h1>Dashboard</h1>
 <%= link_to "Back to Home", root_path %>
-<%= form_with url: dashboard_path, method: :get, local: true do %>
-  <%= text_field_tag :query, params[:query], placeholder: "Search by name" %>
-  <%= submit_tag "Search" %>
+<%= form_with url: dashboard_path, method: :get, html: { id: "search-form" } do %>
+  <%= text_field_tag :query, params[:query], placeholder: "Search by name", id: "search-input" %>
 <% end %>
 
 <div class="participants-grid">
@@ -88,29 +87,7 @@
     font-size: 1.2rem;
     cursor: pointer;
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-</script>  }    document.getElementById('setBalanceModal-' + id).style.display = 'none';  function hideSetBalanceModal(id) {  }    document.getElementById('setBalanceModal-' + id).style.display = 'block';  function showSetBalanceModal(id) {  }    document.getElementById('buyModal-' + id).style.display = 'none';  function hideBuyModal(id) {  }    document.getElementById('buyModal-' + id).style.display = 'block';  function showBuyModal(id) {  }    document.getElementById('modal-' + id).style.display = 'none';  function hideModal(id) {  }    document.getElementById('modal-' + id).style.display = 'block';  function showModal(id) {<script></style></style>
+</style>
 
 <script>
   function showModal(id) {
@@ -131,4 +108,17 @@
   function hideSetBalanceModal(id) {
     document.getElementById('setBalanceModal-' + id).style.display = 'none';
   }
+</script>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    var input = document.getElementById("search-input");
+    var cards = document.querySelectorAll(".participant-card");
+    input.addEventListener("input", function() {
+      var query = input.value.toLowerCase();
+      cards.forEach(function(card) {
+        var name = card.querySelector("p:nth-child(2)").textContent.toLowerCase();
+        card.style.display = name.includes(query) ? "" : "none";
+      });
+    });
+  });
 </script>
