@@ -33,6 +33,12 @@ class AdminsController < ApplicationController
       redirect_to dashboard_path, notice: "#{participant_ids.size} participants earned #{amount_to_earn}"
     end
 
+    def earn
+      participant = Participant.find(params[:id])
+      participant.earn!(1, @admin.id) # or session[:admin_id]
+      redirect_to dashboard_path, notice: "#{participant.name} just earned 1"
+    end
+
     private
 
     def require_admin
