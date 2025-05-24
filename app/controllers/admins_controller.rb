@@ -1,5 +1,6 @@
 class AdminsController < ApplicationController
     before_action :require_admin
+    # before action :product_params, only: [:edit_product]
     def dashboard
         # @participants = if params[:query].present?
         #     Participant.where("name ILIKE ?", "%#{params[:query]}%")
@@ -49,8 +50,8 @@ class AdminsController < ApplicationController
             redirect_to dashboard_path, alert: result[:message]
         end
     end
-    private
 
+    private
     def require_admin
         unless session[:admin_id].present?
             redirect_to login_path
@@ -58,6 +59,6 @@ class AdminsController < ApplicationController
         end
 
         @admin = Admin.find(session[:admin_id])
-        end
+    end
 
 end

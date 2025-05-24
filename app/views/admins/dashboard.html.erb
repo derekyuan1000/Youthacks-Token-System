@@ -47,7 +47,7 @@
         </div>
         <h3>Previous Purchases</h3>
         <ul>
-          <% Transaction.where(participant_id: participant.id).each do |purchase| %>
+          <% Transaction.where(participant_id: participant.id).order(:price).reverse.each do |purchase| %>
             <li><%= purchase.product.name %> - <%= purchase.price%> token(s) (<%= purchase.created_at%>)</li>
           <% end %>
         </ul>
@@ -253,21 +253,11 @@
   // Add any existing JS for modals, searching, etc.
 </script>
 
-<!-- filepath: /Users/matthew/My Drive/Mac/Coding/Youthacks/aha/app/views/admins/dashboard.html.erb -->
 <% if flash[:alert].present? %>
   <script>
-    const flashMessage = "<%= j flash[:alert] %>";
-    const flashKey = "flash_alert_shown_" + flashMessage;
+    alert("<%= j flash[:alert] %>");
 
-    if (!sessionStorage.getItem(flashKey)) {
-      alert(flashMessage);
-      sessionStorage.setItem(flashKey, "true");
-    }
-
-    // Optional: clear the flag when leaving page to allow alert again on fresh load
-    window.addEventListener("unload", () => {
-      sessionStorage.removeItem(flashKey);
-    });
+    window.history.replaceState({}, document.title, window.location.pathname);
   </script>
+  <% flash.delete(:alert) %>
 <% end %>
-
