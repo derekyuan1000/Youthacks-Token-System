@@ -26,7 +26,7 @@ class Participant < ApplicationRecord
 
     def buy!(product, admin_id = nil)
         # Check if the product is available
-        if product.available?
+        if product.quantity > 0
             # Check if the participant has enough balance
             if balance >= product.price
                 # Deduct the product price from the participant's balance
@@ -85,27 +85,42 @@ class Participant < ApplicationRecord
           participant['attendee_preferred_name'] = participant['attendee_first_name']
         end
         # Check if the participant exists in the local database
-        existing_participant = Participant.find_by(participant_id: participant['participant_ID'])
+        existing_participant = Participant.find_by(id: participant['signup_ID'])
         
         
         if existing_participant
           # If the participant exists, update their details
           existing_participant.update!(
-            participant_id: participant['participant_ID'],
             name: participant['attendee_preferred_name'],
             pronouns: participant['pronouns'],
             date_of_birth: participant['date_of_birth'],
-            email: participant['attendee_email']
+            email: participant['attendee_email'],
+            full_name: participant['full name'],
+            address: participant['attendee_address'],
+            phone: participant['attendee_phone_number'],
+            emergency_name: participant['parent_first_name'],
+            emergency_phone: participant['parent_phone_number'],
+            consent: participant['marketing_consent'],
+            dietary: participant['dietary_requirements'],
+            medical: participant['medical_info']
             # balance = existing_participant.balance
           )
         else
           # If the participant doesn't exist, create a new entry
           Participant.create!(
-            participant_id: participant['participant_ID'],
+            id: participant['signup_ID'],
             name: participant['attendee_preferred_name'],
             pronouns: participant['pronouns'],
             date_of_birth: participant['date_of_birth'],
             email: participant['attendee_email'],
+            full_name: participant['full_name'],
+            address: participant['attendee_address'],
+            phone: participant['attendee_phone_number'],
+            emergency_name: participant['parent_first_name'],
+            emergency_phone: participant['parent_phone_number'],
+            consent: participant['marketing_consent'],
+            dietary: participant['dietary_requirements'],
+            medical: participant['medical_info'],
             balance: 0
           )
         end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_17_072155) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_23_234122) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -33,7 +33,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_17_072155) do
   end
 
   create_table "participants", force: :cascade do |t|
-    t.integer "participant_id"
     t.string "name"
     t.string "pronouns"
     t.date "date_of_birth"
@@ -41,6 +40,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_17_072155) do
     t.integer "balance"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "full_name"
+    t.string "address"
+    t.string "phone"
+    t.string "emergency_name"
+    t.string "emergency_phone"
+    t.boolean "consent"
+    t.string "dietary"
+    t.string "medical"
   end
 
   create_table "products", force: :cascade do |t|

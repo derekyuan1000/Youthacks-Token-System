@@ -1,0 +1,27 @@
+<h1>Products for Sale</h1>
+<style>
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  .product-card {
+    border: 1px solid #ccc;
+    padding: 1rem;
+    background-color: #f9f9f9;
+    cursor: pointer;
+  }
+
+</style>
+<%= link_to "Dashboard", dashboard_path %>
+<div class="products-grid">
+<% @products.sort_by{|record| record.price}.each do |product| %>
+    <div class="product-card" >
+        <h2><%= product.name %></h2>
+        <p><%= product.description %></p>
+        <p>Qty: <%=product.quantity %></p>
+        <p>Price: <%= product.price %></p>
+    </div>
+<% end %>
+</div>

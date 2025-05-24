@@ -1,5 +1,8 @@
 <h1>Dashboard</h1>
-
+<%= link_to "Home", root_path %>
+<br>
+<%= link_to "Products", products_path %>
+<br><br>
 <!-- Bulk Select Toggle -->
 <label>
   <input type="checkbox" id="bulk-toggle"> Enable multi-select
@@ -9,15 +12,14 @@
 <%= form_with url: dashboard_path, method: :get, html: { id: "search-form" } do %>
   <%= text_field_tag :query, params[:query], placeholder: "Search by name", id: "search-input" %>
 <% end %>
-
 <!-- Participants list -->
 <div class="participants-grid">
   <% @participants.sort.each do |participant| %>
     <div class="participant-card" data-id="<%= participant.id %>" onclick="showModal(<%= participant.id %>)">
+    <h2><%= participant.name %></h2>
       <!-- Hidden checkbox (shown if bulk mode is on) -->
       <input type="checkbox" name="participant_ids[]" value="<%= participant.id %>" style="display:none;" class="bulk-checkbox">
-      <p>ID: <%= participant.participant_id %></p>
-      <p>Name: <%= participant.name %></p>
+      <p>ID: <%= participant.id %></p>
       <p>Balance: <%= participant.balance %></p>
     </div>
     <!-- Main detail modal -->
@@ -26,11 +28,49 @@
         <span class="close" onclick="hideModal(<%= participant.id %>)">&times;</span>
         <h3>Extra Details for <%= participant.name %></h3>
         <p>Pronouns: <%= participant.pronouns %></p>
-        <p>Email: <%= participant.email %></p>
+        <!-- Personal Info Button/Dropdown -->
+        <button type="button" onclick="togglePersonalInfo(<%= participant.id %>)" id="personal-info-btn-<%= participant.id %>">
+          Show Personal Info
+        </button>
+        <div id="personal-info-<%= participant.id %>" style="display:none; margin-top:0.5rem;">
+          <p>Full Name: <%= participant.full_name %></p>
+          <p>Email: <%= participant.email %></p>
+          <p>Phone: <%= participant.phone %></p>
+          <p>Date of Birth: <%= participant.date_of_birth %></p>
+          <p>Address: <%= participant.address %></p>
+          <p>Emergency Contact: <%= participant.emergency_name %></p>
+          <p>Emergency Phone: <%= participant.emergency_phone %></p>
+          <p>Consent: <%= participant.consent %></p>
+          <p>Dietary Requirements: <%= participant.dietary %></p>
+          <p>Medical Info: <%= participant.medical %></p>
+          <!-- Add more personal info fields as needed -->
+        </div>
+        <h3>Previous Purchases</h3>
+        <ul>
+          <% Transaction.where(participant_id: participant.id).each do |purchase| %>
+            <li><%= purchase.product.name %> - <%= purchase.price%> token(s) (<%= purchase.created_at%>)</li>
+          <% end %>
+        </ul>
+        <script>
+          function togglePersonalInfo(id) {
+            var infoDiv = document.getElementById('personal-info-' + id);
+            var btn = document.getElementById('personal-info-btn-' + id);
+            if (infoDiv.style.display === 'none') {
+              infoDiv.style.display = '';
+              btn.textContent = 'Hide Personal Info';
+            } else {
+              infoDiv.style.display = 'none';
+              btn.textContent = 'Show Personal Info';
+            }
+          }
+        </script>
         <!-- Buttons to open secondary modals -->
         <button onclick="showBuyModal(<%= participant.id %>)">Buy</button>
         <button onclick="showSetBalanceModal(<%= participant.id %>)">Set Balance</button>
-        <button >Earn</button>
+        <%= form_with url: earn_path(participant.id), method: :post, local: true, id: "earn-form" do %>
+          <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+          <button type="submit">Earn</button>
+        <% end %>
       </div>
     </div>
     <!-- Buy modal -->
@@ -38,10 +78,17 @@
       <div class="modal-content">
         <span class="close" onclick="hideBuyModal(<%= participant.id %>)">&times;</span>
         <h4>Buy for <%= participant.name %></h4>
-        <form action="#" method="POST">
-          <!-- Your product/quantity fields go here -->
-          <label>Quantity:</label>
-          <input type="number" name="quantity" min="1">
+        <form action="<%= buy_path(participant.id) %>" method="POST">
+          <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+          <!-- Pass participant ID -->
+          <%= hidden_field_tag :participant_id, participant.id %>
+
+          <label>Select Product:</label>
+          <select name="product_id">
+            <% Product.all.each do |product| %>
+              <option value="<%= product.id %>"><%= product.name %> (price <%=product.price%>)</option>
+            <% end %>
+          </select>
           <button type="submit">Confirm Purchase</button>
         </form>
       </div>
@@ -111,7 +158,12 @@
 
 <script>
   function showModal(id) {
+    if (document.getElementById('bulk-toggle').checked) {
+      return; // Prevent opening modals in bulk mode
+    }
     document.getElementById('modal-' + id).style.display = 'block';
+    document.getElementById('personal-info-' + id).style.display = 'none'; 
+    
   }
   function hideModal(id) {
     document.getElementById('modal-' + id).style.display = 'none';
@@ -130,13 +182,22 @@
   }
 </script>
 <script>
+  document.addEventListener('keydown', function(event) {
+    if (event.keyCode === 27) {
+      // Code to execute when the Escape key is pressed
+      document.querySelectorAll('.modal').forEach(function(modal) {
+        modal.style.display = 'none';
+      });
+    }
+  });
   document.addEventListener("DOMContentLoaded", function() {
     var input = document.getElementById("search-input");
     var cards = document.querySelectorAll(".participant-card");
     input.addEventListener("input", function() {
       var query = input.value.toLowerCase();
       cards.forEach(function(card) {
-        var name = card.querySelector("p:nth-child(2)").textContent.toLowerCase();
+        var name = card.querySelector("h2").textContent.toLowerCase();
+
         card.style.display = name.includes(query) ? "" : "none";
       });
     });
@@ -144,6 +205,8 @@
 </script>
 <script>
   // Toggle bulk checkbox visibility
+  window
+
   document.getElementById('bulk-toggle').addEventListener('change', function(e) {
     const checked = e.target.checked;
     // Show/Hide checkboxes
@@ -152,7 +215,21 @@
     });
     // Show/Hide the bottom bar
     document.getElementById('bulk-earn-bar').style.display = checked ? '' : 'none';
+    document.getElementById('bulk-earn-form').addEventListener('submit', function(e) {
+    // Remove any previously added hidden inputs to avoid duplicates
+    document.querySelectorAll('#bulk-earn-form input[name="participant_ids[]"]').forEach(el => el.remove());
 
+    // Collect checked boxes
+    const checkedBoxes = document.querySelectorAll('.bulk-checkbox:checked');
+    // For each selected participant, append a hidden input in bulk-earn-form
+    checkedBoxes.forEach(box => {
+      const hiddenInput = document.createElement('input');
+      hiddenInput.type = 'hidden';
+      hiddenInput.name = 'participant_ids[]';
+      hiddenInput.value = box.value;
+      this.appendChild(hiddenInput);
+    });
+  });
     // If turning off bulk select, uncheck all boxes
     if (!checked) {
       document.querySelectorAll('.bulk-checkbox').forEach(cb => {
@@ -175,3 +252,22 @@
 
   // Add any existing JS for modals, searching, etc.
 </script>
+
+<!-- filepath: /Users/matthew/My Drive/Mac/Coding/Youthacks/aha/app/views/admins/dashboard.html.erb -->
+<% if flash[:alert].present? %>
+  <script>
+    const flashMessage = "<%= j flash[:alert] %>";
+    const flashKey = "flash_alert_shown_" + flashMessage;
+
+    if (!sessionStorage.getItem(flashKey)) {
+      alert(flashMessage);
+      sessionStorage.setItem(flashKey, "true");
+    }
+
+    // Optional: clear the flag when leaving page to allow alert again on fresh load
+    window.addEventListener("unload", () => {
+      sessionStorage.removeItem(flashKey);
+    });
+  </script>
+<% end %>
+

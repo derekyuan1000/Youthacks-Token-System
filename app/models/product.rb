@@ -8,5 +8,10 @@ class Product < ApplicationRecord
         )
     end
 
-    
+    def change_price(price)
+        update(price: price)
+    end
+    def change_quantity(quantity)
+        update(quantity: quantity)
+    end
 end

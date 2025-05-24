@@ -16,6 +16,8 @@ Rails.application.routes.draw do
   post "/participants/:id/set_balance", to: "admins#set_balance", as: "set_balance"
   post "participants/bulk_earn", to: "admins#bulk_earn", as: "bulk_earn"
   post "/participants/:id/earn", to: "admins#earn", as: "earn"
+  get "products", to: "home#products", as: "products"
+  post "/participants/:id/buy", to: "admins#buy", as: "buy"
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker

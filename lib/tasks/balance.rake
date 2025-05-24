@@ -6,7 +6,7 @@ namespace :participant do
         pid = ENV["ID"]
         amt = (ENV["AMOUNT"] || 1).to_i
 
-        participant = Participant.find_by(participant_id: pid)
+        participant = Participant.find_by(id: pid)
 
         if participant
             participant.earn!(amt)
@@ -20,7 +20,7 @@ namespace :participant do
         pid = ENV["ID"]
         amt = (ENV["AMOUNT"] || 1).to_i
 
-        participant = Participant.find_by(participant_id: pid)
+        participant = Participant.find_by(id: pid)
 
         if participant
             participant.set_balance!(amt)

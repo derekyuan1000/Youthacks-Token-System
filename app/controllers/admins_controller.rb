@@ -38,11 +38,26 @@ class AdminsController < ApplicationController
       participant.earn!(1, @admin.id) # or session[:admin_id]
       redirect_to dashboard_path, notice: "#{participant.name} just earned 1"
     end
-
+    
+    def buy
+        participant = Participant.find(params[:id])
+        product = Product.find(params[:product_id])
+        result = participant.buy!(product, @admin.id) # or session[:admin_id]
+        if result[:success]
+            redirect_to dashboard_path, alert: "#{participant.name} just bought #{product.name}"
+        else
+            redirect_to dashboard_path, alert: result[:message]
+        end
+    end
     private
 
     def require_admin
-        redirect_to login_path unless session[:admin_id].present?
+        unless session[:admin_id].present?
+            redirect_to login_path
+            return  # <== STOP here to prevent further code running
+        end
+
         @admin = Admin.find(session[:admin_id])
-    end
+        end
+
 end
