@@ -22,7 +22,7 @@ default: &default
 
 development:
   <<: *default
-  database: aha_development
+  database: aha_production
 
   # The specified database role being used to connect to PostgreSQL.
   # To create additional roles in PostgreSQL see `$ createuser --help`.
@@ -83,8 +83,6 @@ production:
   primary: &primary_production
     <<: *default
     database: aha_production
-    username: aha
-    password: <%= ENV["AHA_DATABASE_PASSWORD"] %>
   cache:
     <<: *primary_production
     database: aha_production_cache
