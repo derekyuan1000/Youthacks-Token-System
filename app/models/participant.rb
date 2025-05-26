@@ -3,7 +3,9 @@ require 'dotenv/load'
 
 class Participant < ApplicationRecord
     def earn!(amount = 1, admin_id = nil)
-        admin_id = 1
+        if amount <= 0
+            raise "Amount must be greater than 0"
+        end
         new_balance = balance + amount
         Activity.create!(
             participant_id: id,

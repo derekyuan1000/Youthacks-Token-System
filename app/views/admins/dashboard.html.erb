@@ -48,7 +48,10 @@
         <h3>Previous Purchases</h3>
         <ul>
           <% Transaction.where(participant_id: participant.id).order(:price).reverse.each do |purchase| %>
-            <li><%= purchase.product.name %> - <%= purchase.price%> token(s) (<%= purchase.created_at%>)</li>
+            <li>
+              <%= purchase.product.name %> - <%= purchase.price %> token<%= 's' if purchase.price > 1 %>
+              (<%= purchase.created_at.localtime.strftime("%-d %b, %H:%M") %>)
+            </li>
           <% end %>
         </ul>
         <script>
@@ -69,6 +72,7 @@
         <button onclick="showSetBalanceModal(<%= participant.id %>)">Set Balance</button>
         <%= form_with url: earn_path(participant.id), method: :post, local: true, id: "earn-form" do %>
           <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+          <%= number_field_tag :amount, 1, min: 1, step: 1, required: true %>
           <button type="submit">Earn</button>
         <% end %>
       </div>
@@ -117,8 +121,8 @@
   <%= form_with url: bulk_earn_path, method: :post, local: true, id: "bulk-earn-form" do %>
     <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
     <label>Amount to Earn:</label>
-    <input type="number" name="amount" min="1" />
-    <button type="submit">Give Earnings</button>
+    <input type="number" value="1" name="amount" min="1" />
+    <button type="submit">Submit</button>
   <% end %>
 </div>
 
@@ -143,11 +147,15 @@
     width: 100%; height: 100%; 
     background-color: rgba(0,0,0,0.5);
   }
-  .modal-content {
+    .modal-content {
     background-color: #fff; 
-    margin: 10% auto; 
-    padding: 1rem; 
+    margin: 5% auto;
+    padding: 1rem;
     width: 50%;
+    max-height: 80vh;
+    overflow-y: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
   }
   .close {
     float: right; 
@@ -180,8 +188,6 @@
   function hideSetBalanceModal(id) {
     document.getElementById('setBalanceModal-' + id).style.display = 'none';
   }
-</script>
-<script>
   document.addEventListener('keydown', function(event) {
     if (event.keyCode === 27) {
       // Code to execute when the Escape key is pressed
@@ -202,10 +208,7 @@
       });
     });
   });
-</script>
-<script>
   // Toggle bulk checkbox visibility
-  window
 
   document.getElementById('bulk-toggle').addEventListener('change', function(e) {
     const checked = e.target.checked;
@@ -241,7 +244,6 @@
   // Prevent opening modals when in bulk mode (only want checkboxes to be clickable)
   document.querySelectorAll('.participant-card').forEach(card => {
     card.addEventListener('click', function(e) {
-      // If we’re in bulk mode, just toggle the checkbox, do not open the modal
       if (document.getElementById('bulk-toggle').checked) {
         e.stopPropagation();  // Stop showModal
         const checkbox = card.querySelector('.bulk-checkbox');

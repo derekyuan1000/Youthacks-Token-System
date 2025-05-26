@@ -36,7 +36,8 @@ class AdminsController < ApplicationController
 
     def earn
       participant = Participant.find(params[:id])
-      participant.earn!(1, @admin.id) # or session[:admin_id]
+      amount = params[:amount].to_i if params[:amount].present? || 1 
+      participant.earn!(amount, @admin.id) # or session[:admin_id]
       redirect_to dashboard_path, notice: "#{participant.name} just earned 1"
     end
     
