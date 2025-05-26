@@ -85,7 +85,7 @@
 
           <label>Select Product:</label>
           <select name="product_id">
-            <% Product.all.each do |product| %>
+            <% Product.all.sort_by{ |product| [product.price, product.quantity, product.name, product.description]}.each do |product| %>
               <option value="<%= product.id %>"><%= product.name %> (price <%=product.price%>)</option>
             <% end %>
           </select>
