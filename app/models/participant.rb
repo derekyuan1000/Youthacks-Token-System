@@ -63,78 +63,92 @@ class Participant < ApplicationRecord
 
     end
     
-  def self.sync # With Airtable
-    begin
-        api_key = ENV['AIRTABLE_API_KEY']
-        base_id = ENV['AIRTABLE_BASE_ID']
-        table_name = 'signups'
-      # Initialize Airtable client
-      client = Airtable::Client.new(api_key)
-      table  = client.table(base_id, table_name)
-
-      # Remove `.all` – just store the record set
-      records = table.select(filter: "{consent} = 1")
-
-      if records.nil?
-        raise "Invalid API key, base ID, table name, etc. Check env variables and internet connection."
-        # Get all records from the Airtable table
+    def delete!(admin_id = nil)
+      if admin_id.nil?
+        raise "Admin ID is required to delete a participant"
       end
-      # Sync each Airtable record with the local database
-      records.each do |record|
-        participant = record.fields
-
-        if participant['attendee_preferred_name'].nil?
-          participant['attendee_preferred_name'] = participant['attendee_first_name']
-        end
-        # Check if the participant exists in the local database
-        existing_participant = Participant.find_by(id: participant['signup_ID'])
-        
-        
-        if existing_participant
-          # If the participant exists, update their details
-          existing_participant.update!(
-            name: participant['attendee_preferred_name'],
-            pronouns: participant['pronouns'],
-            date_of_birth: participant['date_of_birth'],
-            email: participant['attendee_email'],
-            full_name: participant['full name'],
-            address: participant['attendee_address'],
-            phone: participant['attendee_phone_number'],
-            emergency_name: participant['parent_first_name'],
-            emergency_phone: participant['parent_phone_number'],
-            consent: participant['marketing_consent'],
-            dietary: participant['dietary_requirements'],
-            medical: participant['medical_info']
-            # balance = existing_participant.balance
-          )
-        else
-          # If the participant doesn't exist, create a new entry
-          Participant.create!(
-            id: participant['signup_ID'],
-            name: participant['attendee_preferred_name'],
-            pronouns: participant['pronouns'],
-            date_of_birth: participant['date_of_birth'],
-            email: participant['attendee_email'],
-            full_name: participant['full_name'],
-            address: participant['attendee_address'],
-            phone: participant['attendee_phone_number'],
-            emergency_name: participant['parent_first_name'],
-            emergency_phone: participant['parent_phone_number'],
-            consent: participant['marketing_consent'],
-            dietary: participant['dietary_requirements'],
-            medical: participant['medical_info'],
-            balance: 0
-          )
-        end
-      end
-      puts "Success"
-      # Return success message if sync was successful
-      { success: true, message: "Success" }
-
-    rescue StandardError => e
-      puts "Error syncing: #{e.message}"
-      # If any error occurs during sync, catch the exception and return an error message
-      { success: false, message: "Error syncing: #{e.message}" }
+      Activity.create!(
+        participant_id: id,
+        action: "delete_participant",
+        metadata: { old_balance: balance }.to_json,
+        admin_id: admin_id,
+      )
+      destroy
+      # Return success message
     end
-  end
+
+    def self.sync # With Airtable
+      begin
+          api_key = ENV['AIRTABLE_API_KEY']
+          base_id = ENV['AIRTABLE_BASE_ID']
+          table_name = 'signups'
+        # Initialize Airtable client
+        client = Airtable::Client.new(api_key)
+        table  = client.table(base_id, table_name)
+
+        # Remove `.all` – just store the record set
+        records = table.select(filter: "{consent} = 1")
+
+        if records.nil?
+          raise "Invalid API key, base ID, table name, etc. Check env variables and internet connection."
+          # Get all records from the Airtable table
+        end
+        # Sync each Airtable record with the local database
+        records.each do |record|
+          participant = record.fields
+
+          if participant['attendee_preferred_name'].nil?
+            participant['attendee_preferred_name'] = participant['attendee_first_name']
+          end
+          # Check if the participant exists in the local database
+          existing_participant = Participant.find_by(id: participant['signup_ID'])
+          
+          
+          if existing_participant
+            # If the participant exists, update their details
+            existing_participant.update!(
+              name: participant['attendee_preferred_name'],
+              pronouns: participant['pronouns'],
+              date_of_birth: participant['date_of_birth'],
+              email: participant['attendee_email'],
+              full_name: participant['full name'],
+              address: participant['attendee_address'],
+              phone: participant['attendee_phone_number'],
+              emergency_name: participant['parent_first_name'],
+              emergency_phone: participant['parent_phone_number'],
+              consent: participant['marketing_consent'],
+              dietary: participant['dietary_requirements'],
+              medical: participant['medical_info']
+              # balance = existing_participant.balance
+            )
+          else
+            # If the participant doesn't exist, create a new entry
+            Participant.create!(
+              id: participant['signup_ID'],
+              name: participant['attendee_preferred_name'],
+              pronouns: participant['pronouns'],
+              date_of_birth: participant['date_of_birth'],
+              email: participant['attendee_email'],
+              full_name: participant['full_name'],
+              address: participant['attendee_address'],
+              phone: participant['attendee_phone_number'],
+              emergency_name: participant['parent_first_name'],
+              emergency_phone: participant['parent_phone_number'],
+              consent: participant['marketing_consent'],
+              dietary: participant['dietary_requirements'],
+              medical: participant['medical_info'],
+              balance: 0
+            )
+          end
+        end
+        puts "Success"
+        # Return success message if sync was successful
+        { success: true, message: "Success" }
+
+      rescue StandardError => e
+        puts "Error syncing: #{e.message}"
+        # If any error occurs during sync, catch the exception and return an error message
+        { success: false, message: "Error syncing: #{e.message}" }
+      end
+    end
 end

@@ -52,6 +52,16 @@ class AdminsController < ApplicationController
         end
     end
 
+    def delete_participant
+        participant = Participant.find(params[:id])
+        participant.delete!
+        
+        if result[:success]
+            redirect_to dashboard_path, alert: "#{participant.name} has been deleted"
+        else
+            redirect_to dashboard_path, alert: "Failed to delete #{participant.name}"
+        end
+    end
     private
     def require_admin
         unless session[:admin_id].present?

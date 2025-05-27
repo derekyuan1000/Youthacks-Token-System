@@ -20,6 +20,7 @@ Rails.application.routes.draw do
   post "/participants/:id/buy", to: "admins#buy", as: "buy"
   post "/products/create", to: "products#create", as: "create_product"
   post "/products/:id/edit", to: "products#update", as: "update_product"
+  delete "participants/:id", to: "admins#delete_participant", as: "participant_delete"
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
