@@ -62,6 +62,16 @@ class AdminsController < ApplicationController
             redirect_to dashboard_path, alert: "Failed to delete #{participant.name}"
         end
     end
+
+    def check_in_participant
+        participant = Participant.find(params[:id])
+        result = participant.check_in(@admin.id)
+        if result[:success]
+            redirect_to dashboard_path, alert: "#{participant.name} has been checked in"
+        else
+            redirect_to dashboard_path, alert: "Failed to check in #{participant.name}"
+        end
+    end
     private
     def require_admin
         unless session[:admin_id].present? and Admin.exists?(session[:admin_id])

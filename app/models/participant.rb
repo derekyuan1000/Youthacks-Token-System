@@ -3,6 +3,7 @@ require 'dotenv/load'
 
 class Participant < ApplicationRecord
     scope :active, -> { where(active: true) }
+    scope :present , -> { where(active:true, checked_in:true) }
     def earn!(amount = 1, admin_id = nil)
         if amount <= 0
             raise "Amount must be greater than 0"
@@ -84,6 +85,29 @@ class Participant < ApplicationRecord
       end
     end
 
+    def check_in(admin_id = nil)
+      begin
+        raise "Admin ID is required to check in a participant" if admin_id.nil?
+        
+        if checked_in
+          raise "Participant is already checked in"
+        end
+        
+        update!(checked_in: true)
+        
+        Activity.create!(
+          participant_id: id,
+          action: "check_in",
+          metadata: { }.to_json,
+          admin_id: admin_id,
+        )
+        
+        { success: true, message: "Participant checked in successfully" }
+      rescue StandardError => e
+        { success: false, message: "Error checking in participant: #{e.message}" }
+      end
+    end
+
 
     def self.sync # With Airtable
       begin
@@ -149,7 +173,6 @@ class Participant < ApplicationRecord
             )
           end
         end
-        puts Participant.active.count, "active participants found in the database"
         Participant.active.each do |p|
           puts "Checking participant #{p.id} in Airtable records"
           if records.none? { |r| r.fields['signup_ID'] == p.id }
