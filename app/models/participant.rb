@@ -2,6 +2,7 @@ require 'airtable'
 require 'dotenv/load'
 
 class Participant < ApplicationRecord
+    scope :active, -> { where(active: true) }
     def earn!(amount = 1, admin_id = nil)
         if amount <= 0
             raise "Amount must be greater than 0"
@@ -27,6 +28,7 @@ class Participant < ApplicationRecord
     end
 
     def buy!(product, admin_id = nil)
+      begin
         # Check if the product is available
         if product.quantity > 0
             # Check if the participant has enough balance
@@ -60,22 +62,28 @@ class Participant < ApplicationRecord
             # Return error message if product is not available
             { success: false, message: "Product not available!" }
         end
-
+      rescue StandardError => e
+        {success: false, message: "Error during purchase: #{e.message}"}
+      end
     end
     
     def delete!(admin_id = nil)
-      if admin_id.nil?
-        raise "Admin ID is required to delete a participant"
+      begin 
+        raise "Admin ID is required to delete a participant" if admin_id.nil?
+
+        Activity.create!(
+          participant_id: id,
+          action: "delete_participant",
+          metadata: { old_balance: balance }.to_json,
+          admin_id: admin_id,
+        )
+        update!(active: false)  # Soft-delete instead of destroy
+        { success: true, message: "Participant deleted successfully" }
+      rescue StandardError => e
+        { success: false, message: "Error deleting participant: #{e.message}" }
       end
-      Activity.create!(
-        participant_id: id,
-        action: "delete_participant",
-        metadata: { old_balance: balance }.to_json,
-        admin_id: admin_id,
-      )
-      destroy
-      # Return success message
     end
+
 
     def self.sync # With Airtable
       begin
@@ -118,7 +126,8 @@ class Participant < ApplicationRecord
               emergency_phone: participant['parent_phone_number'],
               consent: participant['marketing_consent'],
               dietary: participant['dietary_requirements'],
-              medical: participant['medical_info']
+              medical: participant['medical_info'],
+              active: true
               # balance = existing_participant.balance
             )
           else
@@ -137,9 +146,17 @@ class Participant < ApplicationRecord
               consent: participant['marketing_consent'],
               dietary: participant['dietary_requirements'],
               medical: participant['medical_info'],
-              balance: 0
             )
           end
+        end
+        puts Participant.active.count, "active participants found in the database"
+        Participant.active.each do |p|
+          puts "Checking participant #{p.id} in Airtable records"
+          if records.none? { |r| r.fields['signup_ID'] == p.id }
+            p.delete!(0)
+          else
+            puts "Participant #{p.id} exists in Airtable records"
+          end 
         end
         puts "Success"
         # Return success message if sync was successful

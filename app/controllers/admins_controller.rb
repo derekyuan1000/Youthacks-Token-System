@@ -7,7 +7,7 @@ class AdminsController < ApplicationController
         # else
         #     Participant.all
         # end
-        @participants = Participant.all
+        @participants = Participant.active
         respond_to do |format|
             format.html # normal page load
             format.js   # AJAX request
@@ -54,7 +54,7 @@ class AdminsController < ApplicationController
 
     def delete_participant
         participant = Participant.find(params[:id])
-        participant.delete!
+        result = participant.delete!(@admin.id)
         
         if result[:success]
             redirect_to dashboard_path, alert: "#{participant.name} has been deleted"
@@ -64,7 +64,7 @@ class AdminsController < ApplicationController
     end
     private
     def require_admin
-        unless session[:admin_id].present?
+        unless session[:admin_id].present? and Admin.exists?(session[:admin_id])
             redirect_to login_path
             return  # <== STOP here to prevent further code running
         end
