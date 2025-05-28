@@ -1,18 +1,23 @@
 <h1>Activity History</h1>
+<%= link_to "Home", root_path %>
+<br>
+<%= link_to "Dashboard", dashboard_path %>
+<br>
+<%= link_to "Products", products_path %>
 <table class="activity-table">
   <thead>
     <tr>
         <th>Participant</th>
       <th>Action</th>
       <th>Metadata</th>
-      <th>Date</th>
     </tr>
   </thead>
   <tbody>
     <% @activities.each do |activity| %>
       <tr>
         <td>
-            <%= activity.participant.name %> (id <%= activity.participant_id %>)
+            <%= activity.participant.name %> (id <%= activity.participant_id %>)<br><br>
+            <%= activity.created_at.localtime.strftime("%-d %b, %H:%M") %>
         <td><%= activity.action %></td>
         <td>
           <% parsed_metadata = JSON.parse(activity.metadata) rescue {} %>
@@ -23,7 +28,6 @@
             <% end %>
           </dl>
         </td>
-        <td><%= activity.created_at.localtime.strftime("%-d %b, %H:%M") %></td>
       </tr>
     <% end %>
   </tbody>

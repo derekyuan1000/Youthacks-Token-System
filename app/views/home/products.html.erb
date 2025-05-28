@@ -1,5 +1,4 @@
 <h1>Products for Sale</h1>
-
 <style>
   .products-grid {
     display: grid;
@@ -37,7 +36,7 @@
   }
 </style>
 
-<% if session[:admin_id].present? %>
+<% if @admin.present? and Admin.exists?(@admin.attributes.except("created_at","updated_at"))%>
   <button onclick="showModal('new')">Add New Product</button>
 
   <div id="modal-new" class="modal" style="display:none;">
@@ -70,7 +69,7 @@
 <div class="products-grid">
   <% @products.sort_by { |product| [product.price, product.quantity, product.name, product.description] }.each do |product| %>
     <div class="product-card" 
-         <% if session[:admin_id].present? %> 
+         <% if @admin.present? and Admin.exists?(@admin.attributes.except("created_at","updated_at")) %> 
            onclick="showModal(<%= product.id %>)" 
          <% end %> >
       <h2><%= product.name %></h2>
@@ -79,7 +78,7 @@
       <p>Price: <%= product.price %></p>
     </div>
 
-    <% if session[:admin_id].present? %>
+    <% if @admin.present? and Admin.exists?(@admin.attributes.except("created_at","updated_at")) %>
       <!-- Modal for editing product -->
       <div id="modal-<%= product.id %>" class="modal" style="display:none;">
         <div class="modal-content">
