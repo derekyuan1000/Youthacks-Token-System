@@ -107,6 +107,7 @@ class AdminsController < ApplicationController
     private
     def require_admin
         unless session[:admin_id].present? and Admin.exists?(session[:admin_id])
+            session[:admin_id] = nil  # Clear session if admin not found
             redirect_to login_path
             return  # <== STOP here to prevent further code running
         end

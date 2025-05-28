@@ -4,7 +4,11 @@ require 'dotenv/load'
 class Participant < ApplicationRecord
     scope :active, -> { where(active: true) }
     scope :present , -> { where(active:true, checked_in:true) }
+    attribute :active, :boolean, default: true
+    attribute :balance, :integer, default: 0
+    attribute :checked_in, :boolean, default: false
     has_many :activities, as: :subject
+
 
     def earn!(amount = 1, admin_id = nil)
         if amount <= 0

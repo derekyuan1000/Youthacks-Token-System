@@ -25,18 +25,19 @@ class Product < ApplicationRecord
             quantity: quantity
         )
 
-        Activity.create!(
+       Activity.create!(
             subject_id: id,
             subject_type: "Product",
             action: "product_update",
-            (old_values.keys.each_with_object({}) do |key, diff|
+            metadata: (old_values.keys.each_with_object({}) do |key, diff|
                 if old_values[key] != binding.local_variable_get(key)
-                    diff[:old_values] ||= {}
-                    diff[:new_values] ||= {}
-                    diff[:old_values][key] = old_values[key]
-                    diff[:new_values][key] = binding.local_variable_get(key)
+                diff[:old_values] ||= {}
+                diff[:new_values] ||= {}
+                diff[:old_values][key] = old_values[key]
+                diff[:new_values][key] = binding.local_variable_get(key)
                 end
             end).to_json
         )
+
     end
 end
