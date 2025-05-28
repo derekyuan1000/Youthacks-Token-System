@@ -16,7 +16,7 @@
     <% @activities.each do |activity| %>
       <tr>
         <td>
-            <%= activity.participant.name %> (id <%= activity.participant_id %>)<br><br>
+            <%= activity.subject.name %> (id <%= activity.subject_id %>)<br><br>
             <%= activity.created_at.localtime.strftime("%-d %b, %H:%M") %>
         <td><%= activity.action %></td>
         <td>

@@ -10,19 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_27_194617) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_28_190831) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
   create_table "activities", force: :cascade do |t|
-    t.bigint "participant_id", null: false
     t.string "action"
     t.json "metadata"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "admin_id", null: false
+    t.string "subject_type"
+    t.bigint "subject_id"
     t.index ["admin_id"], name: "index_activities_on_admin_id"
-    t.index ["participant_id"], name: "index_activities_on_participant_id"
+    t.index ["subject_type", "subject_id"], name: "index_activities_on_subject"
   end
 
   create_table "admins", force: :cascade do |t|
@@ -37,7 +38,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_27_194617) do
     t.string "pronouns"
     t.date "date_of_birth"
     t.string "email"
-    t.integer "balance", default: 0
+    t.integer "balance"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "full_name"
@@ -48,7 +49,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_27_194617) do
     t.boolean "consent"
     t.string "dietary"
     t.string "medical"
-    t.boolean "active", default: true
+    t.boolean "active"
     t.boolean "checked_in", default: false
     t.datetime "check_in_time"
   end
@@ -74,7 +75,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_27_194617) do
   end
 
   add_foreign_key "activities", "admins"
-  add_foreign_key "activities", "participants"
   add_foreign_key "transactions", "participants"
   add_foreign_key "transactions", "products"
 end

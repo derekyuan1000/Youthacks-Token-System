@@ -80,6 +80,30 @@ class AdminsController < ApplicationController
             redirect_to dashboard_path, alert: "Failed to check in #{participant.name}"
         end
     end
+    def create_product
+    name = params[:name]
+    price = params[:price]
+    description = params[:description]
+    quantity = params[:quantity]
+    puts "Name: #{name}", "Price: #{price}", "Description: #{description}", "Quantity: #{quantity}"
+    Product.create(name: name, price: price, description: description, quantity: quantity)
+    redirect_to products_path, notice: 'Product was successfully created.'
+
+  end
+  def update_product
+    product = Product.find(params[:id])
+    name = params[:name]
+    price = params[:price]
+    description = params[:description]
+    quantity = params[:quantity]
+    puts "Product ID: #{product.id}", "Name: #{name}", "Price: #{price}", "Description: #{description}", "Quantity: #{quantity}"
+    if product.change!(name: name, price: price, description: description, quantity: quantity)
+      redirect_to products_path, notice: 'Product was successfully updated.'
+    else
+      render :edit
+    end
+  end
+
     private
     def require_admin
         unless session[:admin_id].present? and Admin.exists?(session[:admin_id])
