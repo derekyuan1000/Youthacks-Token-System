@@ -23,6 +23,8 @@ Rails.application.routes.draw do
   delete "participants/:id", to: "admins#delete_participant", as: "participant_delete"
   post "participants/:id/check_in", to: "admins#check_in_participant", as: "participant_check_in"
   get "activity", to: "admins#activity", as: "activity"
+  get 'products/refresh', to: 'products#refresh'
+
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker

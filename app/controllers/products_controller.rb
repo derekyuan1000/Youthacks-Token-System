@@ -4,7 +4,11 @@ class ProductsController < ApplicationController
     @products = Product.all
   end
 
-  
+  def refresh
+    @products = Product.all
+    render partial: "home/products", locals: { products: @products }
+  end
+
   private
 
 #   def set_product
