@@ -1,0 +1,54 @@
+<h1>Activity History</h1>
+<table class="activity-table">
+  <thead>
+    <tr>
+        <th>Participant</th>
+      <th>Action</th>
+      <th>Metadata</th>
+      <th>Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @activities.each do |activity| %>
+      <tr>
+        <td>
+            <%= activity.participant.name %> (id <%= activity.participant_id %>)
+        <td><%= activity.action %></td>
+        <td>
+          <% parsed_metadata = JSON.parse(activity.metadata) rescue {} %>
+          <dl>
+            <% parsed_metadata.each do |key, value| %>
+              <dt><%= key %></dt>
+              <dd><%= value %></dd>
+            <% end %>
+          </dl>
+        </td>
+        <td><%= activity.created_at.localtime.strftime("%-d %b, %H:%M") %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<style>
+.activity-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+.activity-table th, .activity-table td {
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+}
+.activity-table thead {
+  background-color: #f2f2f2;
+}
+dl {
+  margin: 0;
+}
+dt {
+  font-weight: bold;
+}
+dd {
+  margin: 0 0 0.5rem 0;
+}
+</style>

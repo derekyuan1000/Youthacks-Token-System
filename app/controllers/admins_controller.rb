@@ -14,6 +14,14 @@ class AdminsController < ApplicationController
         end
     end
 
+    def activity
+        @activities = Activity.order(created_at: :desc).limit(100) # Adjust the limit as needed
+        respond_to do |format|
+            format.html # normal page load
+            format.js   # AJAX request
+        end
+    end
+
     def set_balance
         participant = Participant.find( params[:id])
         # participant.set_balance(params[:balance]) # If you have a set_balance method in the model

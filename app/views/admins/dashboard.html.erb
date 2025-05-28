@@ -14,14 +14,15 @@
 <% end %>
 <!-- Participants list -->
 <div class="participants-grid">
-  <% @participants.sort.each do |participant| %>
-    <div class="participant-card" data-id="<%= participant.id %>" onclick="showModal(<%= participant.id %>)">
+  <% @participants.sort_by { |m| m.checked_in ? 0 : 1 }.each do |participant| %>
+    <div class="participant-card" data-id="<%= participant.id %>" onclick="showModal(<%= participant.id %>)" style="background-color: <%= participant.checked_in? ? '#d4edda' : '#f8d7da' %>;">
     <h2><%= participant.name %></h2>
       <!-- Hidden checkbox (shown if bulk mode is on) -->
       <input type="checkbox" name="participant_ids[]" value="<%= participant.id %>" style="display:none;" class="bulk-checkbox">
       <p>ID: <%= participant.id %></p>
-      <p>Balance: <%= participant.balance %></p>
-      <p><%="checked in" if participant.checked_in? %></p>
+      <% if participant.checked_in? %>
+        <p>Balance: <%= participant.balance %></p>
+      <% end %>
     </div>
     <!-- Main detail modal -->
     <div id="modal-<%= participant.id %>" class="modal" style="display:none;">
