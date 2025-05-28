@@ -67,11 +67,13 @@
 <%= link_to "Home", root_path %>
 
 <div class="products-grid">
-  <% @products.sort_by { |product| [product.price, product.quantity, product.name, product.description] }.each do |product| %>
+  <% @products.sort_by { |product| [product.quantity == 0 ? 1 : 0, product.price, product.quantity, product.name, product.description] }.each do |product| %>
     <div class="product-card" 
          <% if @admin.present? and Admin.exists?(@admin.attributes.except("created_at","updated_at")) %> 
            onclick="showModal(<%= product.id %>)" 
-         <% end %> >
+         <% end %> 
+        style="background-color: <%= product.quantity == 0 ? '#f8d7da' : '#f9f9f9' %>"
+         >
       <h2><%= product.name %></h2>
       <p><%= product.description %></p>
       <p>Qty: <%= product.quantity %></p>

@@ -37,7 +37,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_27_194617) do
     t.string "pronouns"
     t.date "date_of_birth"
     t.string "email"
-    t.integer "balance"
+    t.integer "balance", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "full_name"
@@ -48,7 +48,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_27_194617) do
     t.boolean "consent"
     t.string "dietary"
     t.string "medical"
-    t.boolean "active"
+    t.boolean "active", default: true
     t.boolean "checked_in", default: false
     t.datetime "check_in_time"
   end
