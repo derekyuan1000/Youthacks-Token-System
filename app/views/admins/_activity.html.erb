@@ -6,7 +6,7 @@
     </tr>
   </thead>
   <tbody>
-    <% @activities.each do |activity| %>
+    <% @activities.reverse.each do |activity| %>
       <tr>
         <td>
              <%= activity.subject_type == "Transaction"? activity.subject.participant.name : activity.subject.name %> (id <%= activity.subject_id %>) - <%= activity.subject_type %> <br><br>

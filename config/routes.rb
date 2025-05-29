@@ -19,7 +19,7 @@ Rails.application.routes.draw do
   get "products", to: "home#products", as: "products"
   post "/participants/:id/buy", to: "admins#buy", as: "buy"
   post "/products/create", to: "admins#create_product", as: "create_product"
-  post "/products/:id/edit", to: "admin#update_product", as: "update_product"
+  post "/products/:id/edit", to: "admins#update_product", as: "update_product"
   delete "participants/:id", to: "admins#delete_participant", as: "participant_delete"
   post "participants/:id/check_in", to: "admins#check_in_participant", as: "participant_check_in"
   get "activity", to: "admins#activity", as: "activity"

@@ -105,7 +105,7 @@ class AdminsController < ApplicationController
         description = params[:description]
         quantity = params[:quantity]
         puts "Product ID: #{product.id}", "Name: #{name}", "Price: #{price}", "Description: #{description}", "Quantity: #{quantity}"
-        if product.change!(name: name, price: price, description: description, quantity: quantity)
+        if product.change!(name: name, price: price, description: description, quantity: quantity, admin_id: @admin.id)
             redirect_to products_path, notice: 'Product was successfully updated.'
         else
             render :edit

@@ -10,7 +10,12 @@ class Product < ApplicationRecord
     #     )
     # end
 
-    def change!(name:, price:, description:, quantity:)
+    def change!(name:, price:, description:, quantity:, admin_id: )
+        unless admin_id.present? and Admin.exists?(admin_id)
+            raise "Admin ID is required and must be valid"
+        end
+        price = price.to_i
+        quantity = quantity.to_i
         old_values = {
             name: self.name,
             price: self.price,
@@ -36,7 +41,8 @@ class Product < ApplicationRecord
                 diff[:old_values][key] = old_values[key]
                 diff[:new_values][key] = binding.local_variable_get(key)
                 end
-            end).to_json
+            end).to_json,
+            admin_id: admin_id
         )
 
     end
