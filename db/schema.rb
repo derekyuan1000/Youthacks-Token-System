@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_28_220925) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_29_180211) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -36,22 +36,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_28_220925) do
   create_table "participants", force: :cascade do |t|
     t.string "name"
     t.string "pronouns"
-    t.date "date_of_birth"
-    t.string "email"
     t.integer "balance"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "full_name"
-    t.string "address"
-    t.string "phone"
-    t.string "emergency_name"
-    t.string "emergency_phone"
-    t.boolean "consent"
-    t.string "dietary"
-    t.string "medical"
     t.boolean "active", default: true
     t.boolean "checked_in", default: false
     t.datetime "check_in_time"
+    t.json "personal_info"
   end
 
   create_table "products", force: :cascade do |t|

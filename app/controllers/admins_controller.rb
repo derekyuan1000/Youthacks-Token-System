@@ -94,7 +94,7 @@ class AdminsController < ApplicationController
         description = params[:description]
         quantity = params[:quantity]
         puts "Name: #{name}", "Price: #{price}", "Description: #{description}", "Quantity: #{quantity}"
-        Product.create(name: name, price: price, description: description, quantity: quantity)
+        Product.create(name: name, price: price, description: description, quantity: quantity, admin_id: @admin.id)
         redirect_to products_path, notice: 'Product was successfully created.'
 
     end
@@ -109,6 +109,15 @@ class AdminsController < ApplicationController
             redirect_to products_path, notice: 'Product was successfully updated.'
         else
             render :edit
+        end
+    end
+    def delete_product
+        product = Product.find(params[:id])
+        result = product.delete!(admin_id:@admin.id) # or session[:admin_id]
+        if result[:success]
+            redirect_to products_path, notice: 'Product was successfully deleted.'
+        else
+            redirect_to products_path, alert: 'Failed to delete product.'
         end
     end
     def activity_refresh

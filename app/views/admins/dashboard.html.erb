@@ -34,16 +34,9 @@
           Show Personal Info
         </button>
         <div id="personal-info-<%= participant.id %>" style="display:none; margin-top:0.5rem;">
-          <p>Full Name: <%= participant.full_name %></p>
-          <p>Email: <%= participant.email %></p>
-          <p>Phone: <%= participant.phone %></p>
-          <p>Date of Birth: <%= participant.date_of_birth %></p>
-          <p>Address: <%= participant.address %></p>
-          <p>Emergency Contact: <%= participant.emergency_name %></p>
-          <p>Emergency Phone: <%= participant.emergency_phone %></p>
-          <p>Consent: <%= participant.consent %></p>
-          <p>Dietary Requirements: <%= participant.dietary %></p>
-          <p>Medical Info: <%= participant.medical %></p>
+          <%JSON.parse(participant.personal_info).each do |key,value| %>
+            <p><strong><%= key %>:</strong> <%= value %></p>
+          <% end %>
           <!-- Add more personal info fields as needed -->
         </div>
         <h3>Previous Purchases</h3>

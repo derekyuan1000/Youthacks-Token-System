@@ -152,17 +152,7 @@ class Participant < ApplicationRecord
             existing_participant.update!(
               name: participant['attendee_preferred_name'],
               pronouns: participant['pronouns'],
-              date_of_birth: participant['date_of_birth'],
-              email: participant['attendee_email'],
-              full_name: participant['full name'],
-              address: participant['attendee_address'],
-              phone: participant['attendee_phone_number'],
-              emergency_name: participant['parent_first_name'],
-              emergency_phone: participant['parent_phone_number'],
-              consent: participant['marketing_consent'],
-              dietary: participant['dietary_requirements'],
-              medical: participant['medical_info'],
-              active: true
+			  personal_info: participant.to_json
               # balance = existing_participant.balance
             )
           else
@@ -171,33 +161,19 @@ class Participant < ApplicationRecord
               id: participant['signup_ID'],
               name: participant['attendee_preferred_name'],
               pronouns: participant['pronouns'],
-              date_of_birth: participant['date_of_birth'],
-              email: participant['attendee_email'],
-              full_name: participant['full_name'],
-              address: participant['attendee_address'],
-              phone: participant['attendee_phone_number'],
-              emergency_name: participant['parent_first_name'],
-              emergency_phone: participant['parent_phone_number'],
-              consent: participant['marketing_consent'],
-              dietary: participant['dietary_requirements'],
-              medical: participant['medical_info'],
+			  personal_info: participant.to_json
             )
           end
         end
         Participant.active.each do |p|
-          puts "Checking participant #{p.id} in Airtable records"
           if records.none? { |r| r.fields['signup_ID'] == p.id }
             p.delete!(0)
-          else
-            puts "Participant #{p.id} exists in Airtable records"
           end 
         end
-        puts "Success"
         # Return success message if sync was successful
         { success: true, message: "Success" }
 
       rescue StandardError => e
-        puts "Error syncing: #{e.message}"
         # If any error occurs during sync, catch the exception and return an error message
         { success: false, message: "Error syncing: #{e.message}" }
       end
