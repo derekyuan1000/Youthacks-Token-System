@@ -1,9 +1,4 @@
 <h1>Transaction History</h1>
-<%= link_to "Home", root_path %>
-<%= link_to "Dashboard", dashboard_path %>
-<br>
-<%= link_to "Products", products_path %>
-<br>
 <button onclick="refreshTransactionList()">Refresh Transactions</button>
 <table id="transaction-table" class="transaction-table">
 <%= render partial: "admins/transactions", locals: { transactions: @transactions } %>

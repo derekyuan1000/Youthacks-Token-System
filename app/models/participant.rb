@@ -16,8 +16,7 @@ class Participant < ApplicationRecord
         end
         new_balance = balance + amount
         Activity.create!(
-            subject_id: id,
-            subject_type: "Participant",
+			subject: self,
             action: "earn",
             metadata: {amount:amount, old_balance: balance, new_balance:new_balance}.to_json,
             admin_id: admin_id,
@@ -27,8 +26,7 @@ class Participant < ApplicationRecord
 
     def set_balance!(amount, admin_id = nil)
         Activity.create!(
-          subject_id: id,
-          subject_type: "Participant",
+          subject: self,
           action: "set_balance",
           metadata: { amount: amount, old_balance:balance, new_balance:amount}.to_json,
           admin_id: admin_id,
@@ -47,18 +45,17 @@ class Participant < ApplicationRecord
                 # Mark the product as sold
                 product.update!(quantity: product.quantity - 1)
                 
-                transaction = Transaction.create!(
+                transaction = Transaction.create(
                   participant_id: id,
                   product_id: product.id,
                   price: product.price,
                   admin_id: admin_id
                 )
                 Activity.create!(
-                  subject_id: id,
-                  subject_type: "Participant",
-                  action: "buy",
-                  metadata: { product_id: product.id, price: product.price, transaction_id: transaction.id, old_balance:balance, new_balance:balance-product.price}.to_json,
-                  admin_id: admin_id
+					subject: self,
+					action: "buy",
+					metadata: { product_id: product.id, price: product.price, transaction_id: transaction.id, old_balance:balance, new_balance:balance-product.price}.to_json,
+					admin_id: admin_id
                 )
                   
                 update!(balance: balance - product.price)
@@ -82,11 +79,10 @@ class Participant < ApplicationRecord
         raise "Admin ID is required to delete a participant" if admin_id.nil?
 
         Activity.create!(
-          subject_id: id,
-          subject_type: "Participant",
-          action: "delete_participant",
-          metadata: { old_balance: balance }.to_json,
-          admin_id: admin_id,
+			subject: self,
+			action: "delete_participant",
+			metadata: { old_balance: balance }.to_json,
+			admin_id: admin_id,
         )
         update!(active: false)  # Soft-delete instead of destroy
         { success: true, message: "Participant deleted successfully" }
@@ -106,8 +102,7 @@ class Participant < ApplicationRecord
         update!(checked_in: true)
         
         Activity.create!(
-          subject_id: id,
-          subject_type: "Participant",
+			subject: self,
           action: "check_in",
           metadata: { }.to_json,
           admin_id: admin_id,

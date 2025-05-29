@@ -3,10 +3,11 @@
         <th>Participant</th>
         <th>Product</th>
         <th>Price</th>
+        <th>Admin</th>
     </tr>
   </thead>
   <tbody>
-    <% @transactions.each do |transaction| %>
+    <% @transactions.reverse.each do |transaction| %>
       <tr>
         <td>
             <%= transaction.participant.name %> (id <%= transaction.participant_id %>)<br><br>
@@ -16,6 +17,12 @@
         <td>
           <%=transaction.price %>
         </td>
+        <td>
+          <% if transaction.admin_id.present? %>
+            <%= Admin.find_by(id: transaction.admin_id).name %> (id <%= transaction.admin_id %>)
+          <% else %>
+            No admin (THIS IS AN ISSUE!)
+          <% end %>
       </tr>
     <% end %>
 </tbody>

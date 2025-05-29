@@ -39,7 +39,6 @@
 <% if @admin.present? and Admin.exists?(@admin.attributes.except("created_at","updated_at"))%>
   <button onclick="showModal('new')">Add New Product</button>
   <button onclick="refreshProductList()">Refresh Products</button>
-  <%= link_to "Dashboard", dashboard_path %>
 
   <div id="modal-new" class="modal" style="display:none;">
     <div class="modal-content">
@@ -65,8 +64,6 @@
     </div>
   </div>
 <% end %>
-
-<%= link_to "Home", root_path %>
 
 <div class="products-grid" id="products-grid">
   <%= render partial: "home/products", locals: { products: @products } %>
