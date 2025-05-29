@@ -58,9 +58,11 @@
         <!-- Buttons to open secondary modals -->
         <button onclick="showBuyModal(<%= participant.id %>)">Buy</button>
         <button onclick="showSetBalanceModal(<%= participant.id %>)">Set Balance</button>
+        <% unless participant.checked_in? %>
         <%= form_with url: participant_check_in_path(participant.id), method: :post, local: true do %>
           <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
           <button type="submit">Check In</button>
+        <% end %>
         <% end %>
         <%= form_with url: participant_delete_path(participant.id), method: :delete, local: true do %>
           <%= hidden_field_tag :authenticity_token, form_authenticity_token %>

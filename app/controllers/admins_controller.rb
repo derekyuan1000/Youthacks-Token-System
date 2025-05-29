@@ -74,7 +74,7 @@ class AdminsController < ApplicationController
         result = participant.delete!(@admin.id)
         
         if result[:success]
-            redirect_to dashboard_path, alert: "#{participant.name} has been deleted"
+            redirect_to dashboard_path, notice: "#{participant.name} has been deleted"
         else
             redirect_to dashboard_path, alert: "Failed to delete #{participant.name}"
         end
@@ -84,7 +84,7 @@ class AdminsController < ApplicationController
         participant = Participant.find(params[:id])
         result = participant.check_in(@admin.id)
         if result[:success]
-            redirect_to dashboard_path, alert: "#{participant.name} has been checked in"
+            redirect_to dashboard_path, notice: "#{participant.name} has been checked in"
         else
             redirect_to dashboard_path, alert: "Failed to check in #{participant.name}"
         end
