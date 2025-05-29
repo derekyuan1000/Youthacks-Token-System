@@ -1,0 +1,44 @@
+<h1>Transaction History</h1>
+<%= link_to "Home", root_path %>
+<%= link_to "Dashboard", dashboard_path %>
+<br>
+<%= link_to "Products", products_path %>
+<br>
+<button onclick="refreshTransactionList()">Refresh Transactions</button>
+<table id="transaction-table" class="transaction-table">
+<%= render partial: "admins/transactions", locals: { transactions: @transactions } %>
+</table>
+<style>
+.transaction-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+.transaction-table th, .transaction-table td {
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+}
+.transaction-table thead {
+  background-color: #f2f2f2;
+}
+dl {
+  margin: 0;
+}
+dt {
+  font-weight: bold;
+}
+dd {
+  margin: 0 0 0.5rem 0;
+}
+</style>
+
+<script>
+ function refreshTransactionList() {
+    fetch("/transactions/refresh")
+      .then(response => response.text())
+      .then(html => {
+        document.getElementById("transaction-table").innerHTML = html;
+    });
+  }
+  setTimeout(refreshTransactionList, 60000);
+</script>

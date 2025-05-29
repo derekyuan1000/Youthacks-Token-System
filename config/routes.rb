@@ -24,6 +24,9 @@ Rails.application.routes.draw do
   post "participants/:id/check_in", to: "admins#check_in_participant", as: "participant_check_in"
   get "activity", to: "admins#activity", as: "activity"
   get 'products/refresh', to: 'products#refresh'
+  get 'activity/refresh', to: 'admins#activity_refresh'
+  get 'transactions/refresh', to: 'admins#transactions_refresh'
+  get 'transactions', to: 'admins#transactions', as: 'transactions'
 
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest

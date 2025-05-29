@@ -15,7 +15,15 @@ class AdminsController < ApplicationController
     end
 
     def activity
-        @activities = Activity.order(created_at: :desc).limit(100) # Adjust the limit as needed
+        @activities = Activity.all
+        respond_to do |format|
+            format.html # normal page load
+            format.js   # AJAX request
+        end
+    end
+
+    def transactions
+        @transactions = Transaction.all
         respond_to do |format|
             format.html # normal page load
             format.js   # AJAX request
@@ -81,29 +89,37 @@ class AdminsController < ApplicationController
         end
     end
     def create_product
-    name = params[:name]
-    price = params[:price]
-    description = params[:description]
-    quantity = params[:quantity]
-    puts "Name: #{name}", "Price: #{price}", "Description: #{description}", "Quantity: #{quantity}"
-    Product.create(name: name, price: price, description: description, quantity: quantity)
-    redirect_to products_path, notice: 'Product was successfully created.'
+        name = params[:name]
+        price = params[:price]
+        description = params[:description]
+        quantity = params[:quantity]
+        puts "Name: #{name}", "Price: #{price}", "Description: #{description}", "Quantity: #{quantity}"
+        Product.create(name: name, price: price, description: description, quantity: quantity)
+        redirect_to products_path, notice: 'Product was successfully created.'
 
-  end
-  def update_product
-    product = Product.find(params[:id])
-    name = params[:name]
-    price = params[:price]
-    description = params[:description]
-    quantity = params[:quantity]
-    puts "Product ID: #{product.id}", "Name: #{name}", "Price: #{price}", "Description: #{description}", "Quantity: #{quantity}"
-    if product.change!(name: name, price: price, description: description, quantity: quantity)
-      redirect_to products_path, notice: 'Product was successfully updated.'
-    else
-      render :edit
     end
-  end
+    def update_product
+        product = Product.find(params[:id])
+        name = params[:name]
+        price = params[:price]
+        description = params[:description]
+        quantity = params[:quantity]
+        puts "Product ID: #{product.id}", "Name: #{name}", "Price: #{price}", "Description: #{description}", "Quantity: #{quantity}"
+        if product.change!(name: name, price: price, description: description, quantity: quantity)
+            redirect_to products_path, notice: 'Product was successfully updated.'
+        else
+            render :edit
+        end
+    end
+    def activity_refresh
+        @activities = Activity.all
+        render partial: "admins/activity", locals: { activities: @activities }
+    end
 
+    def transactions_refresh
+        @transactions = Transaction.all
+        render partial: "admins/transactions", locals: { transactions: @transactions }
+    end
     private
     def require_admin
         unless session[:admin_id].present? and Admin.exists?(session[:admin_id])

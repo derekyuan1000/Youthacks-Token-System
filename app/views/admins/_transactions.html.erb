@@ -1,0 +1,21 @@
+<thead>
+    <tr>
+        <th>Participant</th>
+        <th>Product</th>
+        <th>Price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @transactions.each do |transaction| %>
+      <tr>
+        <td>
+            <%= transaction.participant.name %> (id <%= transaction.participant_id %>)<br><br>
+            <%= transaction.created_at.localtime.strftime("%-d %b, %H:%M") %>
+        </td>
+        <td><%= transaction.product.name %></td>
+        <td>
+          <%=transaction.price %>
+        </td>
+      </tr>
+    <% end %>
+</tbody>

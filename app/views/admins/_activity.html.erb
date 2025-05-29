@@ -1,0 +1,27 @@
+<thead>
+    <tr>
+        <th>Participant</th>
+      <th>Action</th>
+      <th>Metadata</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @activities.each do |activity| %>
+      <tr>
+        <td>
+             <%= activity.subject_type == "Transaction"? activity.subject.participant.name : activity.subject.name %> (id <%= activity.subject_id %>) - <%= activity.subject_type %> <br><br>
+            <%= activity.created_at.localtime.strftime("%-d %b, %H:%M") %>
+        </td>
+        <td><%= activity.action %></td>
+        <td>
+          <% parsed_metadata = JSON.parse(activity.metadata) rescue {} %>
+          <dl>
+            <% parsed_metadata.each do |key, value| %>
+              <dt><%= key %></dt>
+              <dd><%= value %></dd>
+            <% end %>
+          </dl>
+        </td>
+      </tr>
+    <% end %>
+</tbody>
