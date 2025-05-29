@@ -85,7 +85,7 @@
 
           <label>Select Product:</label>
           <select name="product_id">
-            <% Product.all.sort_by{ |product| [product.price, product.quantity, product.name, product.description]}.each do |product| %>
+            <% Product.where.not(quantity: 0).sort_by{ |product| [product.price, product.quantity, product.name, product.description]}.each do |product| %>
               <option value="<%= product.id %>"><%= product.name %> (price <%=product.price%>)</option>
             <% end %>
           </select>
@@ -171,6 +171,10 @@
   }
   function hideModal(id) {
     document.getElementById('modal-' + id).style.display = 'none';
+    var infoDiv = document.getElementById('personal-info-' + id);
+    var btn = document.getElementById('personal-info-btn-' + id);
+    infoDiv.style.display = 'none';
+    btn.textContent = 'Show Personal Info';
   }
   function showBuyModal(id) {
     document.getElementById('buyModal-' + id).style.display = 'block';
@@ -183,12 +187,13 @@
   }
   function hideSetBalanceModal(id) {
     document.getElementById('setBalanceModal-' + id).style.display = 'none';
+
   }
   document.addEventListener('keydown', function(event) {
     if (event.keyCode === 27) {
       // Code to execute when the Escape key is pressed
       document.querySelectorAll('.modal').forEach(function(modal) {
-        modal.style.display = 'none';
+        hideModal(modal.id.split('-')[1]); // Hide all modals
       });
     }
   });
@@ -237,7 +242,6 @@
     }
   });
 
-  // Prevent opening modals when in bulk mode (only want checkboxes to be clickable)
   document.querySelectorAll('.participant-card').forEach(card => {
     card.addEventListener('click', function(e) {
       if (document.getElementById('bulk-toggle').checked) {
