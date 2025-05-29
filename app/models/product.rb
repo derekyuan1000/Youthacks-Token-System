@@ -12,7 +12,7 @@ class Product < ApplicationRecord
             price = price.to_i
             quantity = quantity.to_i
             unless price.present? and price > 0 and quantity.present?  and quantity >= 0
-                raise "Price must be a positive number and quantity must be a non-negative integer"
+                raise "#{price.present?} Price must be a positive number and quantity must be a non-negative integer"
             end
             values = {
                 name: name,
@@ -64,12 +64,11 @@ class Product < ApplicationRecord
             unless name.present?
                 raise "Name cannot be blank"
             end
-            unless price.present? and price.is_a?(Numeric) and price > 0 and quantity.present? and quantity.is_a?(Numeric) and quantity > 0
-                raise "Price must be a positive number and quantity must be a non-negative integer"
-            end
-            puts "SHOULD NOT SEE THISSHOULD NOT SEE THISSHOULD NOT SEE THISSHOULD NOT SEE THISSHOULD NOT SEE THISSHOULD NOT SEE THISSHOULD NOT SEE THISSHOULD NOT SEE THISSHOULD NOT SEE THISSHOULD NOT SEE THISSHOULD NOT SEE THISSHOULD NOT SEE THISSHOULD NOT SEE THISSHOULD NOT SEE THISSHOULD NOT SEE THISSHOULD NOT SEE THISSHOULD NOT SEE THISSHOULD NOT SEE THISSHOULD NOT SEE THISSHOULD NOT SEE THISSHOULD NOT SEE THISSHOULD NOT SEE THISSHOULD NOT SEE THISSHOULD NOT SEE THISSHOULD NOT SEE THISSHOULD NOT SEE THISSHOULD NOT SEE THISSHOULD NOT SEE THISSHOULD NOT SEE THISSHOULD NOT SEE THISSHOULD NOT SEE THIS"
             price = price.to_i
             quantity = quantity.to_i
+            unless price.present? and price.is_a?(Numeric) and price > 0 and quantity.present? and quantity.is_a?(Numeric) and quantity > 0
+                raise "#{price.is_a?(Numeric)} Price must be a positive number and quantity must be a non-negative integer"
+            end
             old_values = {
                 name: self.name,
                 price: self.price,

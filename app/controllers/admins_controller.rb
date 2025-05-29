@@ -63,7 +63,7 @@ class AdminsController < ApplicationController
         product = Product.find(params[:product_id])
         result = participant.buy!(product, @admin.id) # or session[:admin_id]
         if result[:success]
-            redirect_to dashboard_path, alert: "#{participant.name} just bought #{product.name}"
+            redirect_to dashboard_path, notice: "#{participant.name} just bought #{product.name}"
         else
             redirect_to dashboard_path, alert: result[:message]
         end
@@ -106,10 +106,11 @@ class AdminsController < ApplicationController
         description = params[:description]
         quantity = params[:quantity]
         puts "Product ID: #{product.id}", "Name: #{name}", "Price: #{price}", "Description: #{description}", "Quantity: #{quantity}"
-        if product.change!(name: name, price: price, description: description, quantity: quantity, admin_id: @admin.id)
+        result = product.change!(name: name, price: price, description: description, quantity: quantity, admin_id: @admin.id)
+        if result[:success]
             redirect_to products_path, notice: 'Product was successfully updated.'
         else
-            render :edit
+            redirect_to products_path, alert: result[:message] || 'Failed to update product.'
         end
     end
     def delete_product

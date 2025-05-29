@@ -250,12 +250,3 @@
 
   // Add any existing JS for modals, searching, etc.
 </script>
-
-<% if flash[:alert].present? %>
-  <script>
-    alert("<%= j flash[:alert] %>");
-
-    window.history.replaceState({}, document.title, window.location.pathname);
-  </script>
-  <% flash.delete(:alert) %>
-<% end %>
