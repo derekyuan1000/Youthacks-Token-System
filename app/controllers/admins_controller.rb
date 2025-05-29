@@ -14,6 +14,7 @@ class AdminsController < ApplicationController
         end
     end
 
+
     def activity
         @activities = Activity.all
         respond_to do |format|
@@ -128,6 +129,22 @@ class AdminsController < ApplicationController
     def transactions_refresh
         @transactions = Transaction.all
         render partial: "admins/transactions", locals: { transactions: @transactions }
+    end
+
+    def create
+        name = params[:name]
+        password = params[:password]
+        password_confirmation = params[:password_confirmation]
+        if name.present? && password.present? and password == password_confirmation
+            result = Admin.new!(name: name, password: password, admin_id: @admin.id)
+            if result[:success]
+                redirect_to dashboard_path, notice: 'Admin was successfully created.'
+            else
+                redirect_to dashboard_path, alert: result[:message]
+            end
+        else
+            redirect_to dashboard_path, alert: 'Failed to create admin. Please ensure all fields are filled out correctly.'
+        end
     end
     private
     def require_admin

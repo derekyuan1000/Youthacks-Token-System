@@ -21,7 +21,7 @@
           <% if transaction.admin_id.present? %>
             <%= Admin.find_by(id: transaction.admin_id).name %> (id <%= transaction.admin_id %>)
           <% else %>
-            No admin (THIS IS AN ISSUE!)
+            No admin (THIS IS AN ISSUE (maybe...)!)
           <% end %>
       </tr>
     <% end %>

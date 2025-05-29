@@ -7,6 +7,7 @@
     <li><%= link_to "Products", products_path, style: "color: white; text-decoration: none;" %></li>
     <li><%= link_to "Transaction History", transactions_path, style: "color: white; text-decoration: none;" %></li>
     <li><%= link_to "Activity History", activity_path, style: "color: white; text-decoration: none;" %></li>
+    <li><%= link_to "Create Admin", create_admin_path, style: "color: white; text-decoration: none;" %></li>
     <li style="margin-left: auto; color: white; position: relative;">
       <% if @admin.present? && Admin.exists?(id: @admin.id) %>
         <div class="admin-dropdown">

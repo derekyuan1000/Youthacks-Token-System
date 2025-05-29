@@ -28,6 +28,9 @@ Rails.application.routes.draw do
   get 'transactions/refresh', to: 'admins#transactions_refresh'
   get 'transactions', to: 'admins#transactions', as: 'transactions'
   delete 'products/:id', to: 'admins#delete_product', as: 'product_delete'
+  get 'create_admin', to: 'admins#create_admin', as: 'create_admin'
+  # Create admin form submission
+  post 'admins/create', to: 'admins#create', as: 'admin_create'
 
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest

@@ -3,6 +3,7 @@
         <th>Participant</th>
       <th>Action</th>
       <th>Metadata</th>
+      <th> Admin</th>
     </tr>
   </thead>
   <tbody>
@@ -22,6 +23,12 @@
             <% end %>
           </dl>
         </td>
+        <td>
+          <% if activity.admin_id.present? %>
+            <%= Admin.find_by(id: activity.admin_id).name %> (id <%= activity.admin_id %>)
+          <% else %>
+            No admin (THIS IS AN ISSUE (maybe...)!)
+          <% end %>
       </tr>
     <% end %>
 </tbody>

@@ -14,6 +14,14 @@ namespace :admin do
     password_confirmation = STDIN.noecho(&:gets).chomp
     puts
 
+    print "Enter admin ID who creates this admin (optional): "
+    admin_id = STDIN.gets.chomp
+    admin_id = admin_id.empty? ? nil : admin_id.to_i
+    if admin_id && !Admin.exists?(admin_id)
+      puts "Admin ID does not exist. Please provide a valid admin ID or leave it blank."
+      next
+    end
+    # Validate inputs 
     if name.empty? || password.empty? || password_confirmation.empty?
       puts "Please provide NAME, PASSWORD, and PASSWORD_CONFIRMATION."
       next
