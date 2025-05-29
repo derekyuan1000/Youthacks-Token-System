@@ -2,7 +2,7 @@ class Admin < ApplicationRecord
     has_many :activities, as: :subject
     has_secure_password
 
-    def self.new!(name:, password:, admin_id:)
+    def self.new!(name:, password:)
         puts "Creating new admin with name: #{name}, #{password}, admin_id: #{admin_id}"
         begin
             if Admin.exists?(name: name)
@@ -14,12 +14,6 @@ class Admin < ApplicationRecord
             new_admin = create!(
                 name: name,
                 password: password
-            )
-            Activity.create!(
-                subject: new_admin,
-                action: "admin_create",
-                metadata: { name: name }.to_json,
-                admin_id: admin_id
             )
             puts "Admin created successfully"
             { success: true, message: "Admin created successfully" }

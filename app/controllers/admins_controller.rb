@@ -14,6 +14,26 @@ class AdminsController < ApplicationController
         end
     end
 
+    def new
+        return redirect_to login_path
+    end
+
+    def create
+        name = params[:name]
+        password = params[:password]
+        password_confirmation = params[:password_confirmation]
+        if name.present? && password.present? and password == password_confirmation
+            result = Admin.new!(name: name, password: password, admin_id: @admin.id)
+            if result[:success]
+                redirect_to dashboard_path, notice: 'Admin was successfully created.'
+            else
+                redirect_to dashboard_path, alert: result[:message]
+            end
+        else
+            redirect_to dashboard_path, alert: 'Failed to create admin. Please ensure all fields are filled out correctly.'
+        end
+    end
+
 
     def activity
         @activities = Activity.all
@@ -132,21 +152,7 @@ class AdminsController < ApplicationController
         render partial: "admins/transactions", locals: { transactions: @transactions }
     end
 
-    def create
-        name = params[:name]
-        password = params[:password]
-        password_confirmation = params[:password_confirmation]
-        if name.present? && password.present? and password == password_confirmation
-            result = Admin.new!(name: name, password: password, admin_id: @admin.id)
-            if result[:success]
-                redirect_to dashboard_path, notice: 'Admin was successfully created.'
-            else
-                redirect_to dashboard_path, alert: result[:message]
-            end
-        else
-            redirect_to dashboard_path, alert: 'Failed to create admin. Please ensure all fields are filled out correctly.'
-        end
-    end
+    
     private
     def require_admin
         unless session[:admin_id].present? and Admin.exists?(session[:admin_id])

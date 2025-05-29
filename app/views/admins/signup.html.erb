@@ -1,5 +1,5 @@
-<h1>Create New Admin</h1>
-<%= form_with url: admin_create_path, method: :post, local: true do |form| %>
+<h1>Signup for New Admins</h1>
+<%= form_with url: signup_path, method: :post, local: true do |form| %>
   <div>
     <%= form.label :name %>
     <%= form.text_field :name, required: true %>

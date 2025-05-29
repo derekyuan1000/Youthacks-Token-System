@@ -12,6 +12,8 @@ Rails.application.routes.draw do
   get    'login',  to: 'sessions#new', as: 'login'
   post   'login',  to: 'sessions#create'
   delete 'logout', to: 'sessions#destroy', as: 'logout'
+  get "signup", to: "admins#new", as: "signup"
+  post "signup", to: "admins#create"
   get "dashboard", to: "admins#dashboard", as: "dashboard"
   post "/participants/:id/set_balance", to: "admins#set_balance", as: "set_balance"
   post "participants/bulk_earn", to: "admins#bulk_earn", as: "bulk_earn"
@@ -28,7 +30,6 @@ Rails.application.routes.draw do
   get 'transactions/refresh', to: 'admins#transactions_refresh'
   get 'transactions', to: 'admins#transactions', as: 'transactions'
   delete 'products/:id', to: 'admins#delete_product', as: 'product_delete'
-  get 'create_admin', to: 'admins#create_admin', as: 'create_admin'
   # Create admin form submission
   post 'admins/create', to: 'admins#create', as: 'admin_create'
 
