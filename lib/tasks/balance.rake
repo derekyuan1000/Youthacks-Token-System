@@ -9,7 +9,7 @@ namespace :participant do
         participant = Participant.find_by(id: pid)
 
         if participant
-            participant.earn!(amt)
+            participant.earn!(amount: amt, admin_id: 0)
             puts "Balance updated: #{participant.balance}"
         else
             puts "Participant with ID #{pid} not found."

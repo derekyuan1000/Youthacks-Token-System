@@ -2,7 +2,7 @@ class Product < ApplicationRecord
     has_many :activities, as: :subject
     belongs_to :event
 
-    def self.create(name:,price:,description:,quantity:, admin_id:)
+    def self.create(name:,price:,description:,quantity:, admin_id:, event_id:)
         begin
             unless admin_id.present? and Admin.exists?(admin_id)
                 raise "Admin ID is required and must be valid"
@@ -25,13 +25,15 @@ class Product < ApplicationRecord
                 name: name,
                 price: price,
                 description: description,
-                quantity: quantity
+                quantity: quantity,
+                event_id: event_id
             )
             Activity.create!(
                 subject: new_product,
                 action: "product_create",
                 metadata: values.to_json,
-                admin_id: admin_id
+                admin_id: admin_id,
+                event_id: new_product.event_id
             )
             {success: true, message: "Product creating successfully"}
         end
@@ -48,7 +50,8 @@ class Product < ApplicationRecord
                 subject: self,
                 action: "product_delete",
                 metadata: { name: name, price: price, description: description, quantity: quantity }.to_json,
-                admin_id: admin_id
+                admin_id: admin_id,
+                event_id: event_id
             )
             destroy!
             { success: true, message: "Product deleted successfully" }

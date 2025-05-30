@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_30_223626) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_30_233340) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -22,7 +22,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_30_223626) do
     t.bigint "admin_id", null: false
     t.string "subject_type"
     t.bigint "subject_id"
+    t.bigint "event_id"
     t.index ["admin_id"], name: "index_activities_on_admin_id"
+    t.index ["event_id"], name: "index_activities_on_event_id"
     t.index ["subject_type", "subject_id"], name: "index_activities_on_subject"
   end
 
@@ -54,6 +56,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_30_223626) do
     t.string "airtable_table_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "active", default: true, null: false
+    t.string "id_column"
     t.index ["manager_id"], name: "index_events_on_manager_id"
   end
 
@@ -66,6 +70,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_30_223626) do
     t.boolean "checked_in", default: false
     t.datetime "check_in_time"
     t.json "personal_info"
+    t.bigint "event_id"
+    t.index ["event_id"], name: "index_participants_on_event_id"
   end
 
   create_table "products", force: :cascade do |t|
@@ -75,6 +81,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_30_223626) do
     t.integer "quantity"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "event_id"
+    t.index ["event_id"], name: "index_products_on_event_id"
   end
 
   create_table "transactions", force: :cascade do |t|
@@ -84,14 +92,20 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_30_223626) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "admin_id"
+    t.bigint "event_id"
+    t.index ["event_id"], name: "index_transactions_on_event_id"
     t.index ["participant_id"], name: "index_transactions_on_participant_id"
     t.index ["product_id"], name: "index_transactions_on_product_id"
   end
 
   add_foreign_key "activities", "admins"
+  add_foreign_key "activities", "events"
   add_foreign_key "event_admins", "admins"
   add_foreign_key "event_admins", "events"
   add_foreign_key "events", "admins", column: "manager_id"
+  add_foreign_key "participants", "events"
+  add_foreign_key "products", "events"
+  add_foreign_key "transactions", "events"
   add_foreign_key "transactions", "participants"
   add_foreign_key "transactions", "products"
 end
