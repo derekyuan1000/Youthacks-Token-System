@@ -1,8 +1,9 @@
 class Admin < ApplicationRecord
     has_many :activities, as: :subject
+    
     has_secure_password
 
-    def self.new!(name:, password:)
+    def self.new!(name:, password:, email:)
         begin
             if Admin.exists?(name: name)
                 raise "Admin with this name already exists"
@@ -12,7 +13,8 @@ class Admin < ApplicationRecord
             end
             new_admin = create!(
                 name: name,
-                password: password
+                password: password,
+                email: email
             )
             { success: true, message: "Admin created successfully" }
         rescue => e
