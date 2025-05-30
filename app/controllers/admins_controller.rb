@@ -1,5 +1,5 @@
 class AdminsController < ApplicationController
-    before_action :require_admin
+    before_action :require_admin, except: [:new, :create]
     # before action :product_params, only: [:edit_product]
     def dashboard
         # @participants = if params[:query].present?
@@ -15,22 +15,21 @@ class AdminsController < ApplicationController
     end
 
     def new
-        return redirect_to login_path
     end
 
     def create
-        name = params[:name]
+        name = params[:name].strip
         password = params[:password]
         password_confirmation = params[:password_confirmation]
         if name.present? && password.present? and password == password_confirmation
-            result = Admin.new!(name: name, password: password, admin_id: @admin.id)
+            result = Admin.new!(name: name, password: password)
             if result[:success]
-                redirect_to dashboard_path, notice: 'Admin was successfully created.'
+                redirect_to login_path, notice: 'Admin was successfully created.'
             else
-                redirect_to dashboard_path, alert: result[:message]
+                redirect_to signup_path, alert: result[:message]
             end
         else
-            redirect_to dashboard_path, alert: 'Failed to create admin. Please ensure all fields are filled out correctly.'
+            redirect_to dashboard_path, alert: 'Failed to create admin. Please ensure all fields are filled out correctly (and that the passwords are the same).'
         end
     end
 

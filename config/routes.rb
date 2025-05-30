@@ -15,6 +15,7 @@ Rails.application.routes.draw do
   get "signup", to: "admins#new", as: "signup"
   post "signup", to: "admins#create"
   get "dashboard", to: "admins#dashboard", as: "dashboard"
+  get "settings", to: "admins#settings", as: "settings"
   post "/participants/:id/set_balance", to: "admins#set_balance", as: "set_balance"
   post "participants/bulk_earn", to: "admins#bulk_earn", as: "bulk_earn"
   post "/participants/:id/earn", to: "admins#earn", as: "earn"

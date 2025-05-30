@@ -1,5 +1,5 @@
 import { Application } from "@hotwired/stimulus"
-import Rails from "@rails/ujs"
+import "@rails/ujs"
 
 const application = Application.start()
 Rails.start()

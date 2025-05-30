@@ -1,8 +1,4 @@
-<% if flash[:notice] %>
-  <%= content_tag :h1, flash[:notice] %>
-<% else %>
-  <%= content_tag :h1, "Please Log in" %>
-<% end %>
+<h1>Log in</h1>
 
 <%= form_with url: login_path, method: :post, local: true do |form| %>
   <div>
@@ -18,4 +14,6 @@
   </div>
 <% end %>
 
+Don't have an account? <%= link_to "Sign up", signup_path %>
+<br>
 <%= link_to "Back to Home", root_path %>
