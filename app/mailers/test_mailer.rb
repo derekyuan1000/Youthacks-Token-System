@@ -6,4 +6,6 @@ class TestMailer < ApplicationMailer
             format.text { render plain: "This is a test email sent via AWS SES SMTP from Rails." }
         end
     end
+
 end
+ 

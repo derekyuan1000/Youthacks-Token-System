@@ -1,0 +1,13 @@
+<h1>Enter Confirmation Code</h1>
+<p>Code was sent to <%= session[:pending_admin]["email"] %>. Please enter the code to confirm your account.</p>
+<%= form_with url: confirm_code_path, method: :post do |form| %>
+  <div>
+    <%= form.label :code, "Confirmation Code" %><br>
+    <%= form.text_field :code, required: true, autofocus: true %>
+  </div>
+
+  <div>
+    <%= form.submit "Confirm" %>
+  </div>
+<% end %>
+
