@@ -1,15 +1,57 @@
 <h1>Enter Confirmation Code</h1>
 <p>Code was sent to <%= session[:pending_admin]["email"] %>. Please enter the code to confirm your account.</p>
+
 <%= form_with url: confirm_code_path, method: :post do |form| %>
-  <div>
-    <%= form.label :code, "Confirmation Code" %><br>
-    <%= form.text_field :code, required: true, autofocus: true %>
-  </div>
+    <div>
+        <%= form.label :code, "Confirmation Code" %><br>
+        <% 6.times do |i| %>
+            <%= form.text_field "code_#{i}", maxlength: 1, size: 1, class: "code-input", autocomplete: "one-time-code", required: true, autofocus: (i == 0) %>
+        <% end %>
+        <%= form.hidden_field :code, id: "full-code" %>
+    </div>
 
-  <div>
-    <%= form.submit "Confirm" %>
-  </div>
-  
+    <div>
+        <%= form.submit "Confirm" %>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const inputs = document.querySelectorAll('.code-input');
+            const hiddenCode = document.getElementById('full-code');
+            // Autofocus logic
+            inputs.forEach((input, idx) => {
+                input.addEventListener('input', function() {
+                    if (this.value.length === 1) {
+                        if (idx === inputs.length - 1) {
+                            this.form.requestSubmit();
+                        }
+                        if (idx < inputs.length - 1) inputs[idx + 1].focus();
+                    }
+                });
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === "Backspace" && this.value === "" && idx > 0) {
+                        inputs[idx - 1].focus();
+                    }
+                });
+            });
+            // Combine code before submit
+            const form = inputs[0].closest('form');
+            form.addEventListener('submit', function() {
+                let code = '';
+                inputs.forEach(input => code += input.value);
+                hiddenCode.value = code;
+            });
+        });
+    </script>
+
+    <style>
+        .code-input {
+            width: 2em;
+            font-size: 2em;
+            text-align: center;
+            margin: 0 0.2em;
+        }
+    </style>
 <% end %>
-<%= button_to "Resend Code", resend_code_path, method: :post, class: "resend-code-button" %>
 
+<%= button_to "Resend Code", resend_code_path, method: :post, class: "resend-code-button" %>

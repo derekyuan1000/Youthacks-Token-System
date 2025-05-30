@@ -12,7 +12,6 @@ class SessionsController < ApplicationController
     if @admin && @admin.authenticate(session_params[:password])
       session[:admin_id] = @admin.id
       redirect_to dashboard_path
-      puts "Admin authenticated successfully."
     else
       flash[:notice] = "Login is invalid!"
       redirect_to login_path

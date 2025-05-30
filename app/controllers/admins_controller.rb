@@ -115,7 +115,6 @@ class AdminsController < ApplicationController
         price = params[:price]
         description = params[:description]
         quantity = params[:quantity]
-        puts "Name: #{name}", "Price: #{price}", "Description: #{description}", "Quantity: #{quantity}"
         Product.create(name: name, price: price, description: description, quantity: quantity, admin_id: @admin.id)
         redirect_to products_path, notice: 'Product was successfully created.'
 
@@ -126,7 +125,6 @@ class AdminsController < ApplicationController
         price = params[:price]
         description = params[:description]
         quantity = params[:quantity]
-        puts "Product ID: #{product.id}", "Name: #{name}", "Price: #{price}", "Description: #{description}", "Quantity: #{quantity}"
         result = product.change!(name: name, price: price, description: description, quantity: quantity, admin_id: @admin.id)
         if result[:success]
             redirect_to products_path, notice: 'Product was successfully updated.'
@@ -195,8 +193,6 @@ class AdminsController < ApplicationController
     def confirm_code
         entered_code = params[:code].strip
         if session[:pending_admin].present? 
-            puts "Entered code: #{entered_code}"
-            puts "Actual code: #{session[:pending_admin][:code]}"
             if session[:pending_admin]["code"].to_s == entered_code.to_s
                 result = Admin.new!(name: session[:pending_admin]["name"], password: session[:pending_admin]["password"], email: session[:pending_admin]["email"])
                 if result[:success]
@@ -206,7 +202,7 @@ class AdminsController < ApplicationController
                     redirect_to verify_code_path, alert: result[:message]
                 end
             else
-                flash[:alert] = 'Invalid code. Please try again. ENtered code: ' + entered_code.to_s + ' Actual code: ' + session[:pending_admin]["code"].to_s
+                flash[:alert] = 'Invalid code. Please try again.' 
                 redirect_to verify_code_path
             end
         else

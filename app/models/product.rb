@@ -1,5 +1,6 @@
 class Product < ApplicationRecord
     has_many :activities, as: :subject
+    belongs_to :event
 
     def self.create(name:,price:,description:,quantity:, admin_id:)
         begin

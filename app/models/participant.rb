@@ -4,6 +4,7 @@ require 'dotenv/load'
 class Participant < ApplicationRecord
     scope :active, -> { where(active: true) }
     scope :present , -> { where(active:true, checked_in:true) }
+	belongs_to :event
     attribute :active, :boolean, default: true
     attribute :balance, :integer, default: 0
     attribute :checked_in, :boolean, default: false
