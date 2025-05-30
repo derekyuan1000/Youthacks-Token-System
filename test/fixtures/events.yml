@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  description: MyText
+  manager: one
+  airtable_api_key: MyString
+  airtable_base_id: MyString
+  airtable_table_name: MyString
+
+two:
+  name: MyString
+  description: MyText
+  manager: two
+  airtable_api_key: MyString
+  airtable_base_id: MyString
+  airtable_table_name: MyString

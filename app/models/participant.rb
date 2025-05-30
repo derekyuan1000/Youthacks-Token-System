@@ -117,9 +117,9 @@ class Participant < ApplicationRecord
 
     def self.sync # With Airtable
       begin
-          api_key = ENV['AIRTABLE_API_KEY']
-          base_id = ENV['AIRTABLE_BASE_ID']
-          table_name = 'signups'
+			api_key = ENV['AIRTABLE_API_KEY']
+			base_id = ENV['AIRTABLE_BASE_ID']
+			table_name = 'signups'
         # Initialize Airtable client
         client = Airtable::Client.new(api_key)
         table  = client.table(base_id, table_name)

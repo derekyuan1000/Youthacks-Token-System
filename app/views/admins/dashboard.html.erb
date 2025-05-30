@@ -1,5 +1,6 @@
 <h1>Dashboard</h1>
-<!-- Bulk Select Toggle -->
+
+<%= button_to "Sync Participants", sync_participants_path, method: :post, class: "sync-button" %>
 <label>
   <input type="checkbox" id="bulk-toggle"> Enable multi-select
 </label>
@@ -22,7 +23,6 @@
       <div class="modal-content">
         <span class="close" onclick="hideModal(<%= participant.id %>)">&times;</span>
         <h3>Extra Details for <%= participant.name %></h3>
-        <p>Pronouns: <%= participant.pronouns %></p>
         <!-- Personal Info Button/Dropdown -->
         <button type="button" onclick="togglePersonalInfo(<%= participant.id %>)" id="personal-info-btn-<%= participant.id %>">
           Show Personal Info
