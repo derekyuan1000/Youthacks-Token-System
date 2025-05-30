@@ -9,5 +9,7 @@
   <div>
     <%= form.submit "Confirm" %>
   </div>
+  
 <% end %>
+<%= button_to "Resend Code", resend_code_path, method: :post, class: "resend-code-button" %>
 
