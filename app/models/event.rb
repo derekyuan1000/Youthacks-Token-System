@@ -79,11 +79,12 @@ class Event < ApplicationRecord
           # Get all records from the Airtable table
         end
         # Sync each Airtable record with the local database
+		# raise records.first.fields.inspect
         records.each do |record|
 			participant = record.fields
 
 			existing_participant = participants.find_by(uuid: record.id)
-			
+			puts "Processing participant: #{participant.inspect}"
 			if participant[name_column].blank?
 				next
 			end
@@ -107,7 +108,7 @@ class Event < ApplicationRecord
 			end
         end
         participants.active.each do |p|
-			if records.none? { |r| r.id == p.id } or p.name.blank?
+			if records.none? { |r| r.id == p.uuid }
 				result = p.delete!(admin_id: manager_id)
 				unless result[:success]
 					raise "Error deleting participant: #{result[:message]}"
