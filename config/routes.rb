@@ -11,6 +11,7 @@ Rails.application.routes.draw do
 	get    'login',  to: 'sessions#new',     as: 'login'
 	post   'login',  to: 'sessions#create'
 	delete 'logout', to: 'sessions#destroy', as: 'logout'
+	get "forgot_password", to: "sessions#forgot_password", as: "forgot_password"
 
 	get "signup",       to: "admins#new",          as: "signup"
 	post "signup",      to: "admins#create"
