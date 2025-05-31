@@ -16,6 +16,8 @@ class Event < ApplicationRecord
 
   	has_many :activities, foreign_key: :event_id
 
+	has_many :invitations, class_name: "AdminInvitation", dependent: :destroy
+
 	encrypts :airtable_api_key
 	encrypts :airtable_base_id
 

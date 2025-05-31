@@ -26,7 +26,7 @@ class AdminsController < ApplicationController
     end
 
     def accept_invitation
-        invitation = AdminInvitation.find_by(id: params[:id], admin_id: @admin.id, status: 'pending')
+        invitation = @admin.invitations.find_by(id: params[:id], status: 'pending')
         if invitation
             result = invitation.accept!
             if result[:success]
@@ -35,11 +35,11 @@ class AdminsController < ApplicationController
                 redirect_to pending_invitations_path, alert: result[:message] || 'Failed to accept invitation.'
             end
         else
-            redirect_to pending_invitations_path, alert: 'Invitation not found or already accepted.' + params[:id].to_s
+            redirect_to pending_invitations_path, alert: 'Invitation not found or already accepted/rejected.'
         end
     end
     def reject_invitation
-        invitation = AdminInvitation.find_by(id: params[:invitation_id], admin_id: @admin.id, status: 'pending')
+        invitation = @admin.invitations.find_by(id: params[:id], status: 'pending')
         if invitation
             result = invitation.reject!
             if result[:success]
@@ -48,7 +48,7 @@ class AdminsController < ApplicationController
                 redirect_to pending_invitations_path, alert: result[:message] || 'Failed to reject invitation.'
             end
         else
-            redirect_to pending_invitations_path, alert: 'Invitation not found or already accepted.'
+            redirect_to pending_invitations_path, alert: 'Invitation not found or already accepted/rejected.' + invitation.inspect + params.inspect
         end
     end
 
@@ -78,25 +78,21 @@ class AdminsController < ApplicationController
         end
     end
     def resend_code
+        
         if session[:pending_admin].present?
             code = session[:pending_admin]["code"]
             email = session[:pending_admin]["email"]
-            begin
-                Rails.logger.info "Sending email to #{email}..."
-                AdminMailer.send_code(email, code).deliver_now
-                Rails.logger.info "Email sent successfully"
-            rescue => e
-                Rails.logger.error "Email failed to send: #{e.message}"
-            end
+            AdminMailer.send_code(email, code).deliver_now
             redirect_to verify_code_path, notice: 'Code has been resent to your email.'
         else
             redirect_to signup_path, alert: 'Please start the signup process first.'
         end
+    rescue => e
+        redirect_to signup_path, alert: "Failed to resend code: #{e.message}" 
     end
     def verify_code
         unless session[:pending_admin].present?
             redirect_to signup_path, alert: 'Please start the signup process first.'
-        # Form for user to enter the code
         end
     end
   

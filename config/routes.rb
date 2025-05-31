@@ -23,7 +23,7 @@ Rails.application.routes.draw do
 
 	get "pending_invitations", to: "admins#pending_invitations", as: "pending_invitations"
 	post "accept_invitation/:id", to: "admins#accept_invitation", as: "accept_invitation"
-	delete "decline_invitation/:id", to: "admins#reject_invitation", as: "reject_invitation"
+	delete "reject_invitation/:id", to: "admins#reject_invitation", as: "reject_invitation"
 
 
 	get "create_event", to: "admins#new_event", as: "new_event"
@@ -62,6 +62,7 @@ Rails.application.routes.draw do
 		post "settings/update_airtable_table", to: "managers#update_airtable_table", as: "event_update_airtable_table"
 
 		get "admins", to: "managers#admins", as: "event_admins"
+		post "admins/invite", to: "managers#invite_admin", as: "event_invite_admin"
 
 
 		get "", to: "events#dashboard"

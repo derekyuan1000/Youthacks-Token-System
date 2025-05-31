@@ -1,5 +1,28 @@
 <h1>Event Admins</h1>
 <p>Admins can manage events, view participants, and more.</p>
+<h2>Invite an Admin</h2>
+<%= form_with url: event_invite_admin_path, method: :post, local: true do %>
+  <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+  <div class="form-group">
+    <%= label_tag :name, "Admin Username" %>
+    <%= text_field_tag :name, nil, required: true, class: "form-control" %>
+    <%= submit_tag "Invite Admin", class: "btn btn-primary mt-2" %>
+</div>    
+<% end%>
+<% if @event.invitations.where(status:"pending").any? %>
+  <h2>Invitations</h2>
+  <ul>
+    <% @event.invitations.where(status:"pending").each do |invitation| %>
+      <li>
+        <%= invitation.admin.name %> - 
+        <%= invitation.status %> 
+        <br>
+        Invited at: <%= invitation.created_at.localtime.strftime("%-d %b, %Y %H:%M") %>
+      </li>
+    <% end %>
+  </ul>
+<% end %>
+
 <% if @event.admins.any? %>
   <h2>Admins</h2>
   <ul>
@@ -14,3 +37,17 @@
 <% else %>
     <p>No admins found.</p> 
 <% end %>
+
+<% if @event.invitations.where(status: "declined").any? %>
+  <h2>Rejected Invitations</h2>
+  <ul>
+    <% @event.invitations.where(status: "declined").each do |invitation| %>
+      <li>
+        <%= invitation.admin.name %> - 
+        <%= invitation.status %> 
+        <br>
+        Declined at: <%= invitation.updated_at.localtime.strftime("%-d %b, %Y %H:%M") %>
+      </li>
+    <% end %>
+  </ul>
+<% end%>

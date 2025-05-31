@@ -3,7 +3,7 @@ class Admin < ApplicationRecord
     has_and_belongs_to_many :events, join_table: 'event_admins'
     has_many :managed_events, class_name: "Event", foreign_key: :manager_id
     # app/models/admin.rb
-has_many :invitations, class_name: "AdminInvitation", dependent: :destroy
+    has_many :invitations, class_name: "AdminInvitation", dependent: :destroy
 
     
     has_secure_password

@@ -4,6 +4,25 @@ class ManagersController < EventsController
     def settings
     end
 
+    def invite_admin
+        begin
+            admin = Admin.find_by(name: params[:name])
+            unless admin.present? and admin.id != @event.manager_id && !@event.admins.exists?(admin.id)
+                raise "Invalid admin ID or admin already exists for this event."
+            end
+            result = AdminInvitation.create!(event_id: @event.id, admin_id: admin.id)
+            if result[:success]
+                redirect_to event_admins_path(@event.slug), notice: "Admin invited successfully."
+            else
+                raise result[:message]
+            end
+        rescue => e
+            redirect_to event_admins_path(@event.slug), alert: "Failed to invite admin: #{e.message}"
+        end
+    end
+
+        
+
     def update_settings
         @event.update!(name: params[:name], description: params[:description], date: params[:date])
         redirect_to event_dashboard_path(@event.slug), notice: "Event settings updated successfully."

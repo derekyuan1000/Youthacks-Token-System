@@ -5,27 +5,31 @@ class AdminInvitation < ApplicationRecord
 	validates :status, presence: true, inclusion: { in: %w[pending accepted declined] }
 
 	def self.create!(event_id:, admin_id:)
-		unless event_id.present? and Event.exists?(event_id)
-			raise "Event ID is required and must be valid"
+		begin
+			unless event_id.present? and Event.exists?(event_id)
+				raise "Event ID is required and must be valid"
+			end
+			event = Event.find(event_id)
+			unless admin_id.present? and Admin.exists?(admin_id) and event.manager_id != admin_id and !event.admins.exists?(admin_id)
+				raise "Admin ID is required and must be valid"
+			end
+			if AdminInvitation.exists?(event_id: event_id, admin_id: admin_id, status: "pending")
+				raise "Admin invitation already exists for this event and admin"
+			end
+			invitation = super(event_id: event_id, admin_id: admin_id, status: "pending")
+			admin = Admin.find(admin_id)
+			AdminMailer.invitation(event, admin).deliver_now
+			Activity.create!(
+				subject: invitation,
+				action: "admin_invitation_create",
+				metadata: { event_id: event_id, admin_id: admin_id }.to_json,
+				admin_id: event.manager_id,
+				event_id: event_id
+			)
+			{ success: true, message: "Admin invitation to #{admin.name} created successfully" }
+		rescue => e
+			{ success: false, message: "Error creating admin invitation: #{e.message}" }
 		end
-		event = Event.find(event_id)
-		unless admin_id.present? and Admin.exists?(admin_id) and event.manager_id != admin_id and !event.admins.exists?(admin_id)
-			raise "Admin ID is required and must be valid"
-		end
-		if AdminInvitation.exists?(event_id: event_id, admin_id: admin_id, status: "pending")
-			raise "Admin invitation already exists for this event and admin"
-		end
-		invitation = super(event_id: event_id, admin_id: admin_id, status: "pending")
-		AdminMailer.invitation(event, Admin.find(admin_id)).deliver_now
-		Activity.create!(
-			subject: invitation,
-			action: "admin_invitation_create",
-			metadata: { event_id: event_id, admin_id: admin_id }.to_json,
-			admin_id: event.manager_id,
-			event_id: event_id
-		)
-
-		invitation
 	end
 
 	def accept!
