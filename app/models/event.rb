@@ -13,9 +13,26 @@ class Event < ApplicationRecord
 	has_many :transactions, dependent: :destroy
 	has_many :activities, dependent: :destroy
 
+  	has_many :activities, as: :subject
+
 	encrypts :airtable_api_key
 	encrypts :airtable_base_id
-	encrypts :airtable_table_name
+
+	def add_admin!(admin_id:)
+		begin
+			unless admin_id.present? and Admin.exists?(admin_id)
+				raise "Admin ID is required and must be valid"
+			end
+			unless admins.exists?(admin_id) or manager_id == admin_id
+				admins << Admin.find(admin_id)
+				{ success: true, message: "Admin added successfully" }
+			else
+				{ success: false, message: "Admin already exists in this event" }
+			end
+		rescue => e
+			{ success: false, message: "Error adding admin: #{e.message}" }
+		end
+	end
 
 	def self.create(name:, description: "", airtable_api_key: nil, airtable_base_id: nil, airtable_table_name: nil, manager_id:)
 		begin
@@ -38,8 +55,9 @@ class Event < ApplicationRecord
 			{ success: false, message: "Error creating event: #{e.message}" }
 		end
 	end
+	
 
-	def self.sync # With Airtable
+	def sync # With Airtable
       begin
         # Initialize Airtable client
         client = Airtable::Client.new(airtable_api_key)

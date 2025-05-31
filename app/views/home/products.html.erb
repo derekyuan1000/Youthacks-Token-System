@@ -36,15 +36,15 @@
   }
 </style>
 
+<button onclick="refreshProductList()">Refresh Products</button>
 <% if @admin.present? and Admin.exists?(@admin.attributes.except("created_at","updated_at"))%>
   <button onclick="showModal('new')">Add New Product</button>
-  <button onclick="refreshProductList()">Refresh Products</button>
 
   <div id="modal-new" class="modal" style="display:none;">
     <div class="modal-content">
       <span class="close" onclick="hideModal('new')">&times;</span>
       <h3>Add New Product</h3>
-      <%= form_with url: create_product_path, method: :post, local: true do |f| %>
+      <%= form_with url: event_create_product_path, method: :post, local: true do |f| %>
         <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
 
         <label>Name:</label>
@@ -86,7 +86,7 @@
     }
   });
   function refreshProductList() {
-    fetch("/products/refresh")
+    fetch("products/refresh")
       .then(response => response.text())
       .then(html => {
         document.getElementById("products-grid").innerHTML = html;

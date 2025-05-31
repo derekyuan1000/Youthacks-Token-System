@@ -11,7 +11,7 @@ class Participant < ApplicationRecord
     has_many :activities, as: :subject
 
 
-    def earn!(amount: = 1, admin_id:)
+    def earn!(amount: 1, admin_id:)
         if amount <= 0
             raise "Amount must be greater than 0"
         end

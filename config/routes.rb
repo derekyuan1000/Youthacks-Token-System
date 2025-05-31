@@ -20,11 +20,17 @@ Rails.application.routes.draw do
 
 	get "dashboard", to: "admins#dashboard", as: "dashboard"
 	get    "settings",  to: "admins#settings",  as: "settings"
+
+
+	get "create_event", to: "admins#new_event", as: "new_event"
+	post "create_event", to: "admins#create_event", as: "create_event"
+
 	# Scope routes under event
 	scope '/events/:event_slug' do
-		get    "dashboard", to: "admins#dashboard", as: "event_dashboard"
+		get    "dashboard", to: "events#dashboard", as: "event_dashboard"
 		# get    "settings",  to: "admins#settings",  as: "event_settings"
 		
+		post "participants/sync", 		to: "events#sync_participants", as: "event_sync_participants"
 		post   "/participants/:id/set_balance", to: "events#set_balance", as: "event_set_balance"
 		post   "participants/bulk_earn",         to: "events#bulk_earn",  as: "event_bulk_earn"
 		post   "/participants/:id/earn",         to: "events#earn",       as: "event_earn"
@@ -39,11 +45,15 @@ Rails.application.routes.draw do
 		get    "products",                        to: "events#products",     as: "event_products"
 		get    "products/refresh",                to: "events#products_refresh", as: "event_products_refresh"
 		
-		get    "activity",                        to: "admins#activity",  as: "event_activity"
-		get    "activity/refresh",                to: "admins#activity_refresh"
+		get    "activity",                        to: "events#activity",  as: "event_activity"
+		get    "activity/refresh",                to: "events#activity_refresh"
 		
 		get    "transactions",                    to: "events#transactions", as: "event_transactions"
 		get    "transactions/refresh",            to: "events#transactions_refresh"
+
+		get   "settings",                        to: "events#settings", as: "event_settings"
+
+		get "", to: "events#dashboard"
 	end
 
 	# Admin creation and sync routes outside event scope (if global)

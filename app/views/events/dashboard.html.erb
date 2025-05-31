@@ -1,6 +1,6 @@
 <h1>Dashboard</h1>
 
-<%= button_to "Sync Participants", sync_participants_path, method: :post, class: "sync-button" %>
+<%= button_to "Sync Participants", event_sync_participants_path, method: :post, class: "sync-button" %>
 <label>
   <input type="checkbox" id="bulk-toggle"> Enable multi-select
 </label>
@@ -116,7 +116,7 @@
 
 <!-- Fixed-position bulk earn region (hidden initially) -->
 <div id="bulk-earn-bar" style="display:none; position:fixed; bottom:0; left:0; width:100%; background:#ccc; padding:1rem;">
-  <%= form_with url: bulk_earn_path, method: :post, local: true, id: "bulk-earn-form" do %>
+  <%= form_with url: event_bulk_earn_path, method: :post, local: true, id: "bulk-earn-form" do %>
     <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
     <label>Amount to Earn:</label>
     <input type="number" value="1" name="amount" min="1" />

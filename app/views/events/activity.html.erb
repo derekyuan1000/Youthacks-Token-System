@@ -1,7 +1,7 @@
 <h1>Activity History</h1>
 <button onclick="refreshActivityList()">Refresh Activity</button>
 <table id="activity-table" class="activity-table">
-<%= render partial: "admins/activity", locals: { activities: @activities } %>
+<%= render partial: "activity", locals: { activities: @activities } %>
 </table>
 <style>
 .activity-table {
@@ -29,7 +29,7 @@ dd {
 
 <script>
  function refreshActivityList() {
-    fetch("/activity/refresh")
+    fetch("activity/refresh")
       .then(response => response.text())
       .then(html => {
         document.getElementById("activity-table").innerHTML = html;

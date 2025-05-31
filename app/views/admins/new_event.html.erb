@@ -1,0 +1,15 @@
+<h1>Create a new event</h1>
+<%= form_with url: create_event_path, method: :post, local: true do %>
+	<%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+	<%= label_tag :name, "Event Name" %>
+	<%= text_field_tag :name, nil, required: true %>
+	<br><br>
+	<%= label_tag :date, "Event Date" %>
+	<%= date_field_tag :date, nil, required: true %>
+	(I'm sorry, we tried to change the date format to the actual correct one!)
+	<br><br>
+	<%= label_tag :description, "Event Description (optional)" %>
+	<%= text_area_tag :description, nil, required: false %>
+	<br><br>
+	<%= submit_tag "Create Event" %>
+<% end %>

@@ -1,5 +1,5 @@
 class EventsController < ApplicationController
-    before_action :require_admin, except: [:products]
+    before_action :require_event
     before_action :require_access, except: [:products]
 
     def new
@@ -18,35 +18,42 @@ class EventsController < ApplicationController
         end
     end
 
+    def settings
+    end
+
     def sync_participants
         begin
-            Participant.sync
-            @participants = Participant.active
-            redirect_to dashboard_path, notice: "Participants synced successfully"
+            unless @event.airtable_api_key.present? and @event.airtable_base_id.present? and @event.airtable_table_name.present?
+                raise "Airtable API key, base ID, and table name must be set for this event"
+            end
+            result = @event.sync
+            if result[:success]
+                @participants = Participant.active
+                redirect_to event_dashboard_path, notice: "Participants synced successfully"
+            else
+                raise result[:message] || "Failed to sync participants"
+            end
         rescue => e
-            redirect_to dashboard_path, alert: "Failed to sync participants: #{e.message}"
+            redirect_to event_dashboard_path, alert: "Failed to sync participants: #{e.message}"
         end
     end
 
     def activity
         @activities = Activity.all
-        respond_to do |format|
-            format.html # normal page load
-            format.js   # AJAX request
-        end
+
     end
 
     def products
         @products = Product.all
+        if session[:admin_id].present? && Admin.exists?(session[:admin_id])
+            @admin = Admin.find(session[:admin_id])
+        end
+        render "home/products"
     end
 
 
     def transactions
         @transactions = Transaction.all
-        respond_to do |format|
-            format.html # normal page load
-            format.js   # AJAX request
-        end
     end
 
     def settings
@@ -117,7 +124,7 @@ class EventsController < ApplicationController
         price = params[:price]
         description = params[:description]
         quantity = params[:quantity]
-        Product.create(name: name, price: price, description: description, quantity: quantity, admin_id: @admin.id)
+        Product.create(name: name, price: price, description: description, quantity: quantity, admin_id: @admin.id, event_id: @event.id)
         redirect_to event_products_path, notice: 'Product was successfully created.'
 
     end
@@ -149,28 +156,45 @@ class EventsController < ApplicationController
     end
     def activity_refresh
         @activities = Activity.all
-        render partial: "admins/activity", locals: { activities: @activities }
+        render partial: "events/activity", locals: { activities: @activities }
+    end
+
+    def transactions_refresh
+        @transactions = Transaction.all
+        render partial: "events/transactions", locals: { transactions: @transactions }
     end
     def create
     end
 
     private
 
-    def require_admin
-        unless session[:admin_id].present? && Admin.exists?(session[:admin_id])
-            session[:admin_id] = nil
-            redirect_to login_path
-            return
+    def require_event
+        begin 
+            event = Event.friendly.find(params[:event_slug])
+            unless event.present?
+                redirect_to dashboard_path, alert: "Event not found."
+                return
+            else
+                @event = event
+            end
+        rescue => e
+            redirect_to dashboard_path, alert: "Event does not exist."
         end
-        @admin = Admin.find(session[:admin_id])
     end
 
     def require_access
-        event = Event.friendly.find(params[:event_slug])
-        unless event.admins.exists?(@admin.id)
-            redirect_to dashboard_path, alert: "You do not have access to this event."
-            return
+        begin 
+            unless session[:admin_id].present? && Admin.exists?(session[:admin_id])
+                session[:admin_id] = nil
+                redirect_to login_path
+                return
+            end
+            @admin = Admin.find(session[:admin_id])
+            unless @event.admins.exists?(@admin.id) or @event.manager_id == @admin.id
+                raise
+            end
+        rescue => e
+            redirect_to dashboard_path, alert: "Event does not exist. #{e.message}"
         end
-        @event = event
     end
 end

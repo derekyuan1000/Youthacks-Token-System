@@ -1,7 +1,7 @@
 <h1>Transaction History</h1>
 <button onclick="refreshTransactionList()">Refresh Transactions</button>
 <table id="transaction-table" class="transaction-table">
-<%= render partial: "admins/transactions", locals: { transactions: @transactions } %>
+<%= render partial: "transactions", locals: { transactions: @transactions } %>
 </table>
 <style>
 .transaction-table {
@@ -29,7 +29,7 @@ dd {
 
 <script>
  function refreshTransactionList() {
-    fetch("/transactions/refresh")
+    fetch("transactions/refresh")
       .then(response => response.text())
       .then(html => {
         document.getElementById("transaction-table").innerHTML = html;

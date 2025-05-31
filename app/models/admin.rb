@@ -1,6 +1,8 @@
 class Admin < ApplicationRecord
     has_many :activities, as: :subject
     has_and_belongs_to_many :events, join_table: 'event_admins'
+    has_many :managed_events, class_name: "Event", foreign_key: :manager_id
+
     
     has_secure_password
 
