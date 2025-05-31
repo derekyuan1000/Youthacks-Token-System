@@ -11,9 +11,10 @@ class Event < ApplicationRecord
 	has_many :participants, dependent: :destroy
 	has_many :products, dependent: :destroy
 	has_many :transactions, dependent: :destroy
-	has_many :activities, dependent: :destroy
 
-  	has_many :activities, as: :subject
+  	has_many :subject_activities, as: :subject, class_name: 'Activity'
+
+  	has_many :activities, foreign_key: :event_id
 
 	encrypts :airtable_api_key
 	encrypts :airtable_base_id

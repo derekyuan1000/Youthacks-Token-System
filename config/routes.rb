@@ -36,6 +36,7 @@ Rails.application.routes.draw do
 		post   "/participants/:id/earn",         to: "events#earn",       as: "event_earn"
 		post   "/participants/:id/buy",          to: "events#buy",        as: "event_buy"
 		post   "/participants/:id/check_in",     to: "events#check_in_participant", as: "event_participant_check_in"
+		post  "participants/bulk_check_in",    to: "events#bulk_check_in", as: "event_bulk_check_in"
 		delete "/participants/:id",               to: "events#delete_participant", as: "event_participant_delete"
 
 		post   "/products/create",                to: "events#create_product", as: "event_create_product"

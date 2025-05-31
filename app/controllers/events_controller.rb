@@ -37,7 +37,7 @@ class EventsController < AdminsController
     end
 
     def activity
-        @activities = @event.activity.all
+        @activities = @event.activities.all
 
     end
 
@@ -45,7 +45,7 @@ class EventsController < AdminsController
 
 
     def transactions
-        @transactions = @event.transcations.all
+        @transactions = @event.transactions.all
     end
 
     def settings
@@ -55,7 +55,7 @@ class EventsController < AdminsController
         participant = @event.participants.find( params[:id])
         # participant.set_balance(params[:balance]) # If you have a set_balance method in the model
         participant.set_balance!(params[:balance], @admin.id) # or just directly update
-        redirect_to dashboard_path, notice: "Balance updated for #{participant.name}"
+        redirect_to event_dashboard_path, notice: "Balance updated for #{participant.name}"
     end
 
     def bulk_earn
@@ -65,29 +65,55 @@ class EventsController < AdminsController
       amount_to_earn  = params[:amount].to_i
 
       Participant.where(id: participant_ids).each do |p|
-        p.earn!(amount_to_earn, @admin.id) # or session[:admin_id]
+        p.earn!(amount: amount_to_earn,admin_id: @admin.id) # or session[:admin_id]
       end
 
-      redirect_to dashboard_path, notice: "#{participant_ids.size} participants earned #{amount_to_earn}"
+      redirect_to event_dashboard_path, notice: "#{participant_ids.size} participants earned #{amount_to_earn} token"
 
     end
 
-
+    def bulk_check_in
+        participant_ids = params[:participant_ids] || []
+        Participant.where(id: participant_ids).each do |p|
+            result = p.check_in(@admin.id)
+            if result[:success]
+                flash[:notice] ||= []
+                flash[:notice] << "#{p.name} has been checked in"
+            else
+                flash[:alert] ||= []
+                flash[:alert] << "Failed to check in #{p.name}: #{result[:message]}"
+            end
+        end
+        if flash[:notice].present? and flash[:alert].present?
+            redirect_to event_dashboard_path, notice: flash[:notice].join(", "), alert: flash[:alert].join(", ")
+        elsif flash[:notice].present? and flash[:alert].blank?
+            flash[:notice] = flash[:notice].join(", ")
+            redirect_to event_dashboard_path, notice: flash[:notice]
+        elsif flash[:alert].present? and flash[:notice].blank?
+            flash[:alert] = flash[:alert].join(", ")
+            redirect_to event_dashboard_path, alert: flash[:alert]
+        else
+            redirect_to event_dashboard_path, alert: "No participants were checked in. Something went wrong."
+        end 
+    end
     def earn
-      participant = @event.participants.find(params[:id])
-      amount = params[:amount].to_i if params[:amount].present? || 1 
-      participant.earn!(amount: amount,admin_id: @admin.id) # or session[:admin_id]
-      redirect_to dashboard_path, notice: "#{participant.name} just earned 1"
+        participant = @event.participants.find(params[:id])
+        amount = params[:amount].to_i if params[:amount].present? || 1 
+        result = participant.earn!(amount: amount,admin_id: @admin.id) # or session[:admin_id]
+        if result[:success]
+            redirect_to event_dashboard_path, notice: "#{participant.name} just earned #{amount} token"
+        else
+            redirect_to event_dashboard_path, alert: result[:message] || "Failed to earn tokens for #{participant.name}"
+        end
     end
-    
     def buy
         participant = @event.participants.find(params[:id])
         product = @event.products.find(params[:product_id])
         result = participant.buy!(product, @admin.id) # or session[:admin_id]
         if result[:success]
-            redirect_to dashboard_path, notice: "#{participant.name} just bought #{product.name}"
+            redirect_to event_dashboard_path, notice: "#{participant.name} just bought #{product.name}"
         else
-            redirect_to dashboard_path, alert: result[:message]
+            redirect_to event_dashboard_path, alert: result[:message]
         end
     end
 
@@ -96,9 +122,9 @@ class EventsController < AdminsController
         result = participant.delete!(@admin.id)
         
         if result[:success]
-            redirect_to dashboard_path, notice: "#{participant.name} has been deleted"
+            redirect_to event_dashboard_path, notice: "#{participant.name} has been deleted"
         else
-            redirect_to dashboard_path, alert: "Failed to delete #{participant.name}"
+            redirect_to event_dashboard_path, alert: "Failed to delete #{participant.name}"
         end
     end
 
@@ -106,9 +132,9 @@ class EventsController < AdminsController
         participant = @event.participants.find(params[:id])
         result = participant.check_in(@admin.id)
         if result[:success]
-            redirect_to dashboard_path, notice: "#{participant.name} has been checked in"
+            redirect_to event_dashboard_path, notice: "#{participant.name} has been checked in"
         else
-            redirect_to dashboard_path, alert: "Failed to check in #{participant.name}"
+            redirect_to event_dashboard_path, alert: "Failed to check in #{participant.name}"
         end
     end
     def create_product
@@ -116,7 +142,7 @@ class EventsController < AdminsController
         price = params[:price]
         description = params[:description]
         quantity = params[:quantity]
-        @event.products.create(name: name, price: price, description: description, quantity: quantity, admin_id: @admin.id, event_id: @event.id)
+        Product.create(name: name, price: price, description: description, quantity: quantity, admin_id: @admin.id, event_id: @event.id)
         redirect_to event_products_path, notice: 'Product was successfully created.'
 
     end
@@ -126,7 +152,7 @@ class EventsController < AdminsController
         price = params[:price]
         description = params[:description]
         quantity = params[:quantity]
-        result = product.change!(name: name, price: price, description: description, quantity: quantity, admin_id: @admin.id, event_id: @event.id)
+        result = product.change!(name: name, price: price, description: description, quantity: quantity, admin_id: @admin.id)
         if result[:success]
             redirect_to event_products_path, notice: 'Product was successfully updated.'
         else

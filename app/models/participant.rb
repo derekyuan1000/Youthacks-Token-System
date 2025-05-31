@@ -12,18 +12,23 @@ class Participant < ApplicationRecord
 
 
     def earn!(amount: 1, admin_id:)
-        if amount <= 0
-            raise "Amount must be greater than 0"
-        end
-        new_balance = balance + amount
-        Activity.create!(
-			subject: self,
-            action: "earn",
-            metadata: {amount:amount, old_balance: balance, new_balance:new_balance}.to_json,
-            admin_id: admin_id,
-			event_id: event_id
-        )
-        update!(balance: new_balance)
+		begin
+			if amount <= 0
+				raise "Amount must be greater than 0"
+			end
+			new_balance = balance + amount
+			Activity.create!(
+				subject: self,
+				action: "earn",
+				metadata: {amount:amount, old_balance: balance, new_balance:new_balance}.to_json,
+				admin_id: admin_id,
+				event_id: event_id
+			)
+			update!(balance: new_balance)
+			{ success: true, message: "Earned #{amount} successfully!" }
+		rescue StandardError => e
+			{ success: false, message: "Error earning amount: #{e.message}" }
+		end
     end
 
     def set_balance!(amount, admin_id)
@@ -40,7 +45,7 @@ class Participant < ApplicationRecord
     def buy!(product, admin_id)
       begin
         # Check if the product is available
-        if product.quantity > 0
+        if product.quantity > 0 and product.active
             # Check if the participant has enough balance
             if balance >= product.price
                 # Deduct the product price from the participant's balance
@@ -75,7 +80,7 @@ class Participant < ApplicationRecord
             { success: false, message: "Product not available!" }
         end
       rescue StandardError => e
-        {success: false, message: "Error during purchase: #{e.message}"}
+        {success: false, message: "Error during purchase: #{e.message} #{event_id}"}
       end
     end
     

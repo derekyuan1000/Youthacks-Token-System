@@ -122,6 +122,10 @@
     <input type="number" value="1" name="amount" min="1" />
     <button type="submit">Submit</button>
   <% end %>
+  <%= form_with url: event_bulk_check_in_path, method: :post, local: true, id: "bulk-check-in-form" do %>
+    <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+    <button type="submit">Bulk Check In</button>
+  <% end %>
 </div>
 
 <!-- Basic modal styling/JS -->
@@ -199,43 +203,59 @@
       });
     }
   });
-document.addEventListener("turbo:load", function() {
-  var input = document.getElementById("search-input");
-  var cards = document.querySelectorAll(".participant-card");
-  input.addEventListener("input", function() {
-    var query = input.value.toLowerCase();
-    cards.forEach(function(card) {
-      var name = card.querySelector("h2").textContent.toLowerCase();
+  document.addEventListener("turbo:load", function() {
+		var input = document.getElementById("search-input");
+		var cards = document.querySelectorAll(".participant-card");
+		input.addEventListener("input", function() {
+		var query = input.value.toLowerCase();
+		cards.forEach(function(card) {
+			var name = card.querySelector("h2").textContent.toLowerCase();
 
-      card.style.display = name.includes(query) ? "" : "none";
-    });
+			card.style.display = name.includes(query) ? "" : "none";
+		});
+		});
   });
-});
   // Toggle bulk checkbox visibility
 
-  document.getElementById('bulk-toggle').addEventListener('change', function(e) {
-    const checked = e.target.checked;
-    // Show/Hide checkboxes
-    document.querySelectorAll('.bulk-checkbox').forEach(cb => {
-      cb.style.display = checked ? '' : 'none';
-    });
-    // Show/Hide the bottom bar
-    document.getElementById('bulk-earn-bar').style.display = checked ? '' : 'none';
-    document.getElementById('bulk-earn-form').addEventListener('submit', function(e) {
-    // Remove any previously added hidden inputs to avoid duplicates
-    document.querySelectorAll('#bulk-earn-form input[name="participant_ids[]"]').forEach(el => el.remove());
+	document.getElementById('bulk-toggle').addEventListener('change', function(e) {
+		const checked = e.target.checked;
+		// Show/Hide checkboxes
+		document.querySelectorAll('.bulk-checkbox').forEach(cb => {
+		cb.style.display = checked ? '' : 'none';
+		});
+		// Show/Hide the bottom bar
+		document.getElementById('bulk-earn-bar').style.display = checked ? '' : 'none';
 
-    // Collect checked boxes
-    const checkedBoxes = document.querySelectorAll('.bulk-checkbox:checked');
-    // For each selected participant, append a hidden input in bulk-earn-form
-    checkedBoxes.forEach(box => {
-      const hiddenInput = document.createElement('input');
-      hiddenInput.type = 'hidden';
-      hiddenInput.name = 'participant_ids[]';
-      hiddenInput.value = box.value;
-      this.appendChild(hiddenInput);
-    });
-  });
+		document.getElementById('bulk-earn-form').addEventListener('submit', function(e) {
+
+		document.querySelectorAll('#bulk-earn-form input[name="participant_ids[]"]').forEach(el => el.remove());
+
+
+		const checkedBoxes = document.querySelectorAll('.bulk-checkbox:checked');
+
+		checkedBoxes.forEach(box => {
+		const hiddenInput = document.createElement('input');
+		hiddenInput.type = 'hidden';
+		hiddenInput.name = 'participant_ids[]';
+		hiddenInput.value = box.value;
+		this.appendChild(hiddenInput);
+		});
+		});
+		document.getElementById('bulk-check-in-form').addEventListener('submit', function(e) {
+		// Remove any previously added hidden inputs to avoid duplicates
+		document.querySelectorAll('#bulk-check-in-form input[name="participant_ids[]"]').forEach(el => el.remove());
+
+		// Collect checked boxes
+		const checkedBoxes = document.querySelectorAll('.bulk-checkbox:checked');
+		// For each selected participant, append a hidden input in bulk-earn-form
+		checkedBoxes.forEach(box => {
+		const hiddenInput = document.createElement('input');
+		hiddenInput.type = 'hidden';
+		hiddenInput.name = 'participant_ids[]';
+		hiddenInput.value = box.value;
+		this.appendChild(hiddenInput);
+		});
+	});
     // If turning off bulk select, uncheck all boxes
     if (!checked) {
       document.querySelectorAll('.bulk-checkbox').forEach(cb => {

@@ -1,6 +1,8 @@
 class Product < ApplicationRecord
     has_many :activities, as: :subject
     belongs_to :event
+    attribute :active, :boolean, default: true
+    scope :active, -> { where(active: true) }
 
     def self.create(name:,price:,description:,quantity:, admin_id:, event_id:)
         begin
@@ -53,14 +55,14 @@ class Product < ApplicationRecord
                 admin_id: admin_id,
                 event_id: event_id
             )
-            destroy!
+            update(active: false)
             { success: true, message: "Product deleted successfully" }
         rescue => e
             { success: false, message: "Error deleting product: #{e.message}" }
         end
     end
 
-    def change!(name:, price:, description:, quantity:, admin_id:, event_id:)
+    def change!(name:, price:, description:, quantity:, admin_id:)
         begin
             unless admin_id.present? and Admin.exists?(admin_id)
                 raise "Admin ID is required and must be valid"
