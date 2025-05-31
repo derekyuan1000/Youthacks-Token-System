@@ -25,7 +25,10 @@
   </head>
 
   <body>
-    <%= render "shared/navbar" %>
+    <% if defined?(params[:event_slug]) && Event.friendly.exists?(slug: params[:event_slug]) %>
+      <%= render 'shared/navbar' %>
+    <% end %>
+
     <% if flash[:notice] %>
   <div style="background-color: #d4edda; color: #155724; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
     <%= flash[:notice] %>

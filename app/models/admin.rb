@@ -1,5 +1,6 @@
 class Admin < ApplicationRecord
     has_many :activities, as: :subject
+    has_and_belongs_to_many :events, join_table: 'event_admins'
     
     has_secure_password
 

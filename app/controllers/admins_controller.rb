@@ -1,15 +1,20 @@
 class AdminsController < ApplicationController
     before_action :require_admin, except: [:new, :create, :verify_code, :confirm_code, :resend_code]
+    before_action :require_access, except: [:new, :create, :verify_code, :confirm_code, :resend_code, :dashboard]
 
     def new
         # Render the signup form
         if session[:admin_id].present?
-            redirect_to dashboard_path, notice: "You are already logged in."
+            redirect_to event_dashboard_path, notice: "You are already logged in."
         else
             @admin = Admin.new
         end
     end
+
     def dashboard
+    end
+
+    def event_dashboard
         # @participants = if params[:query].present?
         #     Participant.where("name ILIKE ?", "%#{params[:query]}%")
         # else
@@ -116,7 +121,7 @@ class AdminsController < ApplicationController
         description = params[:description]
         quantity = params[:quantity]
         Product.create(name: name, price: price, description: description, quantity: quantity, admin_id: @admin.id)
-        redirect_to products_path, notice: 'Product was successfully created.'
+        redirect_to event_products_path, notice: 'Product was successfully created.'
 
     end
     def update_product
@@ -127,18 +132,18 @@ class AdminsController < ApplicationController
         quantity = params[:quantity]
         result = product.change!(name: name, price: price, description: description, quantity: quantity, admin_id: @admin.id)
         if result[:success]
-            redirect_to products_path, notice: 'Product was successfully updated.'
+            redirect_to event_products_path, notice: 'Product was successfully updated.'
         else
-            redirect_to products_path, alert: result[:message] || 'Failed to update product.'
+            redirect_to event_products_path, alert: result[:message] || 'Failed to update product.'
         end
     end
     def delete_product
         product = Product.find(params[:id])
         result = product.delete!(admin_id:@admin.id) # or session[:admin_id]
         if result[:success]
-            redirect_to products_path, notice: 'Product was successfully deleted.'
+            redirect_to event_products_path, notice: 'Product was successfully deleted.'
         else
-            redirect_to products_path, alert: 'Failed to delete product.'
+            redirect_to event_products_path, alert: 'Failed to delete product.'
         end
     end
     def activity_refresh
@@ -211,7 +216,7 @@ class AdminsController < ApplicationController
     end
 
 
-  private
+    private
 
     def require_admin
         unless session[:admin_id].present? && Admin.exists?(session[:admin_id])
@@ -220,5 +225,14 @@ class AdminsController < ApplicationController
             return
         end
         @admin = Admin.find(session[:admin_id])
+    end
+
+    def require_access
+        event = Event.friendly.find(params[:event_slug])
+        unless event.admins.exists?(@admin.id)
+            redirect_to dashboard_path, alert: "You do not have access to this event."
+            return
+        end
+        @event = event
     end
 end

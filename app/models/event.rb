@@ -1,4 +1,11 @@
+require 'friendly_id'
 class Event < ApplicationRecord
+	extend FriendlyId
+
+	has_and_belongs_to_many :admins, join_table: 'event_admins'
+
+	friendly_id :name, use: :slugged
+
 	belongs_to :manager, class_name: 'Admin'
 
 	has_many :participants, dependent: :destroy
@@ -39,7 +46,7 @@ class Event < ApplicationRecord
               name: participant['attendee_preferred_name'],
               pronouns: participant['pronouns'],
 			  personal_info: participant.to_json,
-			  
+
               # balance = existing_participant.balance
             )
           else
