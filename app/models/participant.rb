@@ -9,7 +9,7 @@ class Participant < ApplicationRecord
     attribute :balance, :integer, default: 0
     attribute :checked_in, :boolean, default: false
     has_many :activities, as: :subject
-
+				
 
     def earn!(amount: 1, admin_id:)
 		begin

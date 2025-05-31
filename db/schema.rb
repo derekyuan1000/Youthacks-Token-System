@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_31_161316) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_31_185806) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -57,7 +57,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_31_161316) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "active", default: true, null: false
-    t.string "id_column"
     t.string "slug"
     t.date "date"
     t.string "name_column"
@@ -86,7 +85,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_31_161316) do
     t.datetime "check_in_time"
     t.json "personal_info"
     t.bigint "event_id"
+    t.string "uuid"
     t.index ["event_id"], name: "index_participants_on_event_id"
+    t.index ["uuid"], name: "index_participants_on_uuid", unique: true
   end
 
   create_table "products", force: :cascade do |t|

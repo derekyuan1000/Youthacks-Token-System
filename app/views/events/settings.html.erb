@@ -17,24 +17,21 @@
 <% end %>
 
 <h2>Airtable Sync</h2>
-<p>Sync your participants from Airtable. You will need a valid Airtable API key and base ID, with read permissions.</p>
+<p>Sync your participants from Airtable. You will need a valid Airtable API key and base ID, with read and write permissions (you can create a read-only API key, but you will not be able to create a new participant).</p>
 <p>(the API key and base ID are not shown here when updated)
 <%= form_with url: event_update_airtable_path, method: :post, local: true do %>
   <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
   <h3>Airtable API Key</h3>
-  <%= text_field_tag :airtable_api_key, nil, required: true %>
+  <%= text_field_tag :airtable_api_key, @event.airtable_api_key, required: true %>
   <h3>Airtable Base ID</h3>
-  <%= text_field_tag :airtable_base_id, nil, required: true %>
+  <%= text_field_tag :airtable_base_id, @event.airtable_base_id, required: true %>
     <br><br>
     <%= submit_tag "Save" %>
 <% end %>
 <p>The less sensitive information (this is seperate). For the ID column, if you have a column in Airtable that contains unique IDs for each participant, you can specify it here.</p>
 <%= form_with url: event_update_airtable_table_path, method: :post, local: true do %>
-  <h3>Airtable Table Name</h3>
-  <%= text_field_tag :airtable_table_name, @event.airtable_table_name, required: true %>
-  <br><br>
-  <h3>Airtable ID Column (optional, default will be used if not chosen)</h3>
-    <%= text_field_tag :id_column, @event.id_column %>
+    <h3>Airtable Table Name</h3>
+    <%= text_field_tag :airtable_table_name, @event.airtable_table_name, required: true %>
     <br><br>
     <h3>Airtable Name Column (not optional)</h3>
     <%= text_field_tag :name_column, @event.name_column, required: true %>

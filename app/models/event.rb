@@ -74,15 +74,15 @@ class Event < ApplicationRecord
 
         records = table.select()
 
-        if records.nil?
-          raise "Invalid API key, base ID, table name, etc. Check variables entered and internet connection."
+        unless records.any?
+          raise "Invalid API key, base ID, table name, etc (well I got no data...). Check variables entered and internet connection."
           # Get all records from the Airtable table
         end
         # Sync each Airtable record with the local database
         records.each do |record|
 			participant = record.fields
 
-			existing_participant = participants.find_by(id: participant[id_column])
+			existing_participant = participants.find_by(uuid: record.id)
 			
 			if participant[name_column].blank?
 				next
@@ -99,15 +99,15 @@ class Event < ApplicationRecord
 			else
 				# If the participant doesn't exist, create a new entry
 				participants.create!(
-				id: participant[id_column],
-				name: participant[name_column],
-				personal_info: participant.to_json,
-				event_id: id
+					uuid: record.id,
+					name: participant[name_column],
+					personal_info: participant.to_json,
+					event_id: id
 				)
 			end
         end
         participants.active.each do |p|
-			if records.none? { |r| r.fields[id_column] == p.id } or p.name.blank?
+			if records.none? { |r| r.id == p.id } or p.name.blank?
 				result = p.delete!(admin_id: manager_id)
 				unless result[:success]
 					raise "Error deleting participant: #{result[:message]}"
@@ -122,4 +122,33 @@ class Event < ApplicationRecord
         { success: false, message: "Error syncing: #{e.message}" }
       end
     end
+	def self.create!(name:, admin_id:, event_id:)
+		begin
+			client = Airtable::Client.new(airtable_api_key)
+			table  = client.table(airtable_base_id, airtable_table_name)
+			record = Airtable::Record.new(
+				name_column: name
+			)
+			created_record = table.create(record)
+			if created_record
+				participant = participants.create!(
+					uuid: created_record.id,
+					name: name,
+					event_id: event_id
+				)
+				Activity.create!(
+					subject: participant,
+					action: "participant_create",
+					metadata: { name: name }.to_json,
+					admin_id: admin_id,
+					event_id: event_id
+				)
+				{ success: true, message: "Participant created successfully", participant: participant }
+			else
+				{ success: false, message: "Failed to create participant in Airtable" }
+			end
+		rescue => e
+			{ success: false, message: "Error creating participant: #{e.message}" }
+		end
+	end
 end

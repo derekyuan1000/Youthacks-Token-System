@@ -13,14 +13,14 @@ class ManagersController < EventsController
     end
 
     def update_airtable
-        @event.update(airtable_api_key: params[:airtable_api_key], airtable_base_id: params[:airtable_base_id], airtable_table_name: params[:airtable_table_name])
+        @event.update(airtable_api_key: params[:airtable_api_key], airtable_base_id: params[:airtable_base_id])
         redirect_to event_settings_path(@event.slug), notice: "Airtable settings updated successfully."
     rescue => e
         redirect_to event_settings_path(@event.slug), alert: "Failed to update Airtable settings: #{e.message}"
     end
 
     def update_airtable_table
-        @event.update(airtable_table_name: params[:airtable_table_name], id_column:params[:id_column], name_column: params[:name_column])
+        @event.update(airtable_table_name: params[:airtable_table_name], name_column: params[:name_column])
         redirect_to event_settings_path(@event.slug), notice: "Airtable table settings updated successfully."
     rescue => e
         redirect_to event_settings_path(@event.slug), alert: "Failed to update Airtable table settings: #{e.message}"
