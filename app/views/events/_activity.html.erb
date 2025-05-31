@@ -10,9 +10,19 @@
     <% @activities.reverse.each do |activity| %>
       <tr>
         <td>
-			<%= activity.subject_type == "Transaction"? activity.subject.participant.name : activity.subject.name %> (id <%= activity.subject_id %>) - <%= activity.subject_type %> <br><br>
-            <%= activity.created_at.localtime.strftime("%-d %b, %H:%M") %>
-        </td>
+  <% name = case activity.subject_type
+     when "Transaction"
+       activity.subject.participant.name
+     when "AdminInvitation"
+       activity.admin.name
+     else
+       activity.subject.name
+     end %>
+
+  <%= name %> (id <%= activity.subject_id %>) - <%= activity.subject_type %> <br><br>
+  <%= activity.created_at.localtime.strftime("%-d %b, %H:%M") %>
+</td>
+
         <td><%= activity.action %></td>
         <td>
 			<% parsed_metadata = JSON.parse(activity.metadata) rescue {} %>

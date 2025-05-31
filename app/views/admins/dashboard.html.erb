@@ -20,10 +20,10 @@
   <ul>
     <% @admin.events.each do |event| %>
       <li>
-        <strong><%= event.name %></strong> - <%= event.date.strftime("%-d %b, %Y") %>
-        <br>
-        <%= event.description %>
-      </li>
+			<%= link_to event.name, event_dashboard_path(event.slug) %> - <%= event.date.strftime("%-d %b, %Y") %>
+			<br>
+			<%= event.description %>
+		</li>
     <% end %>
   </ul>
 <% end %>

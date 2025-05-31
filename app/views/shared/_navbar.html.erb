@@ -2,6 +2,9 @@
   <ul style="list-style: none; display: flex; gap: 1em; margin: 0; padding: 0;">
     <li><%= link_to "Home", root_path, style: "color: white; text-decoration: none;" %></li>
     <li><%= link_to "Dashboard", dashboard_path, style: "color: white; text-decoration: none;" %></li>
+    <% if @admin.present? and @admin.invitations.where(status: "pending").any? %>
+      <li ><%= link_to "Invitations", pending_invitations_path, style: "color: white; text-decoration: none;" %></li>
+    <% end %>
     <li style="margin-left: auto; color: white; position: relative;">
       <% if @admin.present? && Admin.exists?(id: @admin.id) %>
         <div class="admin-dropdown">

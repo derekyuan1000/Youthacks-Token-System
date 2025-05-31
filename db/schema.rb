@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_31_185806) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_31_205433) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -26,6 +26,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_31_185806) do
     t.index ["admin_id"], name: "index_activities_on_admin_id"
     t.index ["event_id"], name: "index_activities_on_event_id"
     t.index ["subject_type", "subject_id"], name: "index_activities_on_subject"
+  end
+
+  create_table "admin_invitations", force: :cascade do |t|
+    t.bigint "event_id", null: false
+    t.bigint "admin_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "status"
+    t.index ["admin_id"], name: "index_admin_invitations_on_admin_id"
+    t.index ["event_id"], name: "index_admin_invitations_on_event_id"
   end
 
   create_table "admins", force: :cascade do |t|
@@ -117,6 +127,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_31_185806) do
 
   add_foreign_key "activities", "admins"
   add_foreign_key "activities", "events"
+  add_foreign_key "admin_invitations", "admins"
+  add_foreign_key "admin_invitations", "events"
   add_foreign_key "event_admins", "admins"
   add_foreign_key "event_admins", "events"
   add_foreign_key "events", "admins", column: "manager_id"

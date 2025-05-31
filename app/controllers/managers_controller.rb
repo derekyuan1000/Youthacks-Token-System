@@ -2,7 +2,6 @@ class ManagersController < EventsController
     before_action :require_manager
 
     def settings
-        render "events/settings"
     end
 
     def update_settings
@@ -29,7 +28,7 @@ class ManagersController < EventsController
     private
     def require_manager
         unless @event.manager_id == @admin.id
-            redirect_to dashboard_path, alert: "Manager access required."
+            redirect_to event_dashboard_path, alert: "Manager access required."
         end
     end 
 end

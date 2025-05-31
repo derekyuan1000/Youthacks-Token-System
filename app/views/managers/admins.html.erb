@@ -1,0 +1,16 @@
+<h1>Event Admins</h1>
+<p>Admins can manage events, view participants, and more.</p>
+<% if @event.admins.any? %>
+  <h2>Admins</h2>
+  <ul>
+    <% @event.admins.each do |admin| %>
+      <li>
+        <%=  admin.name %> - <%= admin.email %>
+        <br>
+        Invited at: <%= admin.invitations.find_by(event: @event).updated_at.localtime.strftime("%-d %b, %Y %H:%M") %>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+    <p>No admins found.</p> 
+<% end %>

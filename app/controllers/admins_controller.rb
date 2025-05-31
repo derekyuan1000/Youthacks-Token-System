@@ -16,6 +16,42 @@ class AdminsController < ApplicationController
     def dashboard
     end
 
+    def pending_invitations
+        @pending_invitations = AdminInvitation.where(admin_id: @admin.id,status: 'pending')
+        if @pending_invitations.empty?
+            flash[:alert] = "You have no pending invitations."
+            redirect_to dashboard_path
+            return
+        end
+    end
+
+    def accept_invitation
+        invitation = AdminInvitation.find_by(id: params[:id], admin_id: @admin.id, status: 'pending')
+        if invitation
+            result = invitation.accept!
+            if result[:success]
+                redirect_to dashboard_path, notice: 'Invitation accepted successfully.'
+            else
+                redirect_to pending_invitations_path, alert: result[:message] || 'Failed to accept invitation.'
+            end
+        else
+            redirect_to pending_invitations_path, alert: 'Invitation not found or already accepted.' + params[:id].to_s
+        end
+    end
+    def reject_invitation
+        invitation = AdminInvitation.find_by(id: params[:invitation_id], admin_id: @admin.id, status: 'pending')
+        if invitation
+            result = invitation.reject!
+            if result[:success]
+                redirect_to pending_invitations_path, notice: 'Invitation rejected successfully.'
+            else
+                redirect_to pending_invitations_path, alert: result[:message] || 'Failed to reject invitation.'
+            end
+        else
+            redirect_to pending_invitations_path, alert: 'Invitation not found or already accepted.'
+        end
+    end
+
     def settings
     end
 

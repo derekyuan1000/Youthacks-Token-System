@@ -1,0 +1,13 @@
+<h1>Pending invitations</h1>
+<% if @pending_invitations.any? %>
+  <ul>
+    <% @pending_invitations.each do |invitation| %>
+      <li>
+        <strong><%= invitation.event.name %></strong> - <%= invitation.created_at.strftime("%-d %b, %Y") %>
+        <br>
+        <%= link_to "Accept", accept_invitation_path(invitation.id), method: :post, class: "btn btn-success" %>
+        <%= link_to "Reject", reject_invitation_path(invitation.id), method: :delete, class: "btn btn-danger" %>
+      </li>
+    <% end %>
+  </ul>
+<% end %>

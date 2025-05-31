@@ -19,7 +19,11 @@ Rails.application.routes.draw do
 	post "resend_code", to: "admins#resend_code",  as: "resend_code"
 
 	get "dashboard", to: "admins#dashboard", as: "dashboard"
-	get    "settings",  to: "admins#settings",  as: "settings"
+	get "settings",  to: "admins#settings",  as: "settings"
+
+	get "pending_invitations", to: "admins#pending_invitations", as: "pending_invitations"
+	post "accept_invitation/:id", to: "admins#accept_invitation", as: "accept_invitation"
+	delete "decline_invitation/:id", to: "admins#reject_invitation", as: "reject_invitation"
 
 
 	get "create_event", to: "admins#new_event", as: "new_event"
@@ -56,6 +60,8 @@ Rails.application.routes.draw do
 		post "settings/update",                to: "managers#update_settings", as: "event_update_settings"
 		post "settings/update_airtable", to: "managers#update_airtable", as: "event_update_airtable"
 		post "settings/update_airtable_table", to: "managers#update_airtable_table", as: "event_update_airtable_table"
+
+		get "admins", to: "managers#admins", as: "event_admins"
 
 
 		get "", to: "events#dashboard"
