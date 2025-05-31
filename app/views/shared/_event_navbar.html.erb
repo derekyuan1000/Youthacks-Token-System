@@ -1,0 +1,31 @@
+<nav style="background-color: #333; padding: 1em;">
+  <ul style="list-style: none; display: flex; gap: 1em; margin: 0; padding: 0;">
+    <li><%= link_to "Home", root_path, style: "color: white; text-decoration: none;" %></li>
+    <li><%= link_to "Dashboard", event_dashboard_path, style: "color: white; text-decoration: none;" %></li>
+    <li><%= link_to "Products", event_products_path, style: "color: white; text-decoration: none;" %></li>
+    <li><%= link_to "Transaction History", transactions_path, style: "color: white; text-decoration: none;" %></li>
+    <li><%= link_to "Activity History", activity_path, style: "color: white; text-decoration: none;" %></li>
+
+  </ul>
+</nav>
+
+<style>
+.admin-dropdown {
+  display: inline-block;
+  position: relative;
+}
+
+.admin-dropdown-menu {
+  display: none;
+  position: absolute;
+  background: #333;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  min-width: 150px;
+}
+
+.admin-dropdown:hover .admin-dropdown-menu {
+  display: block;
+}
+</style>

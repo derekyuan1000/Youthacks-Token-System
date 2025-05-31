@@ -17,6 +17,28 @@ class Event < ApplicationRecord
 	encrypts :airtable_base_id
 	encrypts :airtable_table_name
 
+	def self.create(name:, description: "", airtable_api_key: nil, airtable_base_id: nil, airtable_table_name: nil, manager_id:)
+		begin
+			unless name.present?
+				raise "Name cannot be blank"
+			end
+			unless manager_id.present? and Admin.exists?(manager_id)
+				raise "Manager ID is required and must be valid"
+			end
+			event = create!(
+				name: name,
+				description: description,
+				airtable_api_key: airtable_api_key,
+				airtable_base_id: airtable_base_id,
+				airtable_table_name: airtable_table_name,
+				manager_id: manager_id
+			)
+			{ success: true, message: "Event created successfully", event: event }
+		rescue => e
+			{ success: false, message: "Error creating event: #{e.message}" }
+		end
+	end
+
 	def self.sync # With Airtable
       begin
         # Initialize Airtable client
