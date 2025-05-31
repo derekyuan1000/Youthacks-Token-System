@@ -93,7 +93,7 @@ class Event < ApplicationRecord
 				existing_participant.update!(
 				name: participant[name_column],
 				personal_info: participant.to_json,
-
+				active: true
 				# balance = existing_participant.balance
 				)
 			else
@@ -122,7 +122,7 @@ class Event < ApplicationRecord
         { success: false, message: "Error syncing: #{e.message}" }
       end
     end
-	def self.create!(name:, admin_id:, event_id:)
+	def self.create_to_airtable!(name:, admin_id:, event_id:)
 		begin
 			client = Airtable::Client.new(airtable_api_key)
 			table  = client.table(airtable_base_id, airtable_table_name)
