@@ -1,2 +1,32 @@
 <h1>Settings</h1>
 
+<%=form_with url: event_update_settings_path, method: :post, local: true do %>
+  <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+  
+  <h3>Event Name</h3>
+  <%= text_field_tag :name, @event.name, required: true %>
+  
+  <h3>Event Date</h3>
+  <%= date_field_tag :date, @event.date.strftime("%Y-%m-%d"), required: true %>
+  
+  <h3>Event Description (optional)</h3>
+  <%= text_area_tag :description, @event.description %>
+  
+  <br><br>
+  <%= submit_tag "Update Settings" %>
+<% end %>
+
+<h2>Airtable Sync</h2>
+<p>Sync your participants from Airtable. You will need a valid Airtable API key and base ID, with read permissions.</p>
+<p>(the API key and base ID are not shown here when updated)
+<%= form_with url: event_update_airtable_path, method: :post, local: true do %>
+  <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+  <h3>Airtable API Key</h3>
+  <%= text_field_tag :airtable_api_key, nil, required: true %>
+  <h3>Airtable Base ID</h3>
+  <%= text_field_tag :airtable_base_id, nil, required: true %>
+  <h3>Airtable Table Name</h3>
+  <%= text_field_tag :airtable_table_name, @event.airtable_table_name, required: true %>
+  <br><br>
+  <%= submit_tag "Save information" %>
+<% end %>

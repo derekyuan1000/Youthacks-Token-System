@@ -1,6 +1,6 @@
-class EventsController < ApplicationController
+class EventsController < AdminsController
     before_action :require_event
-    before_action :require_access, except: [:products]
+    before_action :require_access
 
     def new
     end
@@ -43,13 +43,7 @@ class EventsController < ApplicationController
 
     end
 
-    def products
-        @products = Product.all
-        if session[:admin_id].present? && Admin.exists?(session[:admin_id])
-            @admin = Admin.find(session[:admin_id])
-        end
-        render "home/products"
-    end
+    
 
 
     def transactions
@@ -134,7 +128,7 @@ class EventsController < ApplicationController
         price = params[:price]
         description = params[:description]
         quantity = params[:quantity]
-        result = product.change!(name: name, price: price, description: description, quantity: quantity, admin_id: @admin.id)
+        result = product.change!(name: name, price: price, description: description, quantity: quantity, admin_id: @admin.id, event_id: @event.id)
         if result[:success]
             redirect_to event_products_path, notice: 'Product was successfully updated.'
         else
@@ -150,10 +144,7 @@ class EventsController < ApplicationController
             redirect_to event_products_path, alert: 'Failed to delete product.'
         end
     end
-    def products_refresh
-        @products = Product.all
-        render partial: "home/products", locals: { products: @products }
-    end
+    
     def activity_refresh
         @activities = Activity.all
         render partial: "events/activity", locals: { activities: @activities }
@@ -184,17 +175,11 @@ class EventsController < ApplicationController
 
     def require_access
         begin 
-            unless session[:admin_id].present? && Admin.exists?(session[:admin_id])
-                session[:admin_id] = nil
-                redirect_to login_path
-                return
-            end
-            @admin = Admin.find(session[:admin_id])
             unless @event.admins.exists?(@admin.id) or @event.manager_id == @admin.id
-                raise
+                redirect_to dashboard_path, alert: "Event does not exist."
             end
         rescue => e
-            redirect_to dashboard_path, alert: "Event does not exist. #{e.message}"
+            redirect_to dashboard_path, alert: "Event does not exist."
         end
     end
 end

@@ -1,4 +1,4 @@
-<h1>Products for Sale</h1>
+<h1>Products<%=" for sale - #{@event.name}" unless session[:admin_id].present? and (@event.admins.exists?(@admin.id) or @event.manager_id == @admin.id)%> </h1> 
 <style>
   .products-grid {
     display: grid;

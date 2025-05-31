@@ -42,8 +42,8 @@ Rails.application.routes.draw do
 		post   "/products/:id/edit",              to: "events#update_product", as: "event_update_product"
 		delete "/products/:id",                   to: "events#delete_product", as: "event_product_delete"
 		
-		get    "products",                        to: "events#products",     as: "event_products"
-		get    "products/refresh",                to: "events#products_refresh", as: "event_products_refresh"
+		get    "products",                        to: "home#products",     as: "event_products"
+		get    "products/refresh",                to: "home#products_refresh", as: "event_products_refresh"
 		
 		get    "activity",                        to: "events#activity",  as: "event_activity"
 		get    "activity/refresh",                to: "events#activity_refresh"
@@ -52,6 +52,9 @@ Rails.application.routes.draw do
 		get    "transactions/refresh",            to: "events#transactions_refresh"
 
 		get   "settings",                        to: "events#settings", as: "event_settings"
+		post "settings/update",                to: "events#update_settings", as: "event_update_settings"
+		post "settings/update_airtable", to: "events#update_airtable", as: "event_update_airtable"
+
 
 		get "", to: "events#dashboard"
 	end

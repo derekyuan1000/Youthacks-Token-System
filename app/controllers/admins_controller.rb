@@ -93,7 +93,7 @@ class AdminsController < ApplicationController
             description = params[:description].strip
             date = params[:date].strip
             new_event = Event.create!(name: name, description: description,date:date, manager_id: @admin.id)
-            redirect_to event_dashboard_path(new_event.event_slug), notice: 'Event was successfully created.'
+            redirect_to event_dashboard_path(new_event.slug), notice: 'Event was successfully created.'
         rescue => e
             redirect_to dashboard_path, alert: "Failed to create event: #{e.message}" 
         end

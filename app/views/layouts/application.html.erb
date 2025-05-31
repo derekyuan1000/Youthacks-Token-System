@@ -25,8 +25,8 @@
   </head>
 
   <body>
-  <%= render 'shared/navbar' %>
-    <% if defined?(params[:event_slug]) && Event.friendly.exists?(slug: params[:event_slug]) %>
+  	<%= render 'shared/navbar' %>
+    <% if session[:admin_id].present? and defined?(params[:event_slug]) && Event.friendly.exists?(slug: params[:event_slug]) %>
       <%= render 'shared/event_navbar' %>
     <% end %>
 

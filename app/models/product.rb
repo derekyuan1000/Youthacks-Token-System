@@ -60,7 +60,7 @@ class Product < ApplicationRecord
         end
     end
 
-    def change!(name:, price:, description:, quantity:, admin_id: )
+    def change!(name:, price:, description:, quantity:, admin_id:, event_id:)
         begin
             unless admin_id.present? and Admin.exists?(admin_id)
                 raise "Admin ID is required and must be valid"
@@ -98,7 +98,8 @@ class Product < ApplicationRecord
                     diff[:new_values][key] = binding.local_variable_get(key)
                     end
                 end).to_json,
-                admin_id: admin_id
+                admin_id: admin_id,
+                event_id: event_id
             )
             {success: true, message: "Product updated successfully"}
         end

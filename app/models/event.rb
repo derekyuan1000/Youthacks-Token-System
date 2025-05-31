@@ -18,6 +18,14 @@ class Event < ApplicationRecord
 	encrypts :airtable_api_key
 	encrypts :airtable_base_id
 
+
+    def slug_candidates
+        [
+            :name,
+            -> { "#{name}-#{SecureRandom.hex(2)}" }
+        ]
+    end
+
 	def add_admin!(admin_id:)
 		begin
 			unless admin_id.present? and Admin.exists?(admin_id)

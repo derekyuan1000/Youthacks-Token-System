@@ -19,7 +19,7 @@
         <div class="modal-content">
           <span class="close" onclick="hideModal(<%= product.id %>)">&times;</span>
           <h3>Edit Product: <%= product.name %></h3>
-          <%= form_with url: event_update_product_path(product, @event.slug), method: :post, local: true do |f| %>
+          <%= form_with url: event_update_product_path(id: product, event_slug: @event.slug), method: :post, local: true do |f| %>
             <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
 
             <label>Name:</label>
@@ -37,7 +37,7 @@
             <br><br>
             <%= f.submit "Update Product" %>
           <% end %>
-          <%= button_to "Delete Product", event_product_delete_path(product, @event.slug), method: :delete, form: { data: { turbo: false }, style: "display:inline;" }, data: { confirm: "Are you sure you want to delete this product?" } %>
+          <%= button_to "Delete Product", event_product_delete_path(event_slug: @event.slug, id:product), method: :delete, form: { data: { turbo: false }, style: "display:inline;" }, data: { confirm: "Are you sure you want to delete this product?" } %>
           <h3>Previous Purchases</h3>
           <ul>
             <% Transaction.where(product_id: product.id).order(:created_at).reverse.each do |purchase| %>
