@@ -79,36 +79,38 @@ class Event < ApplicationRecord
         end
         # Sync each Airtable record with the local database
         records.each do |record|
-          participant = record.fields
+			participant = record.fields
 
-          if participant['attendee_preferred_name'].nil?
-            participant['attendee_preferred_name'] = participant['attendee_first_name']
-          end
-          # Check if the participant exists in the local database
-          existing_participant = participants.find_by(id: participant[id_column])
-          
-          
-          if existing_participant
-            # If the participant exists, update their details
-            existing_participant.update!(
-              name: participant['attendee_preferred_name'],
-			  personal_info: participant.to_json,
+			existing_participant = participants.find_by(id: participant[id_column])
+			
+			if participant[name_column].blank?
+				next
+			end
+			
+			if existing_participant
+				# If the participant exists, update their details
+				existing_participant.update!(
+				name: participant[name_column],
+				personal_info: participant.to_json,
 
-              # balance = existing_participant.balance
-            )
-          else
-            # If the participant doesn't exist, create a new entry
-            participants.create!(
-              id: participant[id_column],
-              name: participant['attendee_preferred_name'],
-			  personal_info: participant.to_json,
-			  event_id: id
-            )
-          end
+				# balance = existing_participant.balance
+				)
+			else
+				# If the participant doesn't exist, create a new entry
+				participants.create!(
+				id: participant[id_column],
+				name: participant[name_column],
+				personal_info: participant.to_json,
+				event_id: id
+				)
+			end
         end
         participants.active.each do |p|
-			if records.none? { |r| r.fields[id_column] == p.id }
-				p.delete!(0)
+			if records.none? { |r| r.fields[id_column] == p.id } or p.name.blank?
+				result = p.delete!(admin_id: manager_id)
+				unless result[:success]
+					raise "Error deleting participant: #{result[:message]}"
+				end
 			end 
         end
         # Return success message if sync was successful

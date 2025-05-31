@@ -79,7 +79,7 @@ class Participant < ApplicationRecord
       end
     end
     
-    def delete!(admin_id = nil)
+    def delete!(admin_id:)
       begin 
         raise "Admin ID is required to delete a participant" if admin_id.nil?
 
@@ -87,7 +87,8 @@ class Participant < ApplicationRecord
 			subject: self,
 			action: "delete_participant",
 			metadata: { old_balance: balance }.to_json,
-			admin_id: admin_id
+			admin_id: admin_id,
+			event_id: event_id
         )
         update!(active: false)  # Soft-delete instead of destroy
         { success: true, message: "Participant deleted successfully" }

@@ -11,7 +11,7 @@ class EventsController < AdminsController
         # else
         #     Participant.all
         # end
-        @participants = Participant.active
+        @participants = @event.participants.active
         respond_to do |format|
             format.html # normal page load
             format.js   # AJAX request
@@ -26,8 +26,8 @@ class EventsController < AdminsController
             end
             result = @event.sync
             if result[:success]
-                @participants = Participant.active
-                redirect_to event_dashboard_path, notice: "Participants synced successfully"
+                @participants = @event.participants.active
+                redirect_to event_dashboard_path, notice: "Participants synced successfully. Any activity of participants deleted will be listed as under the manager."
             else
                 raise result[:message] || "Failed to sync participants"
             end
@@ -37,7 +37,7 @@ class EventsController < AdminsController
     end
 
     def activity
-        @activities = Activity.all
+        @activities = @event.activity.all
 
     end
 
@@ -45,14 +45,14 @@ class EventsController < AdminsController
 
 
     def transactions
-        @transactions = Transaction.all
+        @transactions = @event.transcations.all
     end
 
     def settings
     end
 
     def set_balance
-        participant = Participant.find( params[:id])
+        participant = @event.participants.find( params[:id])
         # participant.set_balance(params[:balance]) # If you have a set_balance method in the model
         participant.set_balance!(params[:balance], @admin.id) # or just directly update
         redirect_to dashboard_path, notice: "Balance updated for #{participant.name}"
@@ -74,15 +74,15 @@ class EventsController < AdminsController
 
 
     def earn
-      participant = Participant.find(params[:id])
+      participant = @event.participants.find(params[:id])
       amount = params[:amount].to_i if params[:amount].present? || 1 
       participant.earn!(amount: amount,admin_id: @admin.id) # or session[:admin_id]
       redirect_to dashboard_path, notice: "#{participant.name} just earned 1"
     end
     
     def buy
-        participant = Participant.find(params[:id])
-        product = Product.find(params[:product_id])
+        participant = @event.participants.find(params[:id])
+        product = @event.products.find(params[:product_id])
         result = participant.buy!(product, @admin.id) # or session[:admin_id]
         if result[:success]
             redirect_to dashboard_path, notice: "#{participant.name} just bought #{product.name}"
@@ -92,7 +92,7 @@ class EventsController < AdminsController
     end
 
     def delete_participant
-        participant = Participant.find(params[:id])
+        participant = @event.participants.find(params[:id])
         result = participant.delete!(@admin.id)
         
         if result[:success]
@@ -103,7 +103,7 @@ class EventsController < AdminsController
     end
 
     def check_in_participant
-        participant = Participant.find(params[:id])
+        participant = @event.participants.find(params[:id])
         result = participant.check_in(@admin.id)
         if result[:success]
             redirect_to dashboard_path, notice: "#{participant.name} has been checked in"
@@ -116,12 +116,12 @@ class EventsController < AdminsController
         price = params[:price]
         description = params[:description]
         quantity = params[:quantity]
-        Product.create(name: name, price: price, description: description, quantity: quantity, admin_id: @admin.id, event_id: @event.id)
+        @event.products.create(name: name, price: price, description: description, quantity: quantity, admin_id: @admin.id, event_id: @event.id)
         redirect_to event_products_path, notice: 'Product was successfully created.'
 
     end
     def update_product
-        product = Product.find(params[:id])
+        product = @event.products.find(params[:id])
         name = params[:name]
         price = params[:price]
         description = params[:description]
@@ -134,7 +134,7 @@ class EventsController < AdminsController
         end
     end
     def delete_product
-        product = Product.find(params[:id])
+        product = @event.products.find(params[:id])
         result = product.delete!(admin_id:@admin.id) # or session[:admin_id]
         if result[:success]
             redirect_to event_products_path, notice: 'Product was successfully deleted.'
@@ -144,12 +144,12 @@ class EventsController < AdminsController
     end
     
     def activity_refresh
-        @activities = Activity.all
+        @activities = @event.activities.all
         render partial: "events/activity", locals: { activities: @activities }
     end
 
     def transactions_refresh
-        @transactions = Transaction.all
+        @transactions = @event.transactions.all
         render partial: "events/transactions", locals: { transactions: @transactions }
     end
     def create

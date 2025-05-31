@@ -25,15 +25,19 @@
   <%= text_field_tag :airtable_api_key, nil, required: true %>
   <h3>Airtable Base ID</h3>
   <%= text_field_tag :airtable_base_id, nil, required: true %>
+    <br><br>
     <%= submit_tag "Save" %>
 <% end %>
-<p>The less sensitive information. For the ID column, if you have a column in Airtable that contains unique IDs for each participant, you can specify it here.</p>
+<p>The less sensitive information (this is seperate). For the ID column, if you have a column in Airtable that contains unique IDs for each participant, you can specify it here.</p>
 <%= form_with url: event_update_airtable_table_path, method: :post, local: true do %>
   <h3>Airtable Table Name</h3>
   <%= text_field_tag :airtable_table_name, @event.airtable_table_name, required: true %>
   <br><br>
   <h3>Airtable ID Column (optional, default will be used if not chosen)</h3>
     <%= text_field_tag :id_column, @event.id_column %>
+    <br><br>
+    <h3>Airtable Name Column (not optional)</h3>
+    <%= text_field_tag :name_column, @event.name_column, required: true %>
     <br><br>
   <%= submit_tag "Save information" %>
 <% end %>
