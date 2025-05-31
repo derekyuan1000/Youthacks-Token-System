@@ -92,7 +92,6 @@ class Event < ApplicationRecord
             # If the participant exists, update their details
             existing_participant.update!(
               name: participant['attendee_preferred_name'],
-              pronouns: participant['pronouns'],
 			  personal_info: participant.to_json,
 
               # balance = existing_participant.balance
@@ -100,16 +99,15 @@ class Event < ApplicationRecord
           else
             # If the participant doesn't exist, create a new entry
             participants.create!(
-              id: participant['signup_ID'],
+              id: participant[id_column],
               name: participant['attendee_preferred_name'],
-              pronouns: participant['pronouns'],
 			  personal_info: participant.to_json,
 			  event_id: id
             )
           end
         end
         participants.active.each do |p|
-			if records.none? { |r| r.fields['signup_ID'] == p.id }
+			if records.none? { |r| r.fields[id_column] == p.id }
 				p.delete!(0)
 			end 
         end

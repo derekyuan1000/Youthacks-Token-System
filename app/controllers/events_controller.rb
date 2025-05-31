@@ -18,8 +18,6 @@ class EventsController < AdminsController
         end
     end
 
-    def settings
-    end
 
     def sync_participants
         begin

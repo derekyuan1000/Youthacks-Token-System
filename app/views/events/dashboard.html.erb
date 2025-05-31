@@ -59,16 +59,16 @@
         <button onclick="showBuyModal(<%= participant.id %>)">Buy</button>
         <button onclick="showSetBalanceModal(<%= participant.id %>)">Set Balance</button>
         <% unless participant.checked_in? %>
-        <%= form_with url: participant_check_in_path(participant.id), method: :post, local: true do %>
+        <%= form_with url: event_participant_check_in_path(id:participant.id), method: :post, local: true do %>
           <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
           <button type="submit">Check In</button>
         <% end %>
         <% end %>
-        <%= form_with url: participant_delete_path(participant.id), method: :delete, local: true do %>
+        <%= form_with url: event_participant_delete_path(id: participant.id), method: :delete, local: true do %>
           <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
           <button type="submit" onclick="return confirm('Are you sure you want to delete this participant?')">Delete</button>
         <% end %>
-        <%= form_with url: earn_path(participant.id), method: :post, local: true, id: "earn-form" do %>
+        <%= form_with url: event_earn_path(id: participant.id), method: :post, local: true, id: "earn-form" do %>
           <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
           <%= number_field_tag :amount, 1, min: 1, step: 1, required: true %>
           <button type="submit">Earn</button>
@@ -80,7 +80,7 @@
       <div class="modal-content">
         <span class="close" onclick="hideBuyModal(<%= participant.id %>)">&times;</span>
         <h4>Buy for <%= participant.name %></h4>
-        <form action="<%= buy_path(participant.id) %>" method="POST">
+        <form action="<%= event_buy_path(id: participant.id) %>" method="POST">
           <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
           <!-- Pass participant ID -->
           <%= hidden_field_tag :participant_id, participant.id %>
@@ -101,7 +101,7 @@
       <div class="modal-content">
         <span class="close" onclick="hideSetBalanceModal(<%= participant.id %>)">&times;</span>
         <h4>Set Balance for <%= participant.name %></h4>
-        <form action="<%= set_balance_path(participant.id) %>" method="POST">
+        <form action="<%= event_set_balance_path(id:participant.id) %>" method="POST">
           <!-- Rails needs authenticity token -->
           <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
 
@@ -199,18 +199,18 @@
       });
     }
   });
-  document.addEventListener("DOMContentLoaded", function() {
-    var input = document.getElementById("search-input");
-    var cards = document.querySelectorAll(".participant-card");
-    input.addEventListener("input", function() {
-      var query = input.value.toLowerCase();
-      cards.forEach(function(card) {
-        var name = card.querySelector("h2").textContent.toLowerCase();
+document.addEventListener("turbo:load", function() {
+  var input = document.getElementById("search-input");
+  var cards = document.querySelectorAll(".participant-card");
+  input.addEventListener("input", function() {
+    var query = input.value.toLowerCase();
+    cards.forEach(function(card) {
+      var name = card.querySelector("h2").textContent.toLowerCase();
 
-        card.style.display = name.includes(query) ? "" : "none";
-      });
+      card.style.display = name.includes(query) ? "" : "none";
     });
   });
+});
   // Toggle bulk checkbox visibility
 
   document.getElementById('bulk-toggle').addEventListener('change', function(e) {

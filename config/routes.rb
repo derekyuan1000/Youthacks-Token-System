@@ -51,9 +51,10 @@ Rails.application.routes.draw do
 		get    "transactions",                    to: "events#transactions", as: "event_transactions"
 		get    "transactions/refresh",            to: "events#transactions_refresh"
 
-		get   "settings",                        to: "events#settings", as: "event_settings"
-		post "settings/update",                to: "events#update_settings", as: "event_update_settings"
-		post "settings/update_airtable", to: "events#update_airtable", as: "event_update_airtable"
+		get   "settings",                        to: "managers#settings", as: "event_settings"
+		post "settings/update",                to: "managers#update_settings", as: "event_update_settings"
+		post "settings/update_airtable", to: "managers#update_airtable", as: "event_update_airtable"
+		post "settings/update_airtable_table", to: "managers#update_airtable_table", as: "event_update_airtable_table"
 
 
 		get "", to: "events#dashboard"
