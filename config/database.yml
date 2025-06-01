@@ -16,7 +16,10 @@ production:
   primary: &primary_production
     <<: *default
     database: mattsoh_aha_production
-    host: /var/run/postgres
+    host: hackclub.app
+    port: 5432
+    username: mattsoh
+    password: <%= ENV['DB_PASSWORD'] %>
 
   cache:
     <<: *primary_production
