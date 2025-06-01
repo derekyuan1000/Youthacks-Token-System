@@ -13,6 +13,7 @@ FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 
 # Rails app lives here
 WORKDIR /rails
+RUN apt-get update && apt-get install -y libffi-dev
 
 # Install base packages
 RUN apt-get update -qq && \

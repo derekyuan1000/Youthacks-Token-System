@@ -80,9 +80,13 @@ test:
 # for a full overview on how database connection configuration can be specified.
 #
 production:
+  
   primary: &primary_production
     <<: *default
-    database: aha_production
+    database: mattsoh_aha_production
+    host: hackclub.app
+    port: 5432
+    username: mattsoh
   cache:
     <<: *primary_production
     database: aha_production_cache
