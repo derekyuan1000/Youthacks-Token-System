@@ -41,6 +41,7 @@ env:
     # Run the Solid Queue Supervisor inside the web server's Puma process to do jobs.
     # When you start using multiple servers, you should split out job processing to a dedicated machine.
     SOLID_QUEUE_IN_PUMA: true
+    PORT: 33044
 
     # Set number of processes dedicated to Solid Queue (default: 1)
     # JOB_CONCURRENCY: 3
@@ -55,7 +56,6 @@ env:
     # Log everything from Rails
     # RAILS_LOG_LEVEL: debug
 
-# Aliases are triggered with "bin/kamal <alias>". You can overwrite arguments on invocation:
 # "bin/kamal logs -r job" will tail logs from the first server in the job section.
 aliases:
   console: app exec --interactive --reuse "bin/rails console"

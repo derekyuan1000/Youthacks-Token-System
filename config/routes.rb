@@ -70,8 +70,43 @@ Rails.application.routes.draw do
 		get "", to: "events#dashboard"
 	end
 
-	# Admin creation and sync routes outside event scope (if global)
-	post 'admins/create',          to: 'admins#create',          as: 'admin_create'
+	namespace :api do
+		get 'login', to: 'sessions#new', as: 'login'
+		post 'login', to: 'sessions#create'
+		delete 'logout', to: 'sessions#destroy', as: 'logout'
+
+		scope '/events/:event_slug' do
+			get 'participants', to: 'events#participants', as: 'event_participants'
+			post 'participants/create', to: 'events#create_participant', as: 'event_create_participant'
+			post   'participants/sync',                to: 'events#sync_participants'
+
+			post   'participants/:id/set_balance',     to: 'events#set_balance'
+			post   'participants/bulk_earn',           to: 'events#bulk_earn'
+			post   'participants/:id/earn',            to: 'events#earn'
+			post   'participants/:id/buy',             to: 'events#buy'
+
+			post   'participants/:id/check_in',        to: 'events#check_in_participant'
+			post   'participants/bulk_check_in',       to: 'events#bulk_check_in'
+			delete 'participants/:id',                 to: 'events#delete_participant'
+
+			get 'products', to: 'events#products', as: 'event_products'
+			post 'products/create', to: 'events#create_product', as: 'event_create_product'
+			post   'products/:id/edit',                to: 'events#update_product'
+			delete 'products/:id',                     to: 'events#delete_product'
+
+			get    'activity',                         to: 'events#activity', as: 'event_activity'
+
+			get    'transactions',                     to: 'events#transactions', as: 'event_transactions'
+
+			get    'settings',                         to: 'managers#settings'
+			post   'settings/update',                  to: 'managers#update_settings'
+			post   'settings/update_airtable',         to: 'managers#update_airtable'
+			post   'settings/update_airtable_table',   to: 'managers#update_airtable_table'
+
+			get    'admins',                           to: 'managers#admins'
+			post   'admins/invite',                    to: 'managers#invite_admin'
+		end
+	end
 
 	# Root path
 	root "home#index"
