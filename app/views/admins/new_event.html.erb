@@ -11,5 +11,8 @@
 	<%= label_tag :description, "Event Description (optional)" %>
 	<%= text_area_tag :description, nil, required: false %>
 	<br><br>
+	<%= check_box_tag :sync_with_airtable, '1', false %>
+	<%= label_tag :sync_with_airtable, "Sync with Airtable (this means that you can pull your participants from an Airtable database. You need an API key with at least read permissions. This option cannot be changed later)" %>
+	<br><br>
 	<%= submit_tag "Create Event" %>
 <% end %>

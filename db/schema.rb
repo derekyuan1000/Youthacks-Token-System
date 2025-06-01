@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_31_205433) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_01_134113) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -70,6 +70,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_31_205433) do
     t.string "slug"
     t.date "date"
     t.string "name_column"
+    t.boolean "sync_with_airtable", default: false, null: false
     t.index ["manager_id"], name: "index_events_on_manager_id"
     t.index ["slug"], name: "index_events_on_slug", unique: true
   end

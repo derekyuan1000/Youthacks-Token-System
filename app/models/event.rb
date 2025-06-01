@@ -45,7 +45,7 @@ class Event < ApplicationRecord
 		end
 	end
 
-	def self.create(name:, description: "", airtable_api_key: nil, airtable_base_id: nil, airtable_table_name: nil, manager_id:)
+	def self.create(name:, description: "", airtable_api_key: nil, airtable_base_id: nil, airtable_table_name: nil, manager_id:, sync_with_airtable:false)
 		begin
 			unless name.present?
 				raise "Name cannot be blank"
@@ -59,7 +59,8 @@ class Event < ApplicationRecord
 				airtable_api_key: airtable_api_key,
 				airtable_base_id: airtable_base_id,
 				airtable_table_name: airtable_table_name,
-				manager_id: manager_id
+				manager_id: manager_id,
+				sync_with_airtable: sync_with_airtable
 			)
 			{ success: true, message: "Event created successfully", event: event }
 		rescue => e
@@ -70,6 +71,9 @@ class Event < ApplicationRecord
 
 	def sync # With Airtable
       begin
+		unless sync_with_airtable
+			raise "This event is not set to sync with Airtable. Please enable it in the settings."
+		end
         # Initialize Airtable client
         client = Airtable::Client.new(airtable_api_key)
         table  = client.table(airtable_base_id, airtable_table_name)
@@ -125,8 +129,34 @@ class Event < ApplicationRecord
         { success: false, message: "Error syncing: #{e.message}" }
       end
     end
+	def create_without_airtable!(name:, admin_id:)
+		begin
+			if sync_with_airtable
+				raise "This event is set to sync with Airtable."
+			end
+			participant = participants.create!(
+				name: name,
+				event_id: id,
+				personal_info: { name: name }.to_json,
+				event_id: id
+			)
+			Activity.create!(	
+				subject: participant,
+				action: "participant_create",
+				metadata: { name: name }.to_json,
+				admin_id: admin_id,
+				event_id: id
+			)
+			{ success: true, message: "Participant created successfully", participant: participant }
+		rescue => e
+			{ success: false, message: "Error creating participant: #{e.message}" }
+		end
+	end
 	def create_to_airtable!(name:, admin_id:)
 		begin
+			unless sync_with_airtable
+				raise "This event is not set to sync with Airtable."
+			end
 			client = Airtable::Client.new(airtable_api_key)
 			table  = client.table(airtable_base_id, airtable_table_name)
 			record = Airtable::Record.new(

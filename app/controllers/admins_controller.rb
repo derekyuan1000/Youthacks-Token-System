@@ -124,13 +124,14 @@ class AdminsController < ApplicationController
             name = params[:name].strip
             description = params[:description].strip
             date = params[:date].strip
-            new_event = Event.create!(name: name, description: description,date:date, manager_id: @admin.id)
+            sync_with_airtable = params[:sync_with_airtable] == '1' # Convert to boolean
+            new_event = Event.create!(name: name, description: description,date:date, manager_id: @admin.id, sync_with_airtable: sync_with_airtable)
             redirect_to event_dashboard_path(new_event.slug), notice: 'Event was successfully created.'
         rescue => e
             redirect_to dashboard_path, alert: "Failed to create event: #{e.message}" 
         end
     end
-    
+
 
     private
 

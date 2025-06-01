@@ -1,6 +1,8 @@
 <h1>Dashboard</h1>
 
-<%= button_to "Sync Participants", event_sync_participants_path, method: :post, class: "sync-button" %>
+<% if @event.sync_with_airtable %>
+  <%= button_to "Sync Participants", event_sync_participants_path, method: :post, class: "sync-button" %>
+<% end %>
 <%= form_with url: event_create_participant_path, method: :post, local: true do %>
   <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
   <label for="participant_name">Add Participant:</label>

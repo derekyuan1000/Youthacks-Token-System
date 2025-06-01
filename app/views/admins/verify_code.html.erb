@@ -20,6 +20,17 @@
             const hiddenCode = document.getElementById('full-code');
             // Autofocus logic
             inputs.forEach((input, idx) => {
+                input.addEventListener('paste', function(e) {
+                    const paste = (e.clipboardData || window.clipboardData).getData('text');
+                    if (paste.length === inputs.length) {
+                        e.preventDefault();
+                        paste.split('').forEach((char, i) => {
+                            inputs[i].value = char;
+                        });
+                        inputs[inputs.length - 1].focus();
+                        this.form.requestSubmit();
+                    }
+                });
                 input.addEventListener('input', function() {
                     if (this.value.length === 1) {
                         if (idx === inputs.length - 1) {
@@ -46,10 +57,10 @@
 
     <style>
         .code-input {
-            width: 2em;
-            font-size: 2em;
+            width: 1em;
+            font-size: 0.5em;
             text-align: center;
-            margin: 0 0.2em;
+            margin: 0 0.5em;
         }
     </style>
 <% end %>
