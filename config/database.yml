@@ -89,12 +89,14 @@ production:
     username: mattsoh
   cache:
     <<: *primary_production
-    database: aha_production_cache
+    database: mattsoh_aha_production_cache
     migrations_paths: db/cache_migrate
+
   queue:  
     <<: *primary_production
-    database: aha_production_queue
+    database: mattsoh_aha_production_queue
     migrations_paths: db/queue_migrate
+
   cable:
     <<: *primary_production
     database: aha_production_cable
