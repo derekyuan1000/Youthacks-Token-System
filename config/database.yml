@@ -30,5 +30,5 @@ production:
 
   cable:
     <<: *primary_production
-    database: aha_production_cable
+    database: mattsoh_aha_production_cable
     migrations_paths: db/cable_migrate
