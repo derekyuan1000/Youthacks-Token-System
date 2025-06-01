@@ -35,6 +35,7 @@ Rails.application.routes.draw do
 		get    "dashboard", to: "events#dashboard", as: "event_dashboard"
 		# get    "settings",  to: "admins#settings",  as: "event_settings"
 		
+		post "participants/create", to: "events#create_participant", as: "event_create_participant"
 		post "participants/sync", 		to: "events#sync_participants", as: "event_sync_participants"
 		post   "/participants/:id/set_balance", to: "events#set_balance", as: "event_set_balance"
 		post   "participants/bulk_earn",         to: "events#bulk_earn",  as: "event_bulk_earn"

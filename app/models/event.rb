@@ -125,26 +125,27 @@ class Event < ApplicationRecord
         { success: false, message: "Error syncing: #{e.message}" }
       end
     end
-	def self.create_to_airtable!(name:, admin_id:, event_id:)
+	def create_to_airtable!(name:, admin_id:)
 		begin
 			client = Airtable::Client.new(airtable_api_key)
 			table  = client.table(airtable_base_id, airtable_table_name)
 			record = Airtable::Record.new(
-				name_column: name
+				name_column => name
 			)
 			created_record = table.create(record)
 			if created_record
 				participant = participants.create!(
 					uuid: created_record.id,
 					name: name,
-					event_id: event_id
+					personal_info: created_record.fields.to_json,
+					event_id: id
 				)
 				Activity.create!(
 					subject: participant,
 					action: "participant_create",
 					metadata: { name: name }.to_json,
 					admin_id: admin_id,
-					event_id: event_id
+					event_id: id
 				)
 				{ success: true, message: "Participant created successfully", participant: participant }
 			else

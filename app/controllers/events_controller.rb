@@ -18,6 +18,16 @@ class EventsController < AdminsController
         end
     end
 
+    def create_participant
+        name = params[:name].strip
+        result = @event.create_to_airtable!(name: name, admin_id: @admin.id) # or session[:admin_id]
+        if result[:success]
+            redirect_to event_dashboard_path, notice: "#{name} has been created as a participant."
+        else
+            redirect_to event_dashboard_path, alert: result[:message] || "Failed to create participant."
+        end
+    end
+
 
     def sync_participants
         begin

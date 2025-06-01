@@ -130,6 +130,8 @@ class AdminsController < ApplicationController
             redirect_to dashboard_path, alert: "Failed to create event: #{e.message}" 
         end
     end
+    
+
     private
 
     def require_admin

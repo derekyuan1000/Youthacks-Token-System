@@ -1,6 +1,12 @@
 <h1>Dashboard</h1>
 
 <%= button_to "Sync Participants", event_sync_participants_path, method: :post, class: "sync-button" %>
+<%= form_with url: event_create_participant_path, method: :post, local: true do %>
+  <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+  <label for="participant_name">Add Participant:</label>
+  <input type="text" name="name" id="participant_name" required placeholder="Enter participant name">
+  <button type="submit">Add</button>
+<% end %>
 <label>
   <input type="checkbox" id="bulk-toggle"> Enable multi-select
 </label>
