@@ -16,20 +16,23 @@ WORKDIR /rails
 
 # Install base packages
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y curl libjemalloc2 libvips postgresql-client && \
-    rm -rf /var/lib/apt/lists /var/cache/apt/archives
+apt-get install --no-install-recommends -y curl libjemalloc2 libvips postgresql-client && \
+rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 RUN apt-get update && apt-get install -y libffi-dev build-essential
 
 # Set production environment
 ENV RAILS_ENV="production" \
-    BUNDLE_DEPLOYMENT="1" \
-    BUNDLE_PATH="/usr/local/bundle" \
-    BUNDLE_WITHOUT="development"
+BUNDLE_DEPLOYMENT="1" \
+BUNDLE_PATH="/usr/local/bundle" \
+BUNDLE_WITHOUT="development"
 
 # Throw-away build stage to reduce size of final image
 FROM base AS build
 
+RUN apt-get update && apt-get install -y libffi-dev pkg-config
+
+RUN apt-get update && apt-get install -y libffi-dev
 # Install packages needed to build gems
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y build-essential git libpq-dev libyaml-dev pkg-config && \
