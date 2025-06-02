@@ -3,6 +3,7 @@ class AdminInvitation < ApplicationRecord
 	belongs_to :admin
 	has_many :activities, as: :subject
 	validates :status, presence: true, inclusion: { in: %w[pending accepted declined] }
+	scope :pending, -> { where(status: 'pending') }
 
 	def self.create!(event_id:, admin_id:)
 		begin

@@ -13,6 +13,8 @@ module Api
     private
 
     def generate_token(user)
+        payload = { user_id: user.id, exp: 3.days.from_now.to_i }
+        JWT.encode(payload, Rails.application.secrets.secret_key_base)
     end
   end
 end

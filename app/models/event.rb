@@ -45,7 +45,7 @@ class Event < ApplicationRecord
 		end
 	end
 
-	def self.create(name:, description: "", airtable_api_key: nil, airtable_base_id: nil, airtable_table_name: nil, manager_id:, sync_with_airtable:false)
+	def self.create(name:, description: "", date: ,manager_id:, sync_with_airtable:false)
 		begin
 			unless name.present?
 				raise "Name cannot be blank"
@@ -56,9 +56,7 @@ class Event < ApplicationRecord
 			event = create!(
 				name: name,
 				description: description,
-				airtable_api_key: airtable_api_key,
-				airtable_base_id: airtable_base_id,
-				airtable_table_name: airtable_table_name,
+				date: date,
 				manager_id: manager_id,
 				sync_with_airtable: sync_with_airtable
 			)

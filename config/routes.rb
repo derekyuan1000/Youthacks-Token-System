@@ -73,7 +73,26 @@ Rails.application.routes.draw do
 	namespace :api do
 		get 'login', to: 'sessions#new', as: 'login'
 		post 'login', to: 'sessions#create'
-		delete 'logout', to: 'sessions#destroy', as: 'logout'
+		get "forgot_password", to: "sessions#forgot_password", as: "forgot_password"
+
+		get "signup",       to: "admins#new",          as: "signup"
+		post "signup",      to: "admins#create"
+
+		get "verify_code",  to: "admins#verify_code",  as: "verify_code"
+		post "resend_code", to: "admins#resend_code",  as: "resend_code"
+		post "confirm_code",to: "admins#confirm_code", as: "confirm_code"
+
+		get "events", to: "admins#events", as: "events"
+
+		get "settings",  to: "admins#settings",  as: "settings"
+
+		get "pending_invitations", to: "admins#pending_invitations", as: "pending_invitations"
+		post "accept_invitation/:id", to: "admins#accept_invitation", as: "accept_invitation"
+		delete "reject_invitation/:id", to: "admins#reject_invitation", as: "reject_invitation"
+
+
+		get "create_event", to: "admins#new_event", as: "new_event"
+		post "create_event", to: "admins#create_event", as: "create_event"
 
 		scope '/events/:event_slug' do
 			get 'participants', to: 'events#participants', as: 'event_participants'
@@ -106,8 +125,13 @@ Rails.application.routes.draw do
 			get    'admins',                           to: 'managers#admins'
 			post   'admins/invite',                    to: 'managers#invite_admin'
 		end
+
+		
 	end
 
 	# Root path
-	root "home#index"
+root "home#index"
+
+# Catch-all route for unmatched paths
+match '*unmatched', to: 'application#route_not_found', via: :all
 end
