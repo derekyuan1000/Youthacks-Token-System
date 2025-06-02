@@ -87,7 +87,6 @@ Rails.application.routes.draw do
 		post "accept_invitation/:id", to: "admins#accept_invitation", as: "accept_invitation"
 		delete "reject_invitation/:id", to: "admins#reject_invitation", as: "reject_invitation"
 
-
 		post "create_event", to: "admins#create_event", as: "create_event"
 
 		scope '/events/:event_slug' do
@@ -122,7 +121,8 @@ Rails.application.routes.draw do
 			post   'admins/invite',                    to: 'managers#invite_admin'
 		end
 
-		
+		match '*unmatched', to: 'errors#not_found', via: :all
+		root "status#index"
 	end
 
 	# Root path

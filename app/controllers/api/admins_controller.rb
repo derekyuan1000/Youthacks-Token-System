@@ -27,6 +27,7 @@ class Api::AdminsController < Api::BaseController
                 render json: { message: 'Invitation accepted' }, status: :ok
             else
                 render json: { error: result[:message] || 'Failed to accept invitation' }, status: :unprocessable_entity
+            end
         else
             render json: { error: 'Invitation not found' }, status: :not_found
         end
@@ -50,6 +51,13 @@ class Api::AdminsController < Api::BaseController
         else
             render json: result[:message], status: :unprocessable_entity
         end
+    end
+
+    def events
+        events = @admin.events + @admin.managed_events
+        render json: events, status: :ok
+    rescue StandardError => e
+        render json: { error: e.message }, status: :internal_server_error
     end
 
     private
