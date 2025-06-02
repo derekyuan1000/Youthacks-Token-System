@@ -1,6 +1,5 @@
 class Api::BaseController < ApplicationController
-    before_action :authenticate_user!
-    protect_from_forgery with: :null_session
+    # before_action :authenticate_user!
 
     private
     def authenticate_user!
