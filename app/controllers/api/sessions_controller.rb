@@ -4,9 +4,9 @@ module Api
 		user = Admin.find_by(name: params[:name])
 		if user&.authenticate(params[:password])
 			token = generate_token(user)  # implement token generation (e.g., JWT)
-			render json: { token: token, user: user }
+			render json: { token: token, admin: { name: user.name, email: user.email } }, status: :created
 		else
-			render json: { error: "Invalid email or password" }, status: :unauthorized
+			render json: { message: "Invalid email or password" }, status: :unauthorized
 		end
     end
 

@@ -15,7 +15,7 @@ Rails.application.routes.draw do
 
 	get "signup",       to: "admins#new",          as: "signup"
 	post "signup",      to: "admins#create"
-	get "verify_code",  to: "admins#verify_code",  as: "verify_code"
+	post "verify_code",  to: "admins#verify_code",  as: "verify_code"
 	post "confirm_code",to: "admins#confirm_code", as: "confirm_code"
 	post "resend_code", to: "admins#resend_code",  as: "resend_code"
 

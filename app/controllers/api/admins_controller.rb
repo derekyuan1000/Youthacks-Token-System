@@ -44,7 +44,7 @@ class Api::AdminsController < Api::BaseController
             AdminMailer.send_code(email, code).deliver_now
             render json: { message: 'Code resent successfully' }, status: :ok
         rescue JWT::DecodeError
-            render json: { error: 'Invalid token' }, status: :unauthorized
+            render json: { message: 'Invalid token' }, status: :unauthorized
         end
     end
 
@@ -53,7 +53,7 @@ class Api::AdminsController < Api::BaseController
         token = header&.split(' ')&.last
 
         if token.blank?
-            render json: { error: 'Missing token' }, status: :unauthorized
+            render json: { message: 'Missing token' }, status: :unauthorized
             return
         end
 
@@ -63,15 +63,15 @@ class Api::AdminsController < Api::BaseController
             if decoded['code'].to_s == entered_code.to_s
                 result = Admin.new!(name: decoded['name'], password: decoded['password'], email: decoded['email'])
                 if result[:success]
-                    render json: { message: 'Admin created successfully', admin: result[:admin] }, status: :created
+                    render json: { message: 'Admin created successfully', admin:{name: result[:admin][:name], email: result[:admin][:email]} }, status: :created
                 else
-                    render json: { error: result[:message] }, status: :unprocessable_entity
+                    render json: { message: result[:message] }, status: :unprocessable_entity
                 end
             else
-                render json: { error: 'Invalid code' }, status: :invalid
+                render json: { message: 'Invalid code' }, status: :unauthorized
             end
         rescue JWT::DecodeError => e
-            render json: { error: 'Invalid token' }, status: :unauthorized
+            render json: { message: 'Invalid token' }, status: :unauthorized
         end
     end
 

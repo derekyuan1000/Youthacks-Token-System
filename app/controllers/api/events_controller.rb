@@ -138,9 +138,9 @@ class Api::EventsController < Api::AdminsController
         else
             @event = Event.find_by(id: event)
             if @event.nil?
-                render json: { error: 'Event not found' }, status: :not_found
+                render json: { message: 'Event not found' }, status: :not_found
             elsif @event.admins.exclude?(@admin) or @event.manager.id != @admin.id
-                render json: { error: 'Unauthorized access to event' }, status: :forbidden
+                render json: { message: 'Unauthorized access to event' }, status: :forbidden
             end
         end
     end
