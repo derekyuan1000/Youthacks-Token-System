@@ -18,9 +18,9 @@ class Api::AdminsController < Api::BaseController
                 code: code,
                 exp: 30.minutes.from_now.to_i
             }, Rails.application.secret_key_base)
-            render json: { message: 'Verification code sent', token: pending_token}, status: :created
+            render json: {token: pending_token}, status: :created
         else
-            render json: { error: 'Name, password, and email cannot be blank' }, status: :unprocessable_entity
+            render json: { message: 'Name, password, and email cannot be blank' }, status: :unprocessable_entity
         end
     end
 
