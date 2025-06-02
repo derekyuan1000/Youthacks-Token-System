@@ -71,14 +71,11 @@ Rails.application.routes.draw do
 	end
 
 	namespace :api do
-		get 'login', to: 'sessions#new', as: 'login'
 		post 'login', to: 'sessions#create'
 		get "forgot_password", to: "sessions#forgot_password", as: "forgot_password"
 
-		get "signup",       to: "admins#new",          as: "signup"
 		post "signup",      to: "admins#create"
 
-		get "verify_code",  to: "admins#verify_code",  as: "verify_code"
 		post "resend_code", to: "admins#resend_code",  as: "resend_code"
 		post "confirm_code",to: "admins#confirm_code", as: "confirm_code"
 
@@ -91,7 +88,6 @@ Rails.application.routes.draw do
 		delete "reject_invitation/:id", to: "admins#reject_invitation", as: "reject_invitation"
 
 
-		get "create_event", to: "admins#new_event", as: "new_event"
 		post "create_event", to: "admins#create_event", as: "create_event"
 
 		scope '/events/:event_slug' do
