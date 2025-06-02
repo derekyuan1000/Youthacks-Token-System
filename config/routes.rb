@@ -95,12 +95,10 @@ Rails.application.routes.draw do
 			post   'participants/sync',                to: 'events#sync_participants'
 
 			post   'participants/:id/set_balance',     to: 'events#set_balance'
-			post   'participants/bulk_earn',           to: 'events#bulk_earn'
 			post   'participants/:id/earn',            to: 'events#earn'
 			post   'participants/:id/buy',             to: 'events#buy'
 
 			post   'participants/:id/check_in',        to: 'events#check_in_participant'
-			post   'participants/bulk_check_in',       to: 'events#bulk_check_in'
 			delete 'participants/:id',                 to: 'events#delete_participant'
 
 			get 'products', to: 'events#products', as: 'event_products'

@@ -81,7 +81,7 @@ class Api::AdminsController < Api::BaseController
     end
 
     def accept_invitation
-        invitation = @admin.invitations.pending.find_by(id: params[:id])
+        invitation = @admin.invitations.pending.find_by(id: params[:invitation_id])
         if invitation
             result = invitation.accept![:success]
             if result[:success]
@@ -95,7 +95,7 @@ class Api::AdminsController < Api::BaseController
     end
 
     def reject_invitation
-        invitation = @admin.invitations.pending.find(params[:id])
+        invitation = @admin.invitations.pending.find(params[:invitation_id])
         if invitation
             invitation.reject!
             render json: { message: 'Invitation rejected' }, status: :ok

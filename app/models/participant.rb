@@ -70,7 +70,7 @@ class Participant < ApplicationRecord
                   
                 update!(balance: balance - product.price)
                 # Return success message
-                { success: true, message: "Purchase successful!" }
+                { success: true, transaction: transaction, message: "Purchase successful!" }
             else
                 # Return error message if not enough balance
                 { success: false, message: "Not enough balance!" }
@@ -102,7 +102,7 @@ class Participant < ApplicationRecord
       end
     end
 
-    def check_in(admin_id = nil)
+    def check_in(admin_id)
       begin
         raise "Admin ID is required to check in a participant" if admin_id.nil?
         
