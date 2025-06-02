@@ -7,12 +7,12 @@
   },
   "servers": [
     {
-      "url": "https://aha.youthacks.org/",
+      "url": "https://aha.youthacks.org/api",
       "description": "Youthacks"
     }
   ],
   "paths": {
-    "/api/login": {
+    "/login": {
       "post": {
         "summary": "Login",
         "description": "Login as an admin. Returns a token and user details.",
@@ -42,8 +42,8 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "Successful login",
+          "201": {
+            "description": "Created token",
             "content": {
               "application/json": {
                 "schema": {
@@ -51,24 +51,12 @@
                   "properties": {
                     "token": {
                       "type": "string",
-                      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-                    },
-                    "user": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "integer",
-                          "example": 1
-                        },
-                        "name": {
-                          "type": "string",
-                          "example": "matthew"
-                        },
-                        "email": {
-                          "type": "string",
-                          "example": "matthew@example.com"
-                        }
+                      "x-stoplight": {
+                        "id": "rn6cbtub32372"
                       }
+                    },
+                    "admin": {
+                      "$ref": "../models/admin.yaml"
                     }
                   }
                 }
@@ -82,9 +70,12 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "error": {
+                    "message": {
                       "type": "string",
-                      "example": "Invalid email or password"
+                      "example": "Invalid email or password",
+                      "x-stoplight": {
+                        "id": "duuwc9aien3u1"
+                      }
                     }
                   }
                 }
@@ -98,13 +89,28 @@
       },
       "parameters": []
     },
-    "/api/forgot_password": {
-      "get": {
+    "/forgot_password": {
+      "post": {
         "summary": "Forgot Password",
         "responses": {
           "404": {
             "description": "Admin Not Found",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "x-stoplight": {
+                        "id": "3e1xw2he5xzzg"
+                      }
+                    }
+                  }
+                }
+              }
+            }
           },
           "501": {
             "description": "Not Implemented"
@@ -133,18 +139,49 @@
             }
           }
         }
-      }
+      },
+      "parameters": []
     },
-    "/api/signup": {
+    "/signup": {
       "post": {
         "summary": "Signup",
         "tags": [],
         "responses": {
           "201": {
-            "description": "Created"
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string",
+                      "x-stoplight": {
+                        "id": "hqov6chdnn0j1"
+                      }
+                    }
+                  }
+                }
+              }
+            }
           },
           "422": {
-            "description": "Name, password, and email cannot be blank."
+            "description": "N",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "x-stoplight": {
+                        "id": "gas60gj3joaug"
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         },
         "operationId": "post-api-signup",
@@ -181,6 +218,182 @@
             }
           }
         }
+      },
+      "parameters": []
+    },
+    "/resend_code": {
+      "post": {
+        "summary": "Resend Code",
+        "tags": [],
+        "responses": {
+          "200": {
+            "description": "Email with code resent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing or invalid token)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "x-stoplight": {
+                        "id": "75l6zwbw3n08h"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "post-resend_code",
+        "x-stoplight": {
+          "id": "pmui02rx13qrx"
+        },
+        "description": "Resend verification code to email to sign up.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header"
+          }
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ]
+      }
+    },
+    "/confirm_code": {
+      "post": {
+        "summary": "Confirm Code",
+        "tags": [],
+        "responses": {
+          "201": {
+            "description": "Admin created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "x-stoplight": {
+                        "id": "oz680w6yz9g50"
+                      }
+                    },
+                    "admin": {
+                      "$ref": "../models/admin.yaml"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Invalid code?",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "x-stoplight": {
+                        "id": "4c6ljj3pdzksu"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity. Something went wrong.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "x-stoplight": {
+                        "id": "vqr2fvvjynxjc"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "post-confirm_code",
+        "x-stoplight": {
+          "id": "p5cpgb9z1bacf"
+        },
+        "security": [
+          {
+            "token": []
+          }
+        ]
+      }
+    },
+    "/events": {
+      "get": {
+        "summary": "Events",
+        "tags": [],
+        "responses": {
+          "200": {
+            "description": "OK\nList of events are returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "events": {
+                      "x-stoplight": {
+                        "id": "azzqq8g4o97gr"
+                      },
+                      "type": "array",
+                      "items": {
+                        "$ref": "../models/event.yaml"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-events",
+        "x-stoplight": {
+          "id": "fv9egnpzgtzhk"
+        },
+        "security": [
+          {
+            "token": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "token": {
+        "type": "http",
+        "scheme": "bearer"
       }
     }
   }

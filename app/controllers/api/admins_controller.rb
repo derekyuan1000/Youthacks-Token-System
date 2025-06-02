@@ -117,8 +117,6 @@ class Api::AdminsController < Api::BaseController
     def events
         events = @admin.events + @admin.managed_events
         render json: events, status: :ok
-    rescue StandardError => e
-        render json: { error: e.message }, status: :internal_server_error
     end
 
     def settings
