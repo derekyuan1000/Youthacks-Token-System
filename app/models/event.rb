@@ -69,7 +69,7 @@ class Event < ApplicationRecord
 
 	def sync # With Airtable
       begin
-		unless sync_with_airtable
+		unless sync_with_airtable and airtable_api_key.present? and airtable_base_id.present? and airtable_table_name.present? and name_column.present?
 			raise "This event is not set to sync with Airtable. Please enable it in the settings."
 		end
         # Initialize Airtable client

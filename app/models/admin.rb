@@ -21,7 +21,7 @@ class Admin < ApplicationRecord
                 password: password,
                 email: email
             )
-            { success: true, message: "Admin created successfully" }
+            { success: true, message: "Admin created successfully" , admin: new_admin }
         rescue => e
             { success: false, message: "Error creating admin: #{e.message}" }
         end

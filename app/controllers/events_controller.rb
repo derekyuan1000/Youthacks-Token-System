@@ -35,9 +35,6 @@ class EventsController < AdminsController
 
     def sync_participants
         begin
-            unless @event.airtable_api_key.present? and @event.airtable_base_id.present? and @event.airtable_table_name.present?
-                raise "Airtable API key, base ID, and table name must be set for this event"
-            end
             result = @event.sync
             if result[:success]
                 @participants = @event.participants.active
