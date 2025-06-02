@@ -1,0 +1,187 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "The Aha API",
+    "version": "1.0",
+    "description": "Please note that this is primarily intended for iOS development within the Aha team."
+  },
+  "servers": [
+    {
+      "url": "https://aha.youthacks.org/",
+      "description": "Youthacks"
+    }
+  ],
+  "paths": {
+    "/api/login": {
+      "post": {
+        "summary": "Login",
+        "description": "Login as an admin. Returns a token and user details.",
+        "operationId": "createAdminSession",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "password"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "matthew"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "mySecret123"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful login",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string",
+                      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                    },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "name": {
+                          "type": "string",
+                          "example": "matthew"
+                        },
+                        "email": {
+                          "type": "string",
+                          "example": "matthew@example.com"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid name or password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Invalid email or password"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-stoplight": {
+          "id": "xxv8rgrzlcrin"
+        }
+      },
+      "parameters": []
+    },
+    "/api/forgot_password": {
+      "get": {
+        "summary": "Forgot Password",
+        "responses": {
+          "404": {
+            "description": "Admin Not Found",
+            "headers": {}
+          },
+          "501": {
+            "description": "Not Implemented"
+          }
+        },
+        "operationId": "get-api-forgot_password",
+        "x-stoplight": {
+          "id": "305nzfvszj4cx"
+        },
+        "description": "Reset password if forgotten.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "x-stoplight": {
+                      "id": "h7fu3sb89ozn3"
+                    },
+                    "format": "email"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/signup": {
+      "post": {
+        "summary": "Signup",
+        "tags": [],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "422": {
+            "description": "Name, password, and email cannot be blank."
+          }
+        },
+        "operationId": "post-api-signup",
+        "x-stoplight": {
+          "id": "8xqmisyruk6iq"
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "x-stoplight": {
+                      "id": "s4mbse5ptp24r"
+                    }
+                  },
+                  "password": {
+                    "type": "string",
+                    "x-stoplight": {
+                      "id": "kelfcttky34oe"
+                    }
+                  },
+                  "email": {
+                    "type": "string",
+                    "x-stoplight": {
+                      "id": "e4fsgsru8osp6"
+                    },
+                    "format": "email"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
