@@ -1,0 +1,28 @@
+2025-06-04 14:05:19.542 UTC [15812] LOG:  starting PostgreSQL 17.2 on x86_64-windows, compiled by gcc-14.2.0, 64-bit
+2025-06-04 14:05:19.562 UTC [15812] LOG:  listening on IPv6 address "::1", port 5432
+2025-06-04 14:05:19.562 UTC [15812] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-06-04 14:05:19.867 UTC [9152] LOG:  database system was shut down at 2025-06-04 14:04:15 UTC
+2025-06-04 14:05:19.951 UTC [15812] LOG:  database system is ready to accept connections
+2025-06-04 14:05:41.359 UTC [5432] FATAL:  database "mrsoh" does not exist
+2025-06-04 14:07:58.396 UTC [1904] FATAL:  database "aha_development" does not exist
+2025-06-04 14:10:19.874 UTC [7720] LOG:  checkpoint starting: time
+2025-06-04 14:13:44.776 UTC [7720] LOG:  checkpoint complete: wrote 1876 buffers (11.5%); 1 WAL file(s) added, 0 removed, 0 recycled; write=204.310 s, sync=0.441 s, total=204.910 s; sync files=605, longest=0.006 s, average=0.001 s; distance=8697 kB, estimate=8697 kB; lsn=0/1D6E0B8, redo lsn=0/1D6E028
+2025-06-04 14:17:53.450 UTC [11784] ERROR:  relation "admins" does not exist at character 24
+2025-06-04 14:17:53.450 UTC [11784] STATEMENT:  SELECT "admins".* FROM "admins" /* loading for pp */ LIMIT 11 /*application='Aha'*/
+2025-06-04 14:18:17.653 UTC [15812] LOG:  background worker "logical replication launcher" (PID 16252) was terminated by exception 0xC000013A
+2025-06-04 14:18:17.653 UTC [15812] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2025-06-04 14:18:17.653 UTC [15812] LOG:  terminating any other active server processes
+2025-06-04 14:18:17.674 UTC [15812] LOG:  received fast shutdown request
+^C2025-06-04 14:19:30.467 UTC [17128] LOG:  starting PostgreSQL 17.2 on x86_64-windows, compiled by gcc-14.2.0, 64-bit
+2025-06-04 14:19:30.495 UTC [17128] LOG:  listening on IPv6 address "::1", port 5432
+2025-06-04 14:19:30.495 UTC [17128] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-06-04 14:19:30.834 UTC [18632] LOG:  database system was interrupted; last known up at 2025-06-04 14:13:44 UTC
+2025-06-04 14:19:38.593 UTC [18632] LOG:  database system was not properly shut down; automatic recovery in progress
+2025-06-04 14:19:38.629 UTC [18632] LOG:  redo starts at 0/1D6E028
+2025-06-04 14:19:38.629 UTC [18632] LOG:  invalid record length at 0/1D6E168: expected at least 24, got 0
+2025-06-04 14:19:38.629 UTC [18632] LOG:  redo done at 0/1D6E130 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+2025-06-04 14:19:38.683 UTC [21056] LOG:  checkpoint starting: end-of-recovery immediate wait
+2025-06-04 14:19:38.772 UTC [21056] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.018 s, sync=0.022 s, total=0.106 s; sync files=2, longest=0.011 s, average=0.011 s; distance=0 kB, estimate=0 kB; lsn=0/1D6E168, redo lsn=0/1D6E168
+2025-06-04 14:19:38.849 UTC [17128] LOG:  database system is ready to accept connections
+2025-06-04 14:24:38.785 UTC [21056] LOG:  checkpoint starting: time
+2025-06-04 14:24:53.198 UTC [21056] LOG:  checkpoint complete: wrote 129 buffers (0.8%); 0 WAL file(s) added, 0 removed, 0 recycled; write=14.081 s, sync=0.265 s, total=14.413 s; sync files=119, longest=0.014 s, average=0.003 s; distance=600 kB, estimate=600 kB; lsn=0/1E04358, redo lsn=0/1E042C8

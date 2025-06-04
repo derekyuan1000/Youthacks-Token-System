@@ -1,150 +1,178 @@
-class Api::AdminsController < Api::BaseController
-    before_action :require_admin, except: [:create, :resend_code, :confirm_code]
-    rescue_from StandardError, with: :handle_error
-    def create
-        admin_params = params.permit(:name, :email, :password)
-        name = admin_params[:name]
-        password = admin_params[:password]
-        email = admin_params[:email]
+module API
+  class Admins < Grape::API
+    format :json
+    prefix :api
+
+    helpers do
+      def require_admin!
+        header = headers['Authorization']
+        token = header&.split(' ')&.last
+
+        error!({ error: 'Missing token' }, 401) if token.blank?
+
+        begin
+          decoded = JWT.decode(token, Rails.application.secret_key_base)[0]
+          @admin = Admin.find(decoded['user_id'])
+        rescue JWT::ExpiredSignature
+          error!({ error: 'Token expired' }, 401)
+        rescue JWT::DecodeError
+          error!({ error: 'Invalid token' }, 401)
+        rescue ActiveRecord::RecordNotFound
+          error!({ error: 'Admin not found' }, 401)
+        end
+      end
+    end
+
+    resource :signup do
+      desc 'Create admin'
+      params do
+        requires :name, type: String
+        requires :email, type: String
+        requires :password, type: String
+      end
+      post do
+        name = params[:name]
+        password = params[:password]
+        email = params[:email]
 
         if name.present? && password.present? && email.present?
-            code = rand(100_000..999_999)
-            AdminMailer.send_code(email, code).deliver_now
+          code = rand(100_000..999_999)
+          AdminMailer.send_code(email, code).deliver_now
 
-            pending_token = JWT.encode ({
-                name: name,
-                email: email,
-                password: password,
-                code: code,
-                exp: 30.minutes.from_now.to_i
-            }, Rails.application.secret_key_base)
-            render json: {token: pending_token}, status: :created
+          pending_token = JWT.encode({
+            name: name,
+            email: email,
+            password: password,
+            code: code,
+            exp: 30.minutes.from_now.to_i
+          }, Rails.application.secret_key_base)
+          { token: pending_token }
         else
-            render json: { message: 'Name, password, and email cannot be blank' }, status: :unprocessable_entity
+          error!({ message: 'Name, password, and email cannot be blank' }, 422)
         end
-    end
+      end
 
-    def forgot_password
-        render json: { message: 'Password reset not implemented' }, status: :not_implemented
-    end
+      desc 'Forgot password'
+      get :forgot_password do
+        error!({ message: 'Password reset not implemented' }, 501)
+      end
 
-    def resend_code
-        header = request.headers['Authorization']
+      desc 'Resend code'
+      post :resend_code do
+        header = headers['Authorization']
         token = header&.split(' ')&.last
 
-        if token.blank?
-            render json: { error: 'Missing token' }, status: :unauthorized
-            return
-        end
+        error!({ error: 'Missing token' }, 401) if token.blank?
 
         begin
-            decoded = JWT.decode(token, Rails.application.secret_key_base)[0]
-            email = decoded['email']
-            code = decoded['code']
-            AdminMailer.send_code(email, code).deliver_now
-            render json: { message: 'Code resent successfully' }, status: :ok
+          decoded = JWT.decode(token, Rails.application.secret_key_base)[0]
+          email = decoded['email']
+          code = decoded['code']
+          AdminMailer.send_code(email, code).deliver_now
+          { message: 'Code resent successfully' }
         rescue JWT::DecodeError
-            render json: { message: 'Invalid token' }, status: :unauthorized
+          error!({ message: 'Invalid token' }, 401)
         end
-    end
+      end
 
-    def confirm_code   
-        header = request.headers['Authorization']
+      desc 'Confirm code'
+      params do
+        requires :code, type: String
+      end
+      post :confirm_code do
+        header = headers['Authorization']
         token = header&.split(' ')&.last
 
-        if token.blank?
-            render json: { message: 'Missing token' }, status: :unauthorized
-            return
-        end
+        error!({ message: 'Missing token' }, 401) if token.blank?
 
         begin
-            decoded = JWT.decode(token, Rails.application.secret_key_base)[0]
-            entered_code = params[:code].strip
-            if decoded['code'].to_s == entered_code.to_s
-                result = Admin.new!(name: decoded['name'], password: decoded['password'], email: decoded['email'])
-                if result[:success]
-                    render json: { message: 'Admin created successfully', admin:{name: result[:admin][:name], email: result[:admin][:email]} }, status: :created
-                else
-                    render json: { message: result[:message] }, status: :unprocessable_entity
-                end
-            else
-                render json: { message: 'Invalid code' }, status: :unauthorized
-            end
-        rescue JWT::DecodeError => e
-            render json: { message: 'Invalid token' }, status: :unauthorized
+          decoded = JWT.decode(token, Rails.application.secret_key_base)[0]
+          entered_code = params[:code].strip
+          if decoded['code'].to_s == entered_code.to_s
+            admin = Admin.create!(name: decoded['name'], password: decoded['password'], email: decoded['email'])
+            { message: 'Admin created successfully', admin: { name: admin.name, email: admin.email } }  # status 201 REMEMBER TO INCLUDE
+          else
+            error!({ message: 'Invalid code' }, 401)
+          end
+        rescue JWT::DecodeError
+          error!({ message: 'Invalid token' }, 401)
         end
-    end
+      end
 
-    def pending_invitations
+      desc 'Pending invitations'
+      get :pending_invitations do
+        require_admin!
         invitations = @admin.invitations.pending
-        render json: invitations, status: :ok
-    end
+        invitations
+      end
 
-    def accept_invitation
+      desc 'Accept invitation'
+      params do
+        requires :invitation_id, type: Integer
+      end
+      post :accept_invitation do
+        require_admin!
         invitation = @admin.invitations.pending.find_by(id: params[:invitation_id])
         if invitation
-            result = invitation.accept![:success]
-            if result[:success]
-                render json: { message: 'Invitation accepted' }, status: :ok
-            else
-                render json: { error: result[:message] || 'Failed to accept invitation' }, status: :unprocessable_entity
-            end
+          result = invitation.accept!
+          if result[:success]
+            { message: 'Invitation accepted' }
+          else
+            error!({ error: result[:message] || 'Failed to accept invitation' }, 422)
+          end
         else
-            render json: { error: 'Invitation not found' }, status: :not_found
+          error!({ error: 'Invitation not found' }, 404)
         end
-    end
+      end
 
-    def reject_invitation
-        invitation = @admin.invitations.pending.find(params[:invitation_id])
+      desc 'Reject invitation'
+      params do
+        requires :invitation_id, type: Integer
+      end
+      post :reject_invitation do
+        require_admin!
+        invitation = @admin.invitations.pending.find_by(id: params[:invitation_id])
         if invitation
-            invitation.reject!
-            render json: { message: 'Invitation rejected' }, status: :ok
+          invitation.reject!
+          { message: 'Invitation rejected' }
         else
-            render json: { error: 'Invitation not found or already processed' }, status: :not_found
+          error!({ error: 'Invitation not found or already processed' }, 404)
         end
-    end
+      end
 
-    def create_event
-        event_params = params.require(:event).permit(name:, description: "", date:, manager_id:, sync_with_airtable:false)
-        result = @admin.events.create!(event_params, manager_id: @admin.id)
-        if result[:success]
-            render json: result[:event], status: :created
-        else
-            render json: result[:message], status: :unprocessable_entity
-        end
-    end
+      desc 'Create event'
+      params do
+        requires :name, type: String
+        optional :description, type: String
+        requires :date, type: Date
+        optional :manager_id, type: Integer
+        optional :sync_with_airtable, type: Boolean, default: false
+      end
+      post :create_event do
+        require_admin!
+        event_params = {
+          name: params[:name],
+          description: params[:description],
+          date: params[:date],
+          manager_id: @admin.id,
+          sync_with_airtable: params[:sync_with_airtable]
+        }
+        event = @admin.events.create!(event_params)
+        { event: event }
+      end
 
-    def events
+      desc 'List events'
+      get :events do
+        require_admin!
         events = @admin.events + @admin.managed_events
-        render json: events, status: :ok
+        events
+      end
+
+      desc 'Admin settings'
+      get :settings do
+        require_admin!
+        { admin: @admin }
+      end
     end
-
-    def settings
-        render json: { admin: @admin }, status: :ok
-    end
-
-    private
-
-    def require_admin
-        header = request.headers['Authorization']
-        token = header&.split(' ')&.last
-
-        if token.blank?
-            render json: { error: 'Missing token' }, status: :unauthorized
-            return
-        end
-
-        begin
-            decoded = JWT.decode(token, Rails.application.secret_key_base)[0]
-            @admin = Admin.find(decoded['user_id'])
-        rescue JWT::ExpiredSignature
-            render json: { error: 'Token expired' }, status: :unauthorized
-        rescue JWT::DecodeError
-            render json: { error: 'Invalid token' }, status: :unauthorized
-        rescue ActiveRecord::RecordNotFound
-            render json: { error: 'Admin not found' }, status: :unauthorized
-        end
-
-    end
-
+  end
 end

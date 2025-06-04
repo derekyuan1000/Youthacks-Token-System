@@ -18,6 +18,10 @@ gem "stimulus-rails"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 
+gem "grape" 
+
+gem "grape-swagger"
+
 gem 'airtable', require: 'airtable'
 
 gem 'bcrypt', '~> 3.1.7'
