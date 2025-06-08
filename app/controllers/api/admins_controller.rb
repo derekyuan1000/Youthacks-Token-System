@@ -3,53 +3,36 @@ module API
     format :json
     prefix :api
 
-    helpers do
-      def require_admin!
-        header = headers['Authorization']
-        token = header&.split(' ')&.last
-
-        error!({ error: 'Missing token' }, 401) if token.blank?
-
-        begin
-          decoded = JWT.decode(token, Rails.application.secret_key_base)[0]
-          @admin = Admin.find(decoded['user_id'])
-        rescue JWT::ExpiredSignature
-          error!({ error: 'Token expired' }, 401)
-        rescue JWT::DecodeError
-          error!({ error: 'Invalid token' }, 401)
-        rescue ActiveRecord::RecordNotFound
-          error!({ error: 'Admin not found' }, 401)
-        end
-      end
-    end
+    helpers API::Helpers
+    before {require_admin!}, except: [:signup, :forgot_password, :resend_code, :confirm_code]
 
     resource :signup do
-      desc 'Create admin'
-      params do
-        requires :name, type: String
-        requires :email, type: String
-        requires :password, type: String
-      end
-      post do
-        name = params[:name]
-        password = params[:password]
-        email = params[:email]
-
-        if name.present? && password.present? && email.present?
-          code = rand(100_000..999_999)
-          AdminMailer.send_code(email, code).deliver_now
-
-          pending_token = JWT.encode({
-            name: name,
-            email: email,
-            password: password,
-            code: code,
-            exp: 30.minutes.from_now.to_i
-          }, Rails.application.secret_key_base)
-          { token: pending_token }
-        else
-          error!({ message: 'Name, password, and email cannot be blank' }, 422)
+        desc 'Create admin'
+        params do
+            requires :name, type: String
+            requires :email, type: String
+            requires :password, type: String
         end
+        post do
+            name = params[:name]
+            password = params[:password]
+            email = params[:email]
+
+            if name.present? && password.present? && email.present?
+            code = rand(100_000..999_999)
+            AdminMailer.send_code(email, code).deliver_now
+
+            pending_token = JWT.encode({
+                name: name,
+                email: email,
+                password: password,
+                code: code,
+                exp: 30.minutes.from_now.to_i
+            }, Rails.application.secret_key_base)
+            { token: pending_token }
+            else
+            error!({ message: 'Name, password, and email cannot be blank' }, 422)
+            end
       end
 
       desc 'Forgot password'
@@ -89,9 +72,12 @@ module API
           decoded = JWT.decode(token, Rails.application.secret_key_base)[0]
           entered_code = params[:code].strip
           if decoded['code'].to_s == entered_code.to_s
-            admin = Admin.create!(name: decoded['name'], password: decoded['password'], email: decoded['email'])
-            { message: 'Admin created successfully', admin: { name: admin.name, email: admin.email } }  # status 201 REMEMBER TO INCLUDE
-          else
+            result = Admin.new!(name: decoded['name'], password: decoded['password'], email: decoded['email'])
+            if result[:success]
+                admin = result[:admin]
+                { message: 'Admin created successfully', admin: { name: admin.name, email: admin.email } }  # status 201 REMEMBER TO INCLUDE
+            else
+                error!({ message: result[:message] || 'Failed to create admin' }, 422)
             error!({ message: 'Invalid code' }, 401)
           end
         rescue JWT::DecodeError

@@ -1,148 +1,213 @@
-class Api::EventsController < Api::AdminsController
-    before_action :require_event
-
-    def participants
-      render json: {participants: @event.participants}
+module API
+  class Events < Admins
+    before do
+      require_event!
     end
 
-    def create_participant
-        params = params.permit(:name)
+    resource :events do
+      params do
+        requires :event_id, type: Integer
+      end
+      get ':event_id/participants' do
+        present participants: @event.participants, with API::Entities::Participant
+      end
+
+      params do
+        requires :event_id, type: Integer
+        requires :name, type: String
+      end
+      post ':event_id/participants' do
         if @event.sync_with_airtable
-            result = @event.create_to_airtable!(name: params[:name], admin_id: @admin.id)
+          result = @event.create_to_airtable!(name: params[:name], admin_id: @admin.id)
         else
-            result = @event.create_without_airtable!(name: params[:name], admin_id: @admin.id)
-        if result[:success]
-            render json: {participant: result[:participant]}, status: :created
-        else
-            render json: {message: result[:message] }, status: :unprocessable_entity
+          result = @event.create_without_airtable!(name: params[:name], admin_id: @admin.id)
         end
-    end
+        if result[:success]
+          status :created
+          present participant: result[:participant]
+        else
+          error!({ message: result[:message] }, 422)
+        end
+      end
 
-    def sync_participants
+      params do
+        requires :event_id, type: Integer
+      end
+      post ':event_id/sync_participants' do
         result = @event.sync
         if result[:success]
-            render json: {participants: @event.participants.active}, status: :ok
+          status :ok
+          present participants: @event.participants.active
         else
-            render json: {message: result[:message] || "Failed to sync participants"}, status: :unprocessable_entity
+          error!({ message: result[:message] || "Failed to sync participants" }, 422)
         end
-    end
+      end
 
-    def set_balance
-        participant = @event.participants.find(params[:participant_id])
-        render json: { error: 'Participant not found' }, status: :not_found unless participant
+      params do
+        requires :event_id, type: Integer
+        requires :participant_id, type: Integer
+        requires :balance, type: Integer
+      end
+      post ':event_id/participants/:participant_id/set_balance' do
+        participant = @event.participants.find_by(id: params[:participant_id])
+        error!({ error: 'Participant not found' }, 404) unless participant
         participant.set_balance!(params[:balance], @admin.id)
-        render json: {participant: participant}
-    end
+        present participant: participant
+      end
 
-    def earn
-        participant = @event.participants.find(params[:participant_id])
-        return render json: { error: 'Participant not found' }, status: :not_found unless participant
-        amount = params[:amount].to_i if params[:amount].present? || 1 
-        result = participant.earn!(amount: amount,admin_id: @admin.id)
+      params do
+        requires :event_id, type: Integer
+        requires :participant_id, type: Integer
+        optional :amount, type: Integer, default: 1
+      end
+      post ':event_id/participants/:participant_id/earn' do
+        participant = @event.participants.find_by(id: params[:participant_id])
+        error!({ error: 'Participant not found' }, 404) unless participant
+        amount = params[:amount] || 1
+        result = participant.earn!(amount: amount, admin_id: @admin.id)
         if result[:success]
-            render json: {participant:participant}, status: :ok
+          status :ok
+          present participant: participant
         else
-            render json: {message: result[:message]}, status: :unprocessable_entity
+          error!({ message: result[:message] }, 422)
         end
-    end
+      end
 
-    def buy
-        participant = @event.participants.find(params[:participant_id])
-        return render json: { error: 'Participant not found' }, status: :not_found unless participant
-
-        amount = params[:amount].to_i
+      params do
+        requires :event_id, type: Integer
+        requires :participant_id, type: Integer
+        requires :amount, type: Integer
+        requires :product_id, type: Integer
+      end
+      post ':event_id/participants/:participant_id/buy' do
+        participant = @event.participants.find_by(id: params[:participant_id])
+        error!({ error: 'Participant not found' }, 404) unless participant
         result = participant.buy!(params[:product_id], @admin.id)
         if result[:success]
-            render json: { participant: participant, transaction: result[:transaction] }, status: :ok
+          status :ok
+          present participant: participant, transaction: result[:transaction]
         else
-            render json: { message: result[:message] }, status: :unprocessable_entity
+          error!({ message: result[:message] }, 422)
         end
-    end
+      end
 
-    def check_in_participant
-        participant = @event.participants.find( params[:participant_id])
-        return render json: { error: 'Participant not found' }, status: :not_found unless participant
-
+      params do
+        requires :event_id, type: Integer
+        requires :participant_id, type: Integer
+      end
+      post ':event_id/participants/:participant_id/check_in' do
+        participant = @event.participants.find_by(id: params[:participant_id])
+        error!({ error: 'Participant not found' }, 404) unless participant
         result = participant.check_in(@admin.id)
         if result[:success]
-            render json: {participant: participant }, status: :ok
+          status :ok
+          present participant: participant
         else
-            render json: { message: result[:message]}, status: :unprocessable_entity
+          error!({ message: result[:message] }, 422)
         end
-    end
+      end
 
-    def delete_participant
-        participant = @event.participants.find( params[:participant_id])
-        return render json: { error: 'Participant not found' }, status: :not_found unless participant
-
+      params do
+        requires :event_id, type: Integer
+        requires :participant_id, type: Integer
+      end
+      delete ':event_id/participants/:participant_id' do
+        participant = @event.participants.find_by(id: params[:participant_id])
+        error!({ error: 'Participant not found' }, 404) unless participant
         result = participant.delete!(@admin.id)
         if result[:success]
-            render json: { participant: participant }, status: :ok
+          status :ok
+          present participant: participant
         else
-            render json: { message: result[:message] }, status: :unprocessable_entity
+          error!({ message: result[:message] }, 422)
         end
-    end
+      end
 
-    def products
-        render json: @event.products
-    end
+      params do
+        requires :event_id, type: Integer
+      end
+      get ':event_id/products' do
+        present @event.products
+      end
 
-    def create_product
-        result = Product.create(name: params[:name],price: params[:price],description: params[:description],quantity: params[:quantity], admin_id: @admin.id, event_id: @event.id)
+      params do
+        requires :event_id, type: Integer
+        requires :name, type: String
+        requires :price, type: Numeric
+        optional :description, type: String
+        optional :quantity, type: Integer
+      end
+      post ':event_id/products' do
+        result = Product.create(name: params[:name], price: params[:price], description: params[:description], quantity: params[:quantity], admin_id: @admin.id, event_id: @event.id)
         if result[:success]
-            render json: { product: result[:product] }, status: :created
+          status :created
+          present product: result[:product]
         else
-            render json: { message: result[:message] }, status: :unprocessable_entity
+          error!({ message: result[:message] }, 422)
         end
-    end
+      end
 
-    def update_product
+      params do
+        requires :event_id, type: Integer
+        requires :id, type: Integer
+        optional :name, type: String
+        optional :price, type: Numeric
+        optional :description, type: String
+        optional :quantity, type: Integer
+      end
+      put ':event_id/products/:id' do
         product = @event.products.find_by(id: params[:id])
-        return render json: { error: 'Product not found' }, status: :not_found unless product
+        error!({ error: 'Product not found' }, 404) unless product
         result = product.change!(name: params[:name], price: params[:price], description: params[:description], quantity: params[:quantity], admin_id: @admin.id)
         if result[:success]
-            render json: {product: product}
+          present product: product
         else
-            render json: { error: result[:message]}, status: :unprocessable_entity
+          error!({ error: result[:message] }, 422)
         end
-    end
-    
+      end
 
-    def delete_product
-      product = @event.products.find_by(id: params[:id])
-      return render json: { error: 'Product not found' }, status: :not_found unless product
+      params do
+        requires :event_id, type: Integer
+        requires :id, type: Integer
+      end
+      delete ':event_id/products/:id' do
+        product = @event.products.find_by(id: params[:id])
+        error!({ error: 'Product not found' }, 404) unless product
+        result = product.delete!(admin_id: @admin.id)
+        if result[:success]
+          status :ok
+          present product: product
+        else
+          error!({ message: result[:message] }, 422)
+        end
+      end
 
-      result = product.delete!(admin_id: @admin.id)
-      if result[:success]
-          render json: { product: product }
-      else
-          render json: { message: result[:message] }, status: :unprocessable_entity
+      params do
+        requires :event_id, type: Integer
+      end
+      get ':event_id/activity' do
+        present @event.activities.order(created_at: :desc)
+      end
+
+      params do
+        requires :event_id, type: Integer
+      end
+      get ':event_id/transactions' do
+        present @event.transactions.order(created_at: :desc)
       end
     end
 
-    def activity
-      render json: @event.activities.order(created_at: :desc)
-    end
-
-    # GET /transactions
-    def transactions
-      render json: @event.transactions.order(created_at: :desc)
-    end
-
-    private
-
-    def require_event
+    helpers do
+      def require_event!
         event = params[:event_id]
-        if event.blank?
-            render json: { error: 'Event ID is required' }, status: :bad_request
-        else
-            @event = Event.find_by(id: event)
-            if @event.nil?
-                render json: { message: 'Event not found' }, status: :not_found
-            elsif @event.admins.exclude?(@admin) or @event.manager.id != @admin.id
-                render json: { message: 'Unauthorized access to event' }, status: :forbidden
-            end
-        end
-    end
+        error!({ error: 'Event ID is required' }, 400) if event.blank?
 
+        @event = Event.find_by(id: event)
+        error!({ message: 'Event not found' }, 404) if @event.nil?
+        if @event.admins.exclude?(@admin) || @event.manager.id != @admin.id
+          error!({ message: 'Unauthorized access to event' }, 403)
+        end
+      end
+    end
+  end
 end
