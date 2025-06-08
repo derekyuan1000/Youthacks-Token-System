@@ -5,8 +5,7 @@ module API
         expose :name, documentation: { type: 'String', desc: 'Admin name' }
       end
 
-      class Full < Grape::Entity
-        expose :name, documentation: { type: 'String', desc: 'Admin name' }
+      class Full < Public
         expose :email, documentation: { type: 'string', format: 'email', desc: 'Admin email' }
       end
     end

@@ -1,15 +1,20 @@
-module Api
-    class StatusController < ApplicationController
-        def index
-        render json: { status: 'ok' }, status: :ok
-        end
-    
-        def health_check
-        render json: { status: 'healthy' }, status: :ok
-        end
-    
-        def ping
-        render json: { message: 'pong' }, status: :ok
-        end
+module API
+  class Status < Grape::API
+    format :json
+    prefix :api
+
+    resource :status do
+      get do
+        present status: 'ok'
+      end
+
+      get :health_check do
+        present status: 'healthy'
+      end
+
+      get :ping do
+        present message: 'pong'
+      end
     end
+  end
 end

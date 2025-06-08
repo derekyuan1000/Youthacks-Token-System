@@ -5,6 +5,8 @@ Rails.application.routes.draw do
 	get "sessions/create"
 	get "sessions/destroy"
 
+	mount API::
+
 	# Health check endpoint
 	get "up" => "rails/health#show", as: :rails_health_check
 

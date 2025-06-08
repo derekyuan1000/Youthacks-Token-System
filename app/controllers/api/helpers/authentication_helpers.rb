@@ -28,5 +28,8 @@ module Api
                 error!({ error: 'Unauthorized access to event' }, 403)
             end
         end
+        def require_manager!
+            error!({ error: 'Unauthorized access to manage' }, 403) unless @event.manager_id == @admin.id
+        end
     end
 end

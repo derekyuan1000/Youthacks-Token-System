@@ -67,6 +67,9 @@ class Product < ApplicationRecord
             unless admin_id.present? and Admin.exists?(admin_id)
                 raise "Admin ID is required and must be valid"
             end
+            unless active
+                raise "Product is not active and cannot be updated"
+            end
             unless name.present?
                 raise "Name cannot be blank"
             end
