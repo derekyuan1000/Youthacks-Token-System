@@ -88,7 +88,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_01_134113) do
 
   create_table "participants", force: :cascade do |t|
     t.string "name"
-    t.integer "balance"
+    t.integer "balance", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "active", default: true
