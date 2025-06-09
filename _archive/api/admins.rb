@@ -3,8 +3,10 @@ module API
     format :json
     prefix :api
 
-    helpers API::Helpers
-    before {require_admin!}, except: [:signup, :forgot_password, :resend_code, :confirm_code]
+    # helpers API::Helpers
+    # before except: [:signup, :forgot_password, :resend_code, :confirm_code] do
+    #   require_admin!
+    # end
 
     resource :signup do
         desc 'Create admin'
@@ -69,18 +71,20 @@ module API
         error!({ message: 'Missing token' }, 401) if token.blank?
 
         begin
-          decoded = JWT.decode(token, Rails.application.secret_key_base)[0]
-          entered_code = params[:code].strip
-          if decoded['code'].to_s == entered_code.to_s
-            result = Admin.new!(name: decoded['name'], password: decoded['password'], email: decoded['email'])
-            if result[:success]
-                admin = result[:admin]
-                { message: 'Admin created successfully', admin: { name: admin.name, email: admin.email } }  # status 201 REMEMBER TO INCLUDE
-            else
-                error!({ message: result[:message] || 'Failed to create admin' }, 422)
-            error!({ message: 'Invalid code' }, 401)
-          end
-        rescue JWT::DecodeError
+			decoded = JWT.decode(token, Rails.application.secret_key_base)[0]
+			entered_code = params[:code].strip
+			if decoded['code'].to_s == entered_code.to_s
+				result = Admin.new!(name: decoded['name'], password: decoded['password'], email: decoded['email'])
+				if result[:success]
+					admin = result[:admin]
+					{ message: 'Admin created successfully', admin: { name: admin.name, email: admin.email } }  # status 201 REMEMBER TO INCLUDE
+				else
+					error!({ message: admin.errors.full_messages.join(', ') || 'Failed to create admin' }, 422)
+				end
+			else
+				error!({ message: 'Invalid code' }, 401)
+      		end
+		rescue JWT::DecodeError
           error!({ message: 'Invalid token' }, 401)
         end
       end
