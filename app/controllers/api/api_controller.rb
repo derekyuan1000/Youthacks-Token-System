@@ -1,7 +1,7 @@
 
-class ApiController < ActionController::Base
+class Api::ApiController < ActionController::Base
     skip_before_action :verify_authenticity_token
 
-    def api
+    def docs
     end
 end

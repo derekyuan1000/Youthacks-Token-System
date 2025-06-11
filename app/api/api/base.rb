@@ -1,7 +1,7 @@
 module Api
     class Base < Grape::API
         format :json
-
+        prefix 'api'
 
         get do
             status 200

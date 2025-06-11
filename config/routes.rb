@@ -5,8 +5,11 @@ Rails.application.routes.draw do
 	get "sessions/create"
 	get "sessions/destroy"
 
-	mount Api::Base, at: '/api'
-	get "api_docs", to: "api#api", as: "api_docs"
+	namespace :api do
+		get "api_docs", to: "api#docs", as: "api_docs"
+	end
+
+	mount Api::Base, at: '/'
 
 	# Health check endpoint
 	get "up" => "rails/health#show", as: :rails_health_check
