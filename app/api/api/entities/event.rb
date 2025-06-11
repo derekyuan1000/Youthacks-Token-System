@@ -22,3 +22,5 @@ module Api
                 expose :name_column, documentation: { type: 'String', desc: 'Name column in Airtable' }
             end
         end
+    end
+end

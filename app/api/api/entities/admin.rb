@@ -1,3 +1,4 @@
+require 'grape-entity'
 module Api
   module Entities
     module Admin

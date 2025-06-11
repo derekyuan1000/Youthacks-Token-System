@@ -142,6 +142,9 @@ GEM
       mustermann-grape (~> 1.1.0)
       rack (>= 2)
       zeitwerk
+    grape-entity (1.0.1)
+      activesupport (>= 3.0.0)
+      multi_json (>= 1.3.2)
     grape-swagger (2.1.2)
       grape (>= 1.7, < 3.0)
       rack-test (~> 2)
@@ -192,6 +195,7 @@ GEM
     mini_portile2 (2.8.9)
     minitest (5.25.5)
     msgpack (1.8.0)
+    multi_json (1.15.0)
     multi_xml (0.7.2)
       bigdecimal (~> 3.1)
     mustermann (3.0.3)
@@ -416,6 +420,7 @@ DEPENDENCIES
   fiddle
   friendly_id (~> 5.4.0)
   grape
+  grape-entity
   grape-swagger
   importmap-rails
   jbuilder

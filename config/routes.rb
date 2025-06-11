@@ -7,11 +7,11 @@ Rails.application.routes.draw do
 	get "up" => "rails/health#show", as: :rails_health_check
 
   # Docs API routes
-  namespace :docs do
-  namespace :api do
-    get '/', to: 'api#docs', as: :api_docs
-  end
-end
+	namespace :docs do
+		namespace :api do
+			get '/', to: 'api#docs', as: :api_docs
+		end
+	end
 
   mount Api::Base => '/'
 
