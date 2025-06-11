@@ -5,8 +5,11 @@ Rails.application.routes.draw do
 	get "sessions/create"
 	get "sessions/destroy"
 
-	namespace :api do
-		get "api_docs", to: "api#docs", as: "api_docs"
+	namespace :docs do
+		namespace :api do
+			get "(/*path)", to: "api#docs"
+			get "/", to: "api#docs", as: "api_docs"
+		end
 	end
 
 	mount Api::Base, at: '/'
