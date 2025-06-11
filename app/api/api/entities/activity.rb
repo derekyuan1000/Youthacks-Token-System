@@ -23,6 +23,8 @@ module Api
                 end
             end
             expose :admin, using: Api::Entities::Admin::Public, documentation: { type: 'Admin', desc: 'Admin who performed the activity' } do |activity, _opts|
+              activity.admin
+            end
         end
     end
 end

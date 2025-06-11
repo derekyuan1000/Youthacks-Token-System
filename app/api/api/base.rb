@@ -16,20 +16,24 @@ module Api
             info: {
                 title: "Aha! API",
                 description: "API documentation for Aha! event management system. Meant for internal use, but feel free to try it out!",
-                contact_name: "Matthew",
-                contact_email: "matthew@youthacks.org"
+                contact_name: "Youthacks",
+                contact_email: "aha@youthacks.org"
             
             },
             doc_version: 'v1',
             models: [
-                Entities::Admin,
-                Entities::Event,
-                Entities::Participant,
-                Entities::Product,
-                Entities::Transaction,
-                Entities::Activity
+                Api::Entities::Admin::Public,
+                Api::Entities::Admin::Full,
+                Api::Entities::Event::Public,
+                Api::Entities::Event::Member,
+                Api::Entities::Event::Full,
+                Api::Entities::Participant::Public,
+                Api::Entities::Participant::Full,
+                Api::Entities::Product,
+                Api::Entities::Transaction,
+                Api::Entities::Activity
             ],
-            mount_path: '/api/docs'
+            mount_path: '/docs'
         )
     end
 end

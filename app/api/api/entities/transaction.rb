@@ -8,3 +8,4 @@ module Api
             expose :participant, using: Api::Entities::Participant::Public, documentation: { type: 'Participant', desc: 'Participant involved in the transaction' }
         end
     end
+end

@@ -1,5 +1,5 @@
 module Api
-    module helpers
+    module Helpers
         def require_admin!
             header = headers['Authorization']
             token = header&.split(' ')&.last

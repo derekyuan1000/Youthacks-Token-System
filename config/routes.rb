@@ -83,5 +83,5 @@ Rails.application.routes.draw do
 	root "home#index"
 
 	# Catch-all route for unmatched paths
-	# match '*unmatched', to: 'application#route_not_found', via: :all
+	match '*unmatched', to: 'application#route_not_found', via: :all
 end
