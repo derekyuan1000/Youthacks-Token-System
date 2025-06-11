@@ -2,6 +2,7 @@ module Api
     class Base < Grape::API
         format :json
 
+
         get do
             status 200
             { message: 'Welcome to the API. Docs at /api/docs.' }
