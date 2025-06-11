@@ -6,7 +6,7 @@ Rails.application.routes.draw do
 	get "sessions/destroy"
 
 	mount Api::Base, at: '/api'
-	get "api", to: "api#api", as: "api_docs"
+	get "api_docs", to: "api#api", as: "api_docs"
 
 	# Health check endpoint
 	get "up" => "rails/health#show", as: :rails_health_check

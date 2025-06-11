@@ -29,7 +29,6 @@ gem 'bcrypt', '~> 3.1.7'
 # gem "bcrypt", "~> 3.1.7"
 
 
-gem 'swagger_ui_engine'
 
 gem 'friendly_id', '~> 5.4.0'
 
