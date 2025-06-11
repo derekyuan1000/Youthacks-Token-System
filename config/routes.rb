@@ -4,18 +4,18 @@ Rails.application.routes.draw do
 	get "sessions/new"
 	get "sessions/create"
 	get "sessions/destroy"
+	get "up" => "rails/health#show", as: :rails_health_check
 
-	namespace :docs do
-		namespace :api do
-			get "(/*path)", to: "api#docs"
-			get "/", to: "api#docs", as: "api_docs"
-		end
-	end
+  # Docs API routes
+  namespace :docs do
+  namespace :api do
+    get '/', to: 'api#docs', as: :api_docs
+  end
+end
 
-	mount Api::Base, at: '/'
+  mount Api::Base => '/'
 
 	# Health check endpoint
-	get "up" => "rails/health#show", as: :rails_health_check
 
 	get    'login',  to: 'sessions#new',     as: 'login'
 	post   'login',  to: 'sessions#create'
@@ -83,5 +83,5 @@ Rails.application.routes.draw do
 	root "home#index"
 
 	# Catch-all route for unmatched paths
-	match '*unmatched', to: 'application#route_not_found', via: :all
+	# match '*unmatched', to: 'application#route_not_found', via: :all
 end
