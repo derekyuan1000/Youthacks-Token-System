@@ -1,4 +1,4 @@
-module API
+module Api
     module Entities
         module Participant
             class Public < Grape::Entity

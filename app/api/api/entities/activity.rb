@@ -1,4 +1,4 @@
-module API
+module Api
     module Entities
         class Activity < Grape::Entity
             expose :id, documentation: { type: 'Integer', desc: 'Activity ID' }
@@ -11,18 +11,18 @@ module API
             expose :subject, documentation: { type: 'Object', desc: 'Polymorphic subject of the activity' } do |activity, _opts|
                 case activity.subject
                     when ::Participant
-                        API::Entities::Participant::Public.represent(activity.subject)
+                        Api::Entities::Participant::Public.represent(activity.subject)
                     when ::Product
-                        API::Entities::Product.represent(activity.subject)
+                        Api::Entities::Product.represent(activity.subject)
                     when ::Admin
-                        API::Entities::Admin::Public.represent(activity.subject)
+                        Api::Entities::Admin::Public.represent(activity.subject)
                     when ::Event
-                        API::Entities::Event::Public.represent(activity.subject)
+                        Api::Entities::Event::Public.represent(activity.subject)
                     else
                         nil
                 end
             end
-            expose :admin, using: API::Entities::Admin::Public, documentation: { type: 'Admin', desc: 'Admin who performed the activity' } do |activity, _opts|
+            expose :admin, using: Api::Entities::Admin::Public, documentation: { type: 'Admin', desc: 'Admin who performed the activity' } do |activity, _opts|
         end
     end
 end

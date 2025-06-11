@@ -1,4 +1,4 @@
-module API
+module Api
     module Entities
         class Product < Grape::Entity
             expose :id, documentation: { type: 'Integer', desc: 'Admin ID' }

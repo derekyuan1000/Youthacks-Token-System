@@ -1,9 +1,9 @@
-module API
+module Api
   class Admins < Grape::API
     format :json
     prefix :api
 
-    # helpers API::Helpers
+    # helpers Api::Helpers
     # before except: [:signup, :forgot_password, :resend_code, :confirm_code] do
     #   require_admin!
     # end

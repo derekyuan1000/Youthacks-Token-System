@@ -1,4 +1,4 @@
-module API
+module Api
   module Entities
     module Admin
       class Public < Grape::Entity

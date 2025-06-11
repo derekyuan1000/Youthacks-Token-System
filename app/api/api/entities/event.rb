@@ -1,4 +1,4 @@
-module API
+module Api
     module Entities
         module Event
             class Public < Grape::Entity
@@ -6,12 +6,12 @@ module API
                 expose :date, documentation: { type: 'Date', desc: 'Event date' }
                 expose :desc, documentation: { type: 'String', desc: 'Event description' }
                 expose :slug, documentation: { type: 'String', desc: 'Event slug' }
-                expose :manager, using: API::Entities::Admin::Public, documentation: { type: 'Admin', desc: 'Event manager' }
+                expose :manager, using: Api::Entities::Admin::Public, documentation: { type: 'Admin', desc: 'Event manager' }
             end
 
             class Member < Public
-                expose :participants, using: API::Entities::Participant::Public, documentation: { type: 'Array[Participant]', desc: 'List of participants in the event' }
-                expose :admins, using: API::Entities::Admin::Public, documentation: { type: 'Array[Admin]', desc: 'List of admins managing the event' }
+                expose :participants, using: Api::Entities::Participant::Public, documentation: { type: 'Array[Participant]', desc: 'List of participants in the event' }
+                expose :admins, using: Api::Entities::Admin::Public, documentation: { type: 'Array[Admin]', desc: 'List of admins managing the event' }
             end
 
             class Full < Member

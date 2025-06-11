@@ -1,10 +1,10 @@
-module API
+module Api
   class Managers < Events
     route_param :event_slug do
     before {require_manager!}
 
         get :settings do
-            present event: @event, with: API::Entities::Event::Full
+            present event: @event, with: Api::Entities::Event::Full
         end
 
         params do
@@ -25,14 +25,14 @@ module API
         post :update_airtable do
             if @event.sync_with_airtable
                 @event.update!(declared(params, include_missing: false))
-                present @event, with: API::Entities::Event::Full
+                present @event, with: Api::Entities::Event::Full
             else
             error!({ message: 'Event is not set to sync with Airtable' }, 403)
             end
         end
 
         get :admins do
-            present @event.admins, with: API::Entities::Admin::Public
+            present @event.admins, with: Api::Entities::Admin::Public
         end
 
         params do

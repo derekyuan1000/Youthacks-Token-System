@@ -1,4 +1,4 @@
-module API
+module Api
   class Status < Grape::API
     format :json
     prefix :api
