@@ -30,7 +30,7 @@ module Api
     end
 
     resource :signup do
-		desc 'Create admin'
+		desc 'Create admin', tags: ['Signup']
 		params do
 			requires :name, type: String
 			requires :email, type: String
@@ -58,7 +58,7 @@ module Api
 			end
       	end
 		
-		desc 'Resend code'
+		desc 'Resend code', tags: ['Signup']
 		post :resend_code do
 			header = headers['Authorization']
 			token = header&.split(' ')&.last
@@ -76,7 +76,7 @@ module Api
 			end
 		end
 		
-		desc 'Confirm code'
+		desc 'Confirm code', tags: ['Signup']
 		params do
 		requires :code, type: String
 		end
@@ -105,19 +105,19 @@ module Api
 			end
 		end
 	end
-	desc 'Forgot password'
+	desc 'Forgot password', tags: ['Auth']
 	get :forgot_password do
 		error!({ message: 'Password reset not implemented' }, 501)
 	end
 
-    desc 'Pending invitations'
+    desc 'Pending invitations', tags: ['Invitations']
     get :pending_invitations do
       require_admin!
       invitations = @admin.invitations.pending
       invitations
     end
 
-    desc 'Accept invitation'
+    desc 'Accept invitation', tags: ['Invitations']
     params do
       requires :invitation_id, type: Integer
     end
@@ -136,7 +136,7 @@ module Api
       end
     end
 
-    desc 'Reject invitation'
+    desc 'Reject invitation', tags: ['Invitations']
     params do
       requires :invitation_id, type: Integer
     end
@@ -151,7 +151,7 @@ module Api
       end
     end
 
-    desc 'Create event'
+    desc 'Create event', tags: ['Events']
     params do
       requires :name, type: String
       optional :description, type: String
@@ -171,17 +171,16 @@ module Api
       { event: event }
     end
 
-    desc 'List events'
+    desc 'List events', tags: ['Events']
     get :events do
       require_admin!
       events = @admin.events + @admin.managed_events
       events
     end
 
-    desc 'Admin settings'
-    get :settings do
-      require_admin!
-      { admin: @admin }
+    desc 'Admin settings', tags: ['Events']
+    get :settings do	
+      admin, with = Api::Entities::Admin::Full
     end
   end
 end
