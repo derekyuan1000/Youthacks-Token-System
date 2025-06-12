@@ -2,11 +2,10 @@ module Api
 	class Events < Admins
 
 		helpers do
-			def require_event!
-				event_id = params[:event_id]
-				error!({ error: 'Event ID is required' }, 400) if event_id.blank?
+			def require_event!(event_slug:)
+				error!({ error: 'Event ID is required' }, 400) if event_slug.blank?
 
-				@event = Event.find_by(id: event_id)
+				@event = Event.find_by(slug: event_slug)
 				error!({ error: 'Event not found' }, 404) if @event.nil?
 
 				unless @event.admins.include?(@admin) || @event.manager.id == @admin.id
@@ -14,13 +13,13 @@ module Api
 				end
 			end
         end
-
-		before do
-			require_event!
-		end
-
+		
 		resource :events do
 			route_param :event_slug, type: String do
+		
+				before do
+					require_event!(event_slug: :event_slug)
+				end
 				get 'participants' do
 				present participants: @event.participants.active, with: Api::Entities::Participant
 				end
@@ -189,18 +188,7 @@ module Api
 				end
 			end
 
-			helpers do
-				def require_event!
-					event = params[:event_slug]
-					error!({ error: 'Event ID is required' }, 400) if event.blank?
-
-					@event = Event.find_by(id: event)
-					error!({ message: 'Event not found' }, 404) if @event.nil?
-					if @event.admins.exclude?(@admin) || @event.manager.id != @admin.id
-						error!({ message: 'Unauthorized access to event' }, 403)
-					end
-				end
-			end
+		
 		end
 	end
 end

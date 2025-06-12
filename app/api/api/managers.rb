@@ -1,13 +1,26 @@
 module Api
-  class Managers < Events
+  class Managers < Admins
     helpers do
+        def require_event!(event_slug:)
+            error!({ error: 'Event ID is required' }, 400) if event_slug.blank?
+
+            @event = Event.find_by(slug: event_slug)
+            error!({ error: 'Event not found' }, 404) if @event.nil?
+
+            unless @event.admins.include?(@admin) || @event.manager.id == @admin.id
+                error!({ error: 'Unauthorized access to event' }, 403)
+            end
+        end
         def require_manager!
             error!({ error: 'Unauthorized access to manage' }, 403) unless @event.manager_id == @admin.id
         end
     end
-    before {require_manager!}
+    
     route_param :event_slug do
-
+        before do
+            require_event!(event_slug: :event_slug)
+            require_manager!
+        end
         get :settings do
             present event: @event, with: Api::Entities::Event::Full
         end
