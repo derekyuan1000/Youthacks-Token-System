@@ -13,7 +13,7 @@ Rails.application.routes.draw do
 		end
 	end
 
-  mount Api::Base => '/'
+  	mount Api::Base => '/'
 
 	# Health check endpoint
 

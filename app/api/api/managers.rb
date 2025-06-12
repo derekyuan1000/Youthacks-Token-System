@@ -1,7 +1,12 @@
 module Api
   class Managers < Events
-    route_param :event_slug do
+    helpers do
+        def require_manager!
+            error!({ error: 'Unauthorized access to manage' }, 403) unless @event.manager_id == @admin.id
+        end
+    end
     before {require_manager!}
+    route_param :event_slug do
 
         get :settings do
             present event: @event, with: Api::Entities::Event::Full

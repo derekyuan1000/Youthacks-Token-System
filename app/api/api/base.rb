@@ -1,12 +1,14 @@
 module Api
     class Base < Grape::API
         format :json
-        prefix 'api'
+        default_format :json
+        prefix :api
 
         get do
             status 200
-            { message: 'Welcome to the API. Docs at /docs/api.' }
+            { message: 'Welcome to the API. Docs at aha.youthacks.org/docs/api.' }
         end
+        
 
         mount Api::Admins
         mount Api::Events
@@ -35,5 +37,8 @@ module Api
             ],
             mount_path: '/docs'
         )
+        route :any, '*path' do
+            error!({ error: 'Not Found. Check aha.youthacks.org/docs/api for documentation.' }, 404)
+        end
     end
 end

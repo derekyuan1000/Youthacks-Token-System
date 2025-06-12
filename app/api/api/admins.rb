@@ -58,10 +58,6 @@ module Api
 			end
       	end
 		
-		desc 'Forgot password'
-		get :forgot_password do
-			error!({ message: 'Password reset not implemented' }, 501)
-		end
 		desc 'Resend code'
 		post :resend_code do
 			header = headers['Authorization']
@@ -108,6 +104,10 @@ module Api
 				error!({ message: 'Invalid token' }, 401)
 			end
 		end
+	end
+	desc 'Forgot password'
+	get :forgot_password do
+		error!({ message: 'Password reset not implemented' }, 501)
 	end
 
     desc 'Pending invitations'
