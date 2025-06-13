@@ -182,5 +182,20 @@ module Api
     get :settings do	
       admin, with = Api::Entities::Admin::Full
     end
+    desc 'Login and get JWT token', tags: ['Auth']
+    params do
+      requires :name, type: String
+      requires :password, type: String
+    end
+    post :login do
+		admin = Admin.find_by(name: params[:name])
+		if admin && admin.authenticate(params[:password])
+			payload = { user_id: admin.id, exp: 2.days.from_now.to_i }
+			token = JWT.encode(payload, Rails.application.secret_key_base)
+			{message: "Successful log in", token: token }
+		else
+			error!({ error: 'Invalid email or password' }, 401)
+		end
+  end
   end
 end

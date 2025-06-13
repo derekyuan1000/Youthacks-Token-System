@@ -21,7 +21,7 @@ module Api
             require_event!(event_slug: :event_slug)
             require_manager!
         end
-        desc 'Get event settings', tags: ['Manager Events']
+        desc 'Get event settings', tags: ['Event Managers']
         get :settings do
             present event: @event, with: Api::Entities::Event::Full
         end
@@ -31,7 +31,7 @@ module Api
             optional :description, type: String
             optional :date, type: Date
         end
-        desc 'Update event settings', tags: ['Manager Events']
+        desc 'Update event settings', tags: ['Event Managers']
         post :update_settings do
             @event.update!(declared(params, include_missing: false))
         end
@@ -42,7 +42,7 @@ module Api
             optional :airtable_table_name, type: String
             optional :name_column, type: String
         end
-        desc 'Update Airtable settings', tags: ['Manager Events']
+        desc 'Update Airtable settings', tags: ['Event Managers']
         post :update_airtable do
             if @event.sync_with_airtable
                 @event.update!(declared(params, include_missing: false))
@@ -52,7 +52,7 @@ module Api
             end
         end
 
-        desc 'List event admins', tags: ['Manager Events']
+        desc 'List event admins', tags: ['Event Managers']
         get :admins do
             present @event.admins, with: Api::Entities::Admin::Public
         end
@@ -60,7 +60,7 @@ module Api
         params do
             requires :name, type: String
         end
-        desc 'Invite event admin', tags: ['Manager Events']
+        desc 'Invite event admin', tags: ['Event Managers']
         post :invite_admin do
             admin = Admin.find_by(name: params[:name])
             unless admin.present? && admin.id != @event.manager_id && !@event.admins.exists?(admin.id)
