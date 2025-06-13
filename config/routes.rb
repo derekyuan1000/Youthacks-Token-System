@@ -9,6 +9,7 @@ Rails.application.routes.draw do
   # Docs API routes
 	namespace :docs do
 		namespace :api do
+			get "(/*path)", to: "api#docs"
 			get '/', to: 'api#docs', as: :api_docs
 		end
 	end
