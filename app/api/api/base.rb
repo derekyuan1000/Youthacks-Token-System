@@ -8,7 +8,12 @@ module Api
             status 200
             { message: 'Welcome to the API. Docs at aha.youthacks.org/docs/api.' }
         end
-        
+        rescue_from :all do |e|
+            error!(
+                message: "Internal server error: #{e.message}",
+                status: 500
+            )
+        end
 
         mount Api::Admins
         mount Api::Events

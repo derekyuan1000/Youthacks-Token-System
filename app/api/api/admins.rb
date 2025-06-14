@@ -24,9 +24,15 @@ module Api
 	end
 
     before do
-		unless [:signup, :forgot_password, :resend_code, :confirm_code].include?(route.route_name)
-			require_admin!
-		end
+      unless [
+        '/api/signup',
+        '/api/signup/resend_code',
+        '/api/signup/confirm_code',
+        '/api/forgot_password',
+        '/api/login'
+      ].include?(request.path)
+        require_admin!
+      end
     end
 
     resource :signup do
