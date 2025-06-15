@@ -1,45 +1,69 @@
+require 'jwt'
 module Api
   class Admins < Grape::API
     format :json
     prefix :api
 
-    helpers do
+	helpers do
 		def require_admin!
-            header = headers['Authorization']
-            token = header&.split(' ')&.last
+			header = headers['Authorization']
+			token = header&.split(' ')&.last
 
-            error!({ error: 'Missing token' }, 401) if token.blank?
+			error!({ error: 'Missing token' }, 401) if token.blank?
 
-            begin
-                decoded = JWT.decode(token, Rails.application.secret_key_base)[0]
-                @admin = Admin.find(decoded['user_id'])
-                rescue JWT::ExpiredSignature
-                    error!({ error: 'Token expired' }, 401)
-                rescue JWT::DecodeError
-                    error!({ error: 'Invalid token' }, 401)
-                rescue ActiveRecord::RecordNotFound
-                    error!({ error: 'Admin not found' }, 401)
-            end
-        end
+			begin
+				decoded = JWT.decode(token, Rails.application.secret_key_base)[0]
+				@admin = Admin.find(decoded['user_id'])
+			rescue JWT::ExpiredSignature
+				error!({ error: 'Token expired' }, 401)
+			rescue JWT::DecodeError
+				error!({ error: 'Invalid token' }, 401)
+			rescue ActiveRecord::RecordNotFound
+				error!({ error: 'Admin not found' }, 401)
+			end
+		end
+
+		params :email_param do
+			requires :email, type: String,
+				format: URI::MailTo::EMAIL_REGEXP,
+				documentation: { format: 'email'}
+		end
+
+		params :auth_header do
+			requires :Authorization, type: String, documentation: {
+				param_type: 'header',
+				required: true,
+				description: 'Bearer token for admin authentication'
+			}
+		end
+
+		# Shared params for pending signup token
+		params :pending_signup_token do
+			requires :Authorization, type: String, documentation: {
+				param_type: 'header',
+				required: true,
+				description: 'Bearer token from pending signup step'
+			}
+		end
 	end
 
     before do
-      unless [
-        '/api/signup',
-        '/api/signup/resend_code',
-        '/api/signup/confirm_code',
-        '/api/forgot_password',
-        '/api/login'
-      ].include?(request.path)
+      exempt_paths = ['/api/signup', '/api/signup/resend_code', '/api/signup/confirm_code', '/api/login', '/api/forgot_password']
+      clean_path = route.path.gsub(/\(\.:format\)/, '')
+      unless exempt_paths.include?(clean_path)
         require_admin!
       end
     end
 
     resource :signup do
-		desc 'Create admin', tags: ['Signup']
+		desc 'Create admin', {
+		  tags: ['Signup'],
+		  detail: 'Create admin',
+		  documentation: { operationId: 'create_admin' }
+		}
 		params do
 			requires :name, type: String
-			requires :email, type: String
+			use :email_param
 			requires :password, type: String
 		end
 		post do
@@ -48,28 +72,40 @@ module Api
 			email = params[:email]
 
 			if name.present? && password.present? && email.present?
-			code = rand(100_000..999_999)
-			AdminMailer.send_code(email, code).deliver_now
+				error!({ message: 'Admin already exists' }, 422) if Admin.exists?(email: email)
+				error!({ message: 'Invalid email format' }, 422) unless email =~ URI::MailTo::EMAIL_REGEXP
+				code = rand(100_000..999_999)
+				AdminMailer.send_code(email, code).deliver_now
 
-			pending_token = JWT.encode({
-				name: name,
-				email: email,
-				password: password,
-				code: code,
-				exp: 30.minutes.from_now.to_i
-			}, Rails.application.secret_key_base)
-			{ token: pending_token }
+				pending_token = JWT.encode({
+					name: name,
+					email: email,
+					password: password,
+					code: code,
+					exp: 30.minutes.from_now.to_i
+				}, Rails.application.secret_key_base)
+				{ token: pending_token }
 			else
 				error!({ message: 'Name, password, and email cannot be blank' }, 422)
 			end
       	end
 		
-		desc 'Resend code', tags: ['Signup']
+		desc 'Resend verification code', {
+		  tags: ['Signup'],
+		  detail: 'Resend verification code',
+		  headers: {
+		    Authorization: {
+		      required: true,
+		      type: 'string',
+		      description: 'Bearer token from pending signup step'
+		    }
+		  },
+		  documentation: { operationId: 'resend_signup_code' }
+		}
 		post :resend_code do
 			header = headers['Authorization']
+			error!({ error: 'Missing token' }, 401) if header.blank?
 			token = header&.split(' ')&.last
-		
-			error!({ error: 'Missing token' }, 401) if token.blank?
 		
 			begin
 				decoded = JWT.decode(token, Rails.application.secret_key_base)[0]
@@ -82,27 +118,37 @@ module Api
 			end
 		end
 		
-		desc 'Confirm code', tags: ['Signup']
+		desc 'Confirm signup code', {
+		  tags: ['Signup'],
+		  detail: 'Confirm signup code',
+		  headers: {
+		    Authorization: {
+		      required: true,
+		      type: 'string',
+		      description: 'Bearer token from pending signup step'
+		    }
+		  },
+		  documentation: { operationId: 'confirm_signup_code' }
+		}
 		params do
-		requires :code, type: String
+			requires :code, type: String
 		end
 		post :confirm_code do
 			header = headers['Authorization']
+			error!({ message: 'Missing token' }, 401) if header.blank?
 			token = header&.split(' ')&.last
-		
-			error!({ message: 'Missing token' }, 401) if token.blank?
 		
 			begin
 				decoded = JWT.decode(token, Rails.application.secret_key_base)[0]
 				entered_code = params[:code].strip
 				if decoded['code'].to_s == entered_code.to_s
-				result = Admin.new!(name: decoded['name'], password: decoded['password'], email: decoded['email'])
-				if result[:success]
-					admin = result[:admin]
-					{ message: 'Admin created successfully', admin: { name: admin.name, email: admin.email } }
-				else
-					error!({ message: admin.errors.full_messages.join(', ') || 'Failed to create admin' }, 422)
-				end
+					result = Admin.new!(name: decoded['name'], password: decoded['password'], email: decoded['email'])
+					if result[:success]
+						admin = result[:admin]
+						{ message: 'Admin created successfully', admin: { name: admin.name, email: admin.email } }
+					else
+						error!({ message: admin.errors.full_messages.join(', ') || 'Failed to create admin' }, 422)
+					end
 				else
 					error!({ message: 'Invalid code' }, 401)
 				end
@@ -111,24 +157,39 @@ module Api
 			end
 		end
 	end
-	desc 'Forgot password', tags: ['Auth']
+	
+	desc 'Forgot password', {
+	  tags: ['User'],
+	  detail: 'Forgot password',
+	  documentation: { operationId: 'forgot_password' }
+	}
 	get :forgot_password do
 		error!({ message: 'Password reset not implemented' }, 501)
 	end
 
-    desc 'Pending invitations', tags: ['Invitations']
+    desc 'Get pending invitations', {
+      tags: ['Event Managers'],
+      detail: 'Get pending invitations',
+      documentation: { operationId: 'list_pending_invitations' }
+    }
+    params do
+      use :auth_header
+    end
     get :pending_invitations do
-      require_admin!
       invitations = @admin.invitations.pending
-      invitations
+      present invitations, with: Api::Entities::Invitation
     end
 
-    desc 'Accept invitation', tags: ['Invitations']
+    desc 'Accept invitation by ID', {
+      tags: ['User'],
+      detail: 'Accept invitation by ID',
+      documentation: { operationId: 'accept_invitation' }
+    }
     params do
+      use :auth_header
       requires :invitation_id, type: Integer
     end
     post :accept_invitation do
-      require_admin!
       invitation = @admin.invitations.pending.find_by(id: params[:invitation_id])
       if invitation
         result = invitation.accept!
@@ -142,30 +203,38 @@ module Api
       end
     end
 
-    desc 'Reject invitation', tags: ['Invitations']
+    desc 'Reject invitation by ID', {
+      tags: ['User'],
+      detail: 'Reject invitation by ID',
+      documentation: { operationId: 'reject_invitation' }
+    }
     params do
+      use :auth_header
       requires :invitation_id, type: Integer
     end
     post :reject_invitation do
-      require_admin!
-      invitation = @admin.invitations.pending.find_by(id: params[:invitation_id])
-      if invitation
-        invitation.reject!
-        { message: 'Invitation rejected' }
-      else
-        error!({ error: 'Invitation not found or already processed' }, 404)
-      end
+		invitation = @admin.invitations.pending.find_by(id: params[:invitation_id])
+		if invitation
+			invitation.reject!
+			{ message: 'Invitation rejected' }
+		else
+			error!({ error: 'Invitation not found or already processed' }, 404)
+		end
     end
 
-    desc 'Create event', tags: ['Events']
+    desc 'Create a new event', {
+      tags: ['User'],
+      detail: 'Create a new event',
+      documentation: { operationId: 'create_event' }
+    }
     params do
+      use :auth_header
       requires :name, type: String
       optional :description, type: String
       requires :date, type: Date
       optional :sync_with_airtable, type: Boolean, default: false
     end
     post :create_event do
-      require_admin!
       event_params = {
         name: params[:name],
         description: params[:description],
@@ -174,34 +243,52 @@ module Api
         sync_with_airtable: params[:sync_with_airtable]
       }
       event = @admin.events.create!(event_params)
-      { event: event }
+      present event, with: Api::Entities::Event
     end
 
-    desc 'List events', tags: ['Events']
+    desc 'List admin and managed events', {
+      tags: ['User'],
+      detail: 'List admin and managed events',
+      documentation: { operationId: 'list_events' }
+    }
+    params do
+      use :auth_header
+    end
     get :events do
-      require_admin!
       events = @admin.events + @admin.managed_events
-      events
+      present events, with: Api::Entities::Event
     end
 
-    desc 'Admin settings', tags: ['Events']
-    get :settings do	
-      admin, with = Api::Entities::Admin::Full
+    desc 'Get admin settings', {
+      tags: ['User'],
+      detail: 'Get admin settings',
+      documentation: { operationId: 'get_admin_settings' }
+    }
+    params do
+      use :auth_header
     end
-    desc 'Login and get JWT token', tags: ['Auth']
+    get :settings do	
+      present @admin, with: Api::Entities::Admin::Full
+    end
+
+    desc 'Login and receive JWT token', {
+      tags: ['User'],
+      detail: 'Login and receive JWT token',
+      documentation: { operationId: 'login_admin' }
+    }
     params do
       requires :name, type: String
       requires :password, type: String
     end
     post :login do
-		admin = Admin.find_by(name: params[:name])
-		if admin && admin.authenticate(params[:password])
-			payload = { user_id: admin.id, exp: 2.days.from_now.to_i }
-			token = JWT.encode(payload, Rails.application.secret_key_base)
-			{message: "Successful log in", token: token }
-		else
-			error!({ error: 'Invalid email or password' }, 401)
-		end
-  end
+      admin = Admin.find_by(name: params[:name])
+      if admin && admin.authenticate(params[:password])
+        payload = { user_id: admin.id, exp: 2.days.from_now.to_i }
+        token = JWT.encode(payload, Rails.application.secret_key_base)
+        { message: "Successful log in", token: token }
+      else
+        error!({ error: 'Invalid email or password' }, 401)
+      end
+    end
   end
 end
