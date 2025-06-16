@@ -5,7 +5,7 @@ module Api
       Authorization: {
         required: true,
         type: 'string',
-        description: 'Bearer token for admin authentication'
+        description: ' token for admin authentication'
       }
     }.freeze
 
