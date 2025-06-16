@@ -1,4 +1,4 @@
-require 'jwt' # Test fix just for docker on nest
+require 'jwt' # Test fix just for docker on
 module Api
   class Admins < Grape::API
     AUTH_HEADER_DOC = {
