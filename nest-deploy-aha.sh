@@ -47,6 +47,7 @@ if [ "$LOCAL_HASH" != "$REMOTE_HASH" ]; then
     aha
 
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] Deploy complete."
+  systemctl --user reload caddy
 else
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] No new updates."
 fi
