@@ -2,9 +2,6 @@ module Api
 	class Events < Admins
 
 		helpers do
-			params :auth_header do
-				requires :Authorization, type: String, desc: 'Admin authorization token', documentation: { param_type: 'header' }
-			end
 
 			def require_event!(event_slug:)
 				error!({ error: 'Event ID is required' }, 400) if event_slug.blank?
@@ -16,11 +13,15 @@ module Api
 					error!({ error: 'Unauthorized access to event' }, 403)
 				end
 			end
+			params :auth_header do
+			requires :Authorization, type: String, documentation: {
+				param_type: 'header',
+				required: true,
+				description: 'Bearer token for admin authentication'
+			}
+			end
 		end
 
-		before do
-			helpers.require_admin!
-		end
 		
 		resource :events do
 			route_param :event_slug, type: String do

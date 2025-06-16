@@ -4,7 +4,7 @@ module Api
             class Public < Grape::Entity
                 expose :name, documentation: { type: 'String', desc: 'Event name' }
                 expose :date, documentation: { type: 'Date', desc: 'Event date' }
-                expose :desc, documentation: { type: 'String', desc: 'Event description' }
+                expose :description, documentation: { type: 'String', desc: 'Event description' }, unless: ->(event, _) { event.description.nil? }
                 expose :slug, documentation: { type: 'String', desc: 'Event slug' }
                 expose :manager, using: Api::Entities::Admin::Public, documentation: { type: 'Admin', desc: 'Event manager' }
             end

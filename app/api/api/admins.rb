@@ -1,6 +1,14 @@
 require 'jwt'
 module Api
   class Admins < Grape::API
+    AUTH_HEADER_DOC = {
+      Authorization: {
+        required: true,
+        type: 'string',
+        description: 'Bearer token for admin authentication'
+      }
+    }.freeze
+
     format :json
     prefix :api
 
@@ -13,6 +21,7 @@ module Api
 
 			begin
 				decoded = JWT.decode(token, Rails.application.secret_key_base)[0]
+				error!({message: 'Invalid token type' }, 401) unless decoded['type'] == 'login'
 				@admin = Admin.find(decoded['user_id'])
 			rescue JWT::ExpiredSignature
 				error!({ error: 'Token expired' }, 401)
@@ -29,20 +38,12 @@ module Api
 				documentation: { format: 'email'}
 		end
 
-		params :auth_header do
-			requires :Authorization, type: String, documentation: {
-				param_type: 'header',
-				required: true,
-				description: 'Bearer token for admin authentication'
-			}
-		end
-
 		# Shared params for pending signup token
 		params :pending_signup_token do
 			requires :Authorization, type: String, documentation: {
 				param_type: 'header',
 				required: true,
-				description: 'Bearer token from pending signup step'
+				description: ' token from pending signup step'
 			}
 		end
 	end
@@ -59,7 +60,19 @@ module Api
 		desc 'Create admin', {
 		  tags: ['Signup'],
 		  detail: 'Create admin',
-		  documentation: { operationId: 'create_admin' }
+		  documentation: { operationId: 'create_admin',
+			responses: {
+			  200 => {
+				description: 'Pending signup token returned',
+				schema: {
+				  type: 'object',
+				  properties: {
+					token: { type: 'string' }
+				  }
+				}
+			  }
+			}
+		  }
 		}
 		params do
 			requires :name, type: String
@@ -78,6 +91,7 @@ module Api
 				AdminMailer.send_code(email, code).deliver_now
 
 				pending_token = JWT.encode({
+					type: "signup",
 					name: name,
 					email: email,
 					password: password,
@@ -97,10 +111,22 @@ module Api
 		    Authorization: {
 		      required: true,
 		      type: 'string',
-		      description: 'Bearer token from pending signup step'
+		      description: ' token from pending signup step'
 		    }
 		  },
-		  documentation: { operationId: 'resend_signup_code' }
+		  documentation: { operationId: 'resend_signup_code',
+			responses: {
+			  200 => {
+				description: 'Code resent successfully',
+				schema: {
+				  type: 'object',
+				  properties: {
+					message: { type: 'string' }
+				  }
+				}
+			  }
+			}
+		  }
 		}
 		post :resend_code do
 			header = headers['Authorization']
@@ -109,6 +135,7 @@ module Api
 		
 			begin
 				decoded = JWT.decode(token, Rails.application.secret_key_base)[0]
+				error!({message: 'Invalid token type' }, 401) unless decoded['type'] == 'signup'
 				email = decoded['email']
 				code = decoded['code']
 				AdminMailer.send_code(email, code).deliver_now
@@ -125,10 +152,29 @@ module Api
 		    Authorization: {
 		      required: true,
 		      type: 'string',
-		      description: 'Bearer token from pending signup step'
+		      description: 'Token from pending signup step'
 		    }
 		  },
-		  documentation: { operationId: 'confirm_signup_code' }
+		  documentation: { operationId: 'confirm_signup_code',
+			responses: {
+			  200 => {
+				description: 'Admin created successfully',
+				schema: {
+				  type: 'object',
+				  properties: {
+					message: { type: 'string' },
+					admin: {
+					  type: 'object',
+					  properties: {
+						name: { type: 'string' },
+						email: { type: 'string' }
+					  }
+					}
+				  }
+				}
+			  }
+			}
+		  }
 		}
 		params do
 			requires :code, type: String
@@ -161,7 +207,13 @@ module Api
 	desc 'Forgot password', {
 	  tags: ['User'],
 	  detail: 'Forgot password',
-	  documentation: { operationId: 'forgot_password' }
+	  documentation: { operationId: 'forgot_password',
+		responses: {
+		  501 => {
+			description: 'Password reset not implemented'
+		  }
+		}
+	  }
 	}
 	get :forgot_password do
 		error!({ message: 'Password reset not implemented' }, 501)
@@ -170,10 +222,20 @@ module Api
     desc 'Get pending invitations', {
       tags: ['Event Managers'],
       detail: 'Get pending invitations',
-      documentation: { operationId: 'list_pending_invitations' }
+      headers: AUTH_HEADER_DOC,
+      documentation: { operationId: 'list_pending_invitations',
+		responses: {
+		  200 => {
+			description: 'List of pending invitations',
+			schema: {
+			  type: 'array',
+			  items: { '$ref' => '#/definitions/Api::Entities::Invitation' }
+			}
+		  }
+		}
+	  }
     }
     params do
-      use :auth_header
     end
     get :pending_invitations do
       invitations = @admin.invitations.pending
@@ -183,10 +245,22 @@ module Api
     desc 'Accept invitation by ID', {
       tags: ['User'],
       detail: 'Accept invitation by ID',
-      documentation: { operationId: 'accept_invitation' }
+      headers: AUTH_HEADER_DOC,
+      documentation: { operationId: 'accept_invitation',
+		responses: {
+		  200 => {
+			description: 'Invitation accepted',
+			schema: {
+			  type: 'object',
+			  properties: {
+				message: { type: 'string' }
+			  }
+			}
+		  }
+		}
+	  }
     }
     params do
-      use :auth_header
       requires :invitation_id, type: Integer
     end
     post :accept_invitation do
@@ -206,10 +280,22 @@ module Api
     desc 'Reject invitation by ID', {
       tags: ['User'],
       detail: 'Reject invitation by ID',
-      documentation: { operationId: 'reject_invitation' }
+      headers: AUTH_HEADER_DOC,
+      documentation: { operationId: 'reject_invitation',
+		responses: {
+		  200 => {
+			description: 'Invitation rejected',
+			schema: {
+			  type: 'object',
+			  properties: {
+				message: { type: 'string' }
+			  }
+			}
+		  }
+		}
+	  }
     }
     params do
-      use :auth_header
       requires :invitation_id, type: Integer
     end
     post :reject_invitation do
@@ -225,10 +311,17 @@ module Api
     desc 'Create a new event', {
       tags: ['User'],
       detail: 'Create a new event',
-      documentation: { operationId: 'create_event' }
+      headers: AUTH_HEADER_DOC,
+      documentation: { operationId: 'create_event',
+		responses: {
+		  200 => {
+			description: 'Event created successfully',
+			schema: { '$ref' => '#/definitions/Api::Entities::Event::Full' }
+		  }
+		}
+	  }
     }
     params do
-      use :auth_header
       requires :name, type: String
       optional :description, type: String
       requires :date, type: Date
@@ -243,38 +336,68 @@ module Api
         sync_with_airtable: params[:sync_with_airtable]
       }
       event = @admin.events.create!(event_params)
-      present event, with: Api::Entities::Event
+      present event, with: Api::Entities::Event::Full
     end
 
     desc 'List admin and managed events', {
       tags: ['User'],
       detail: 'List admin and managed events',
-      documentation: { operationId: 'list_events' }
+      headers: AUTH_HEADER_DOC,
+      documentation: { operationId: 'list_events',
+		responses: {
+		  200 => {
+			description: 'List of admin and managed events',
+			schema: {
+			  type: 'array',
+			  items: { '$ref' => '#/definitions/Api::Entities::Event::Full' }
+			}
+		  }
+		}
+	  }
     }
     params do
-      use :auth_header
     end
     get :events do
       events = @admin.events + @admin.managed_events
-      present events, with: Api::Entities::Event
+      present events, with: Api::Entities::Event::Full
     end
 
     desc 'Get admin settings', {
       tags: ['User'],
       detail: 'Get admin settings',
-      documentation: { operationId: 'get_admin_settings' }
+      headers: AUTH_HEADER_DOC,
+      documentation: { operationId: 'get_admin_settings',
+		responses: {
+		  200 => {
+			description: 'Admin settings returned',
+			schema: { '$ref' => '#/definitions/Api::Entities::Admin::Full' }
+		  }
+		}
+	  }
     }
     params do
-      use :auth_header
     end
     get :settings do	
       present @admin, with: Api::Entities::Admin::Full
     end
 
-    desc 'Login and receive JWT token', {
+    desc 'Login', {
       tags: ['User'],
-      detail: 'Login and receive JWT token',
-      documentation: { operationId: 'login_admin' }
+      detail: 'Login',
+      documentation: { operationId: 'login_admin',
+		responses: {
+		  200 => {
+			description: 'Successful login with token',
+			schema: {
+			  type: 'object',
+			  properties: {
+				message: { type: 'string' },
+				token: { type: 'string' }
+			  }
+			}
+		  }
+		}
+	  }
     }
     params do
       requires :name, type: String
@@ -283,7 +406,7 @@ module Api
     post :login do
       admin = Admin.find_by(name: params[:name])
       if admin && admin.authenticate(params[:password])
-        payload = { user_id: admin.id, exp: 2.days.from_now.to_i }
+        payload = {type: "login", user_id: admin.id, exp: 2.days.from_now.to_i }
         token = JWT.encode(payload, Rails.application.secret_key_base)
         { message: "Successful log in", token: token }
       else
