@@ -5,7 +5,7 @@ cd /home/mattsoh/pub/aha || exit 1
 
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] Checking for updates..."
 
-# Fetch remote changes
+# Fetch remote changesqw
 git fetch origin main
 
 LOCAL_HASH=$(git rev-parse HEAD)
