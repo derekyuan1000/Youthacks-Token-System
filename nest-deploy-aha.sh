@@ -11,7 +11,7 @@ git fetch origin main
 LOCAL_HASH=$(git rev-parse HEAD)
 REMOTE_HASH=$(git rev-parse origin/main)
 
-if [ "$LOCAL_HASH" != "$REMOTE_HASH" ]; then
+if [ "$LOCAL_HASH" == "$REMOTE_HASH" ]; then
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] New commit detected. Rebuilding and restarting Docker container..."
 
   git reset --hard origin/main
@@ -36,7 +36,7 @@ if [ "$LOCAL_HASH" != "$REMOTE_HASH" ]; then
 
   docker build -t aha .
 
-  docker run --name aha -d \
+  docker run --name mattsoh_aha -d \
     -p 3836:3000 \
     -v /var/run/postgres:/var/run/postgres \
     -e PGDATABASE=mattsoh_aha_production \
