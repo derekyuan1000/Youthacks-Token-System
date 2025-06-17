@@ -17,11 +17,14 @@ if [ "$LOCAL_HASH" != "$REMOTE_HASH" ]; then
   git reset --hard origin/main
 
 
+  TIMESTAMP=$(date +%s)
+  BACKUP_NAME="mattsoh_aha_backup_$TIMESTAMP"
+
   EXISTING_CONTAINER=$(docker ps -a -q -f "name=^mattsoh_aha$")
 
   if [ -n "$EXISTING_CONTAINER" ]; then
-    echo "Removing existing container mattsoh_aha: $EXISTING_CONTAINER"
-    docker rm -f $EXISTING_CONTAINER
+    echo "Renaming existing container mattsoh_aha to $BACKUP_NAME"
+    docker rename mattsoh_aha "$BACKUP_NAME"
   fi
   # PID=$(lsof -ti TCP:3836)
   # if [ -n "$PID" ]; then
@@ -43,6 +46,17 @@ if [ "$LOCAL_HASH" != "$REMOTE_HASH" ]; then
     -e PGPASSWORD=$DB_PASSWORD \
     -e RAILS_MASTER_KEY=$RAILS_MASTER_KEY \
     aha
+
+  # Check if new container is running, restore backup if not
+  if ! docker ps -q -f name=mattsoh_aha | grep -q .; then
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] New container failed to start. Restoring previous container..."
+    docker rename "$BACKUP_NAME" mattsoh_aha
+    docker start mattsoh_aha
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Previous container restored."
+  else
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] New container running successfully. Removing backup..."
+    docker rm -f "$BACKUP_NAME" || true
+  fi
 
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] Deploy complete."
   systemctl --user reload caddy
