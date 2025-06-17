@@ -11,7 +11,7 @@ git fetch origin main
 LOCAL_HASH=$(git rev-parse HEAD)
 REMOTE_HASH=$(git rev-parse origin/main)
 
-if [ "$LOCAL_HASH" == "$REMOTE_HASH" ]; then
+if [ "$LOCAL_HASH" != "$REMOTE_HASH" ]; then
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] New commit detected. Rebuilding and restarting Docker container..."
 
   git reset --hard origin/main
