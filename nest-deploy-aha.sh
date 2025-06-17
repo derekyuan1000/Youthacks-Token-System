@@ -16,14 +16,12 @@ if [ "$LOCAL_HASH" != "$REMOTE_HASH" ]; then
 
   git reset --hard origin/main
 
-  CONTAINER_IDS=$(docker ps -q --filter "publish=3836")
+  EXISTING_CONTAINER=$(docker ps -q -f "name=^mattsoh_aha$")
 
-  if [ -n "$CONTAINER_IDS" ]; then
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Stopping and removing container(s) using port 3836: $CONTAINER_IDS"
-    docker stop $CONTAINER_IDS
-    docker rm $CONTAINER_IDS
-  else
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] No container found using port 3836"
+  if [ -n "$EXISTING_CONTAINER" ]; then
+    echo "Stopping existing container mattsoh_aha: $EXISTING_CONTAINER"
+    docker stop $EXISTING_CONTAINER
+    docker rm $EXISTING_CONTAINER
   fi
   # PID=$(lsof -ti TCP:3836)
   # if [ -n "$PID" ]; then
