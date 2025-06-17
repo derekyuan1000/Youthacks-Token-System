@@ -16,12 +16,12 @@ if [ "$LOCAL_HASH" == "$REMOTE_HASH" ]; then
 
   git reset --hard origin/main
 
-  EXISTING_CONTAINER=$(docker ps -q -f "name=^mattsoh_aha$")
+
+  EXISTING_CONTAINER=$(docker ps -a -q -f "name=^mattsoh_aha$")
 
   if [ -n "$EXISTING_CONTAINER" ]; then
-    echo "Stopping existing container mattsoh_aha: $EXISTING_CONTAINER"
-    docker stop $EXISTING_CONTAINER
-    docker rm $EXISTING_CONTAINER
+    echo "Removing existing container mattsoh_aha: $EXISTING_CONTAINER"
+    docker rm -f $EXISTING_CONTAINER
   fi
   # PID=$(lsof -ti TCP:3836)
   # if [ -n "$PID" ]; then
