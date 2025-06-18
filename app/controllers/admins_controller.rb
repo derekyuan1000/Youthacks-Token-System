@@ -62,6 +62,8 @@ class AdminsController < ApplicationController
         email = params[:email]
 
         if name.present? && password.present? && password == password_confirmation && email.present?
+            redirect_to signup_path, alert: "username already exists" if Admin.exists?(name: name)
+            redirect_to signup_path, alert: "email already exists" if Admin.exists?(email: email)
             code = rand(100_000..999_999)
             AdminMailer.send_code(email, code).deliver_now
 
