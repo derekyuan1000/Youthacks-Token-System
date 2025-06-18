@@ -1,6 +1,6 @@
 class AdminsController < ApplicationController
     before_action :require_admin, except: [:new, :create, :verify_code, :confirm_code, :resend_code]
-
+    # test
     def index
     end
 
