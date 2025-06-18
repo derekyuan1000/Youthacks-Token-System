@@ -1,24 +1,18 @@
 # README
+A token system for hackathons. Try it out at aha.youthacks.org.
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Set up
 
-Things you may want to cover:
+Now, this is really complicated if you want to run it locally. Like really.
 
-* Ruby version
+First, follow this guide:
 
-* System dependencies
+https://guides.rubyonrails.org/install_ruby_on_rails.html
 
-* Configuration
+Second, you need to cover the following, including but not limited to (since there's a lot to do)
 
-* Database creation
+1. Basically everything in config/ (especially the database setup and email server setup)
 
-* Database initialization
+2. Other deployment stuff.
 
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+Seriously, just email me if you need help.
