@@ -56,25 +56,34 @@ class AdminsController < ApplicationController
     end
 
     def create
-        name = params[:name].strip
-        password = params[:password]
-        password_confirmation = params[:password_confirmation]
-        email = params[:email]
+        name = params[:name].strip.downcase
+        password = params[:password].strip
+        password_confirmation = params[:password_confirmation].strip
+        email = params[:email].strip.downcase
 
         if name.present? && password.present? && password == password_confirmation && email.present?
-            redirect_to signup_path, alert: "username already exists" if Admin.exists?(name: name)
-            redirect_to signup_path, alert: "email already exists" if Admin.exists?(email: email)
-            code = rand(100_000..999_999)
-            AdminMailer.send_code(email, code).deliver_now
+            if Admin.exists?(name: name)
+                redirect_to signup_path, alert: "Username already exists. Try another one." 
+            elsif Admin.exists?(email: email)
+                redirect_to signup_path, alert: "Email already exists. Try another one."
+            else
+                code = rand(100_000..999_999)
+                begin
+                    AdminMailer.send_code(email, code).deliver_now
+                rescue => e
+                    redirect_to signup_path, alert: "Failed to send verification email: #{e.message}"
+                    return
+                end
 
-            session[:pending_admin] = {
-                name: name,
-                password: password,
-                email: email,
-                code: code
-            }
+                session[:pending_admin] = {
+                    name: name,
+                    password: password,
+                    email: email,
+                    code: code
+                }
+                redirect_to verify_code_path
+            end
 
-            redirect_to verify_code_path
         else
             redirect_to signup_path, alert: 'Please fill all fields correctly.'
         end
