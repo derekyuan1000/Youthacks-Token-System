@@ -13,9 +13,9 @@ git fetch origin main
 LOCAL_HASH=$(git rev-parse HEAD)
 REMOTE_HASH=$(git rev-parse origin/main)
 
-if [ "$LOCAL_HASH" != "$REMOTE_HASH" ]; then
+if [ "$LOCAL_HASH" != "$REMOTE_HASH" ] || ! docker ps -q -f name=mattsoh_aha | grep -q .; then
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] New commit detected. Rebuilding and restarting Docker container..."
-
+  docker container prune -f 2>>"$ERROR_LOG"
   git reset --hard origin/main
 
 
@@ -59,7 +59,11 @@ if [ "$LOCAL_HASH" != "$REMOTE_HASH" ]; then
   else
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] New container running successfully. Removing backup..."
     docker rm -f "$BACKUP_NAME" || true
+    
   fi
+
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] Cleaning up stopped containers..."
+  docker container prune -f 2>>"$ERROR_LOG"
 
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] Deploy complete."
   systemctl --user reload caddy
