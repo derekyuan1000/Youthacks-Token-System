@@ -57,23 +57,14 @@ module Api
     end
 
     resource :signup do
-		desc 'Create admin', {
-		  tags: ['Signup'],
-		  detail: 'Create admin',
-		  documentation: { operationId: 'create_admin',
-			responses: {
-			  200 => {
-				description: 'Pending signup token returned',
-				schema: {
-				  type: 'object',
-				  properties: {
-					token: { type: 'string' }
-				  }
-				}
-			  }
-			}
-		  }
-		}
+		desc 'Create admin' do
+			summary 'Create a new admin account'
+			detail 'Returns a JWT pending signup token for further verification'
+			tags ['Signup']
+			success Api::Entities::Token
+			failure [[422, 'Validation failed', Api::Entities::Error]]
+			nickname 'create_admin'
+		end
 		params do
 			requires :name, type: String
 			use :email_param
@@ -85,20 +76,20 @@ module Api
 			email = params[:email]
 
 			if name.present? && password.present? && email.present?
-				error!({ message: 'Admin already exists' }, 422) if Admin.exists?(email: email)
+				error!({ message: 'Admin already exists' }, 422) if Admin.exists?(email: email) or Admin.exists?(name: name)
 				error!({ message: 'Invalid email format' }, 422) unless email =~ URI::MailTo::EMAIL_REGEXP
 				code = rand(100_000..999_999)
 				AdminMailer.send_code(email, code).deliver_now
-
+				exp_time = 30.minutes.from_now.to_i
 				pending_token = JWT.encode({
 					type: "signup",
 					name: name,
 					email: email,
 					password: password,
 					code: code,
-					exp: 30.minutes.from_now.to_i
+					exp: exp_time
 				}, Rails.application.secret_key_base)
-				{ token: pending_token }
+				{ token: pending_token, message: 'Pending signup token created', expires_at: Time.at(exp_time) }
 			else
 				error!({ message: 'Name, password, and email cannot be blank' }, 422)
 			end
