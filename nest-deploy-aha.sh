@@ -26,6 +26,7 @@ if [ "$LOCAL_HASH" != "$REMOTE_HASH" ]; then
 
   if [ -n "$EXISTING_CONTAINER" ]; then
     echo "Renaming existing container mattsoh_aha to $BACKUP_NAME"
+    docker stop mattsoh_aha 2>>"$ERROR_LOG"
     docker rename mattsoh_aha "$BACKUP_NAME" 2>>"$ERROR_LOG"
   fi
   # PID=$(lsof -ti TCP:3836)
