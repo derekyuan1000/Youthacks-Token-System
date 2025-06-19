@@ -55,6 +55,7 @@ module Api
         require_admin!
       end
     end
+	#fixagain
     resource :signup do
 		desc 'Create admin' do
 			summary 'Create a new admin account'
