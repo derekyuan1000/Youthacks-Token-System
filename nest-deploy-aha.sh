@@ -40,8 +40,10 @@ if [ "$LOCAL_HASH" != "$REMOTE_HASH" ] || ! docker ps -q -f name=mattsoh_aha | g
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] DB_PASSWORD set: ${DB_PASSWORD:+yes}"
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] RAILS_MASTER_KEY set: ${RAILS_MASTER_KEY:+yes}"
 
-  docker build -t aha . 2>>"$ERROR_LOG"
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] Running: docker build -t aha ."
+  docker build -t aha . 2>&1 | tee -a "$ERROR_LOG"
 
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] Running: docker run --name mattsoh_aha ..."
   docker run --name mattsoh_aha -d \
     -p 3836:3000 \
     -v /var/run/postgres:/var/run/postgres \
@@ -49,7 +51,7 @@ if [ "$LOCAL_HASH" != "$REMOTE_HASH" ] || ! docker ps -q -f name=mattsoh_aha | g
     -e PGPASSWORD=$DB_PASSWORD \
     -e RAILS_MASTER_KEY=$RAILS_MASTER_KEY \
     -e SECRET_KEY_BASE=$SECRET_KEY_BASE \
-    aha 2>>"$ERROR_LOG"
+    aha 2>&1 | tee -a "$ERROR_LOG"
 
   # Check if new container is running, restore backup if not
   if ! docker ps -q -f name=mattsoh_aha | grep -q .; then
