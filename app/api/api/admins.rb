@@ -62,7 +62,6 @@ module Api
 			tags ['Signup']
 			success Api::Entities::Token
 			failure [[422, 'Validation failed', Api::Entities::Error]]
-			nickname 'create_admin'
 		end
 		params do
 			requires :name, type: String
@@ -94,30 +93,14 @@ module Api
 			end
       	end
 		
-		desc 'Resend verification code', {
-		  tags: ['Signup'],
-		  detail: 'Resend verification code',
-		  headers: {
-		    Authorization: {
-		      required: true,
-		      type: 'string',
-		      description: ' token from pending signup step'
-		    }
-		  },
-		  documentation: { operationId: 'resend_signup_code',
-			responses: {
-			  200 => {
-				description: 'Code resent successfully',
-				schema: {
-				  type: 'object',
-				  properties: {
-					message: { type: 'string' }
-				  }
-				}
-			  }
-			}
-		  }
-		}
+		desc 'Resend verification code' do
+			summary 'Resend the verification code for admin signup'
+			detail 'Resends the verification code to the email address provided during the signup process'
+			tags ['Signup']
+			headers AUTH_HEADER_DOC
+			success code: 200, message: 'Code resent successfully'
+			failure [[401, 'Missing or invalid token', Api::Entities::Error], [422, 'Validation failed', Api::Entities::Error]]
+		end
 		post :resend_code do
 			header = headers['Authorization']
 			error!({ error: 'Missing token' }, 401) if header.blank?
@@ -135,39 +118,16 @@ module Api
 			end
 		end
 		
-		desc 'Confirm signup code', {
-		  tags: ['Signup'],
-		  detail: 'Confirm signup code',
-		  headers: {
-		    Authorization: {
-		      required: true,
-		      type: 'string',
-		      description: 'Token from pending signup step'
-		    }
-		  },
-		  documentation: { operationId: 'confirm_signup_code',
-			responses: {
-			  200 => {
-				description: 'Admin created successfully',
-				schema: {
-				  type: 'object',
-				  properties: {
-					message: { type: 'string' },
-					admin: {
-					  type: 'object',
-					  properties: {
-						name: { type: 'string' },
-						email: { type: 'string' }
-					  }
-					}
-				  }
-				}
-			  }
-			}
-		  }
-		}
+		desc 'Confirm signup code' do
+			summary 'Confirm the verification code for admin signup'
+			detail 'Confirms the verification code and creates the admin account'
+			tags ['Signup']
+			headers AUTH_HEADER_DOC
+			success Api::Entities::Admin::Public
+			failure [[401, 'Invalid code or token', Api::Entities::Error], [422, 'Validation failed', Api::Entities::Error]]
+		end
 		params do
-			requires :code, type: String
+			requires :code, type: String, documentation: { type: 'string', desc: 'Signup confirmation code', name: 'ConfirmCodeParams' }
 		end
 		post :confirm_code do
 			header = headers['Authorization']
@@ -181,7 +141,7 @@ module Api
 					result = Admin.new!(name: decoded['name'], password: decoded['password'], email: decoded['email'])
 					if result[:success]
 						admin = result[:admin]
-						{ message: 'Admin created successfully', admin: { name: admin.name, email: admin.email } }
+						present admin, with: Api::Entities::Admin::Public
 					else
 						error!({ message: admin.errors.full_messages.join(', ') || 'Failed to create admin' }, 422)
 					end
@@ -194,37 +154,24 @@ module Api
 		end
 	end
 	
-	desc 'Forgot password', {
-	  tags: ['User'],
-	  detail: 'Forgot password',
-	  documentation: { operationId: 'forgot_password',
-		responses: {
-		  501 => {
-			description: 'Password reset not implemented'
-		  }
-		}
-	  }
-	}
+	desc 'Forgot password' do
+		summary 'Forgot password'
+		detail 'Endpoint for password reset (not yet implemented)'
+		tags ['User']
+		success code: 501, message: 'Password reset not implemented'
+	end
 	get :forgot_password do
 		error!({ message: 'Password reset not implemented' }, 501)
 	end
 
-    desc 'Get pending invitations', {
-      tags: ['Event Managers'],
-      detail: 'Get pending invitations',
-      headers: AUTH_HEADER_DOC,
-      documentation: { operationId: 'list_pending_invitations',
-		responses: {
-		  200 => {
-			description: 'List of pending invitations',
-			schema: {
-			  type: 'array',
-			  items: { '$ref' => '#/definitions/Api::Entities::Invitation' }
-			}
-		  }
-		}
-	  }
-    }
+    desc 'Get pending invitations' do
+      summary 'List all pending invitations for the current admin'
+      detail 'Returns all invitations that are pending and require action from the admin'
+      tags ['Event Managers']
+      headers AUTH_HEADER_DOC
+      success Api::Entities::Invitation
+      failure [[401, 'Unauthorized', Api::Entities::Error]]
+    end
     params do
     end
     get :pending_invitations do
@@ -232,24 +179,14 @@ module Api
       present invitations, with: Api::Entities::Invitation
     end
 
-    desc 'Accept invitation by ID', {
-      tags: ['User'],
-      detail: 'Accept invitation by ID',
-      headers: AUTH_HEADER_DOC,
-      documentation: { operationId: 'accept_invitation',
-		responses: {
-		  200 => {
-			description: 'Invitation accepted',
-			schema: {
-			  type: 'object',
-			  properties: {
-				message: { type: 'string' }
-			  }
-			}
-		  }
-		}
-	  }
-    }
+    desc 'Accept invitation by ID' do
+      summary 'Accept a pending invitation by its ID'
+      detail 'Accepts the invitation and updates its status'
+      tags ['User']
+      headers AUTH_HEADER_DOC
+      success code: 200, message: 'Invitation accepted'
+      failure [[401, 'Unauthorized', Api::Entities::Error], [404, 'Invitation not found', Api::Entities::Error], [422, 'Failed to accept invitation', Api::Entities::Error]]
+    end
     params do
       requires :invitation_id, type: Integer
     end
@@ -267,24 +204,14 @@ module Api
       end
     end
 
-    desc 'Reject invitation by ID', {
-      tags: ['User'],
-      detail: 'Reject invitation by ID',
-      headers: AUTH_HEADER_DOC,
-      documentation: { operationId: 'reject_invitation',
-		responses: {
-		  200 => {
-			description: 'Invitation rejected',
-			schema: {
-			  type: 'object',
-			  properties: {
-				message: { type: 'string' }
-			  }
-			}
-		  }
-		}
-	  }
-    }
+    desc 'Reject invitation by ID' do
+      summary 'Reject a pending invitation by its ID'
+      detail 'Rejects the invitation and updates its status'
+      tags ['User']
+      headers AUTH_HEADER_DOC
+      success code: 200, message: 'Invitation rejected'
+      failure [[401, 'Unauthorized', Api::Entities::Error], [404, 'Invitation not found or already processed', Api::Entities::Error]]
+    end
     params do
       requires :invitation_id, type: Integer
     end
@@ -298,19 +225,14 @@ module Api
 		end
     end
 
-    desc 'Create a new event', {
-      tags: ['User'],
-      detail: 'Create a new event',
-      headers: AUTH_HEADER_DOC,
-      documentation: { operationId: 'create_event',
-		responses: {
-		  200 => {
-			description: 'Event created successfully',
-			schema: { '$ref' => '#/definitions/Api::Entities::Event::Full' }
-		  }
-		}
-	  }
-    }
+    desc 'Create a new event' do
+      summary 'Create a new event'
+      detail 'Creates a new event managed by the current admin'
+      tags ['User']
+      headers AUTH_HEADER_DOC
+      success Api::Entities::Event::Full
+      failure [[401, 'Unauthorized', Api::Entities::Error], [422, 'Validation failed', Api::Entities::Error]]
+    end
     params do
       requires :name, type: String
       optional :description, type: String
@@ -329,22 +251,14 @@ module Api
       present event, with: Api::Entities::Event::Full
     end
 
-    desc 'List admin and managed events', {
-      tags: ['User'],
-      detail: 'List admin and managed events',
-      headers: AUTH_HEADER_DOC,
-      documentation: { operationId: 'list_events',
-		responses: {
-		  200 => {
-			description: 'List of admin and managed events',
-			schema: {
-			  type: 'array',
-			  items: { '$ref' => '#/definitions/Api::Entities::Event::Full' }
-			}
-		  }
-		}
-	  }
-    }
+    desc 'List admin and managed events' do
+      summary 'List all events for which the admin is responsible'
+      detail 'Returns all events created or managed by the current admin'
+      tags ['User']
+      headers AUTH_HEADER_DOC
+      success Api::Entities::Event::Full
+      failure [[401, 'Unauthorized', Api::Entities::Error]]
+    end
     params do
     end
     get :events do
@@ -352,43 +266,27 @@ module Api
       present events, with: Api::Entities::Event::Full
     end
 
-    desc 'Get admin settings', {
-      tags: ['User'],
-      detail: 'Get admin settings',
-      headers: AUTH_HEADER_DOC,
-      documentation: { operationId: 'get_admin_settings',
-		responses: {
-		  200 => {
-			description: 'Admin settings returned',
-			schema: { '$ref' => '#/definitions/Api::Entities::Admin::Full' }
-		  }
-		}
-	  }
-    }
+    desc 'Get admin settings' do
+      summary 'Get the current admin\'s settings'
+      detail 'Returns the full settings and profile for the current admin'
+      tags ['User']
+      headers AUTH_HEADER_DOC
+      success Api::Entities::Admin::Full
+      failure [[401, 'Unauthorized', Api::Entities::Error]]
+    end
     params do
     end
     get :settings do	
       present @admin, with: Api::Entities::Admin::Full
     end
 
-    desc 'Login', {
-      tags: ['User'],
-      detail: 'Login',
-      documentation: { operationId: 'login_admin',
-		responses: {
-		  200 => {
-			description: 'Successful login with token',
-			schema: {
-			  type: 'object',
-			  properties: {
-				message: { type: 'string' },
-				token: { type: 'string' }
-			  }
-			}
-		  }
-		}
-	  }
-    }
+    desc 'Login' do
+      summary 'Admin login'
+      detail 'Authenticates an admin and returns a JWT token for further requests'
+      tags ['User']
+      success Api::Entities::Token
+      failure [[401, 'Invalid email or password', Api::Entities::Error]]
+    end
     params do
       requires :name, type: String
       requires :password, type: String

@@ -4,7 +4,9 @@ module Api
             class Public < Grape::Entity
                 expose :name, documentation: { type: 'String', desc: 'Participant name' }
                 expose :balance, documentation: { type: 'Integer', desc: 'Participant balance' }
-               
+                def self.entity_name
+                    'Participant (public view)'
+                end
             end
             class Full < Public
                 expose :id, documentation: { type: 'Integer', desc: 'Participant ID' } 
@@ -12,6 +14,9 @@ module Api
                 expose :checked_in, documentation: { type: 'Boolean', desc: 'Whether the participant is checked in' }
                 expose :check_in_time, documentation: { type: 'DateTime', desc: 'Check-in time of the participant' }
                 expose :uuid, documentation: { type: 'String', desc: 'Unique identifier for the participant' }
+                def self.entity_name
+                    'Participant (admin view)'
+                end
             end
         end
     end

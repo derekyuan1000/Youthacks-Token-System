@@ -26,5 +26,8 @@ module Api
               activity.admin
             end
         end
+        def self.entity_name
+            'Activity'
+        end 
     end
 end

@@ -33,8 +33,11 @@ module Api
                 Api::Entities::Participant::Full,
                 Api::Entities::Product,
                 Api::Entities::Transaction,
-                Api::Entities::Activity
+                Api::Entities::Activity,
+                Api::Entities::Error
             ],
+            array_use_braces: true,
+
             mount_path: '/docs'
         )
         route :any, '*path' do

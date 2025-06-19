@@ -7,11 +7,17 @@ module Api
                 expose :description, documentation: { type: 'String', desc: 'Event description' }, unless: ->(event, _) { event.description.nil? }
                 expose :slug, documentation: { type: 'String', desc: 'Event slug' }
                 expose :manager, using: Api::Entities::Admin::Public, documentation: { type: 'Admin', desc: 'Event manager' }
+                def self.entity_name
+                    'Event (public view)'
+                end
             end
 
             class Member < Public
                 expose :participants, using: Api::Entities::Participant::Public, documentation: { type: 'Array[Participant]', desc: 'List of participants in the event' }
                 expose :admins, using: Api::Entities::Admin::Public, documentation: { type: 'Array[Admin]', desc: 'List of admins managing the event' }
+                def self.entity_name
+                    'Event (admin view)'
+                end
             end
 
             class Full < Member
@@ -20,6 +26,9 @@ module Api
                 expose :airtable_base_id, documentation: { type: 'String', desc: 'Airtable base ID' }
                 expose :airtable_table_name, documentation: { type: 'String', desc: 'Airtable table name' }
                 expose :name_column, documentation: { type: 'String', desc: 'Name column in Airtable' }
+                def self.entity_name
+                    'Event (manager view)'
+                end
             end
         end
     end

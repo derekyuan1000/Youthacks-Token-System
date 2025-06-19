@@ -23,6 +23,13 @@ module Api
 		end
 
 		
+		desc 'Event scoped routes' do
+			summary 'Routes that operate on a specific event identified by event_slug'
+			detail 'Provides operations on participants, products, transactions, and activities scoped under a particular event'
+			tags ['Events']
+			failure [[400, 'Event ID is required', Api::Entities::Error], [403, 'Unauthorized access to event', Api::Entities::Error], [404, 'Event not found', Api::Entities::Error]]
+		end
+
 		resource :events do
 			route_param :event_slug, type: String do
 		
@@ -30,11 +37,13 @@ module Api
 					require_event!(event_slug: params[:event_slug])
 				end
 
-				desc 'Get participants for an event', {
-					tags: ['Events'],
-					detail: 'Returns a list of active participants for the specified event',
-					documentation: { operationId: 'getParticipants' }
-				}
+				desc 'Get participants for an event' do
+					summary 'Get participants for an event'
+					detail 'Returns a list of active participants for the specified event'
+					tags ['Events']
+					success Api::Entities::Participant::Full
+					failure [[401, 'Unauthorized', Api::Entities::Error], [404, 'Event not found', Api::Entities::Error]] 
+				end
 				params do
 					use :auth_header
 				end
@@ -42,11 +51,13 @@ module Api
 					present participants: @event.participants.active, with: Api::Entities::Participant
 				end
 
-				desc 'Add a participant to an event', {
-					tags: ['Events'],
-					detail: 'Creates a new participant in the event',
-					documentation: { operationId: 'postParticipants' }
-				}
+				desc 'Add a participant to an event' do
+					summary 'Add a participant to an event'
+					detail 'Creates a new participant in the event'
+					tags ['Events']
+					success Api::Entities::Participant::Public
+					failure [[401, 'Unauthorized', Api::Entities::Error], [422, 'Unprocessable Entity', Api::Entities::Error]]
+				end
 				params do
 					use :auth_header
 					requires :name, type: String
@@ -65,11 +76,13 @@ module Api
 					end
 				end
 
-				desc 'Sync participants for an event', {
-					tags: ['Events'],
-					detail: 'Synchronizes participants data for the event',
-					documentation: { operationId: 'postSyncParticipants' }
-				}
+				desc 'Sync participants for an event' do
+					summary 'Sync participants for an event'
+					detail 'Synchronizes participants data for the event'
+					tags ['Events']
+					success Api::Entities::Participant::Public
+					failure [[401, 'Unauthorized', Api::Entities::Error], [422, 'Unprocessable Entity', Api::Entities::Error]]
+				end
 				params do
 					use :auth_header
 				end
@@ -83,11 +96,13 @@ module Api
 					end
 				end
 
-				desc 'Set participant balance', {
-					tags: ['Events'],
-					detail: 'Sets the balance for a participant in the event',
-					documentation: { operationId: 'postParticipantSetBalance' }
-				}
+				desc 'Set participant balance' do
+					summary 'Set participant balance'
+					detail 'Sets the balance for a participant in the event'
+					tags ['Events']
+					success Api::Entities::Participant::Public
+					failure [[401, 'Unauthorized', Api::Entities::Error], [404, 'Participant not found', Api::Entities::Error]]
+				end
 				params do
 					use :auth_header
 					requires :participant_id, type: Integer
@@ -100,11 +115,13 @@ module Api
 					present participant: participant, with: Api::Entities::Participant::Public
 				end
 
-				desc 'Earn points for participant', {
-					tags: ['Events'],
-					detail: 'Adds points to a participant\'s balance',
-					documentation: { operationId: 'postParticipantEarn' }
-				}
+				desc 'Earn points for participant' do
+					summary 'Earn points for participant'
+					detail 'Adds points to a participant\'s balance'
+					tags ['Events']
+					success Api::Entities::Participant::Public
+					failure [[401, 'Unauthorized', Api::Entities::Error], [404, 'Participant not found', Api::Entities::Error], [422, 'Unprocessable Entity', Api::Entities::Error]]
+				end
 				params do
 					use :auth_header
 					requires :participant_id, type: Integer
@@ -123,11 +140,13 @@ module Api
 					end
 				end
 
-				desc 'Participant buys a product', {
-					tags: ['Events'],
-					detail: 'Processes a purchase transaction for a participant',
-					documentation: { operationId: 'postParticipantBuy' }
-				}
+				desc 'Participant buys a product' do
+					summary 'Participant buys a product'
+					detail 'Processes a purchase transaction for a participant'
+					tags ['Events']
+					success Api::Entities::Transaction
+					failure [[401, 'Unauthorized', Api::Entities::Error], [404, 'Participant not found', Api::Entities::Error], [422, 'Unprocessable Entity', Api::Entities::Error]]
+				end
 				params do
 					use :auth_header
 					requires :participant_id, type: Integer
@@ -146,11 +165,13 @@ module Api
 					end
 				end
 
-				desc 'Check in a participant', {
-					tags: ['Events'],
-					detail: 'Checks in a participant to the event',
-					documentation: { operationId: 'postParticipantCheckIn' }
-				}
+				desc 'Check in a participant' do
+					summary 'Check in a participant'
+					detail 'Checks in a participant to the event'
+					tags ['Events']
+					success Api::Entities::Participant::Public
+					failure [[401, 'Unauthorized', Api::Entities::Error], [404, 'Participant not found', Api::Entities::Error], [422, 'Unprocessable Entity', Api::Entities::Error]]
+				end
 				params do
 					use :auth_header
 					requires :participant_id, type: Integer
@@ -167,11 +188,13 @@ module Api
 					end
 				end
 
-				desc 'Delete a participant', {
-					tags: ['Events'],
-					detail: 'Deletes a participant from the event',
-					documentation: { operationId: 'deleteParticipant' }
-				}
+				desc 'Delete a participant' do
+					summary 'Delete a participant'
+					detail 'Deletes a participant from the event'
+					tags ['Events']
+					success Api::Entities::Participant::Public
+					failure [[401, 'Unauthorized', Api::Entities::Error], [404, 'Participant not found', Api::Entities::Error], [422, 'Unprocessable Entity', Api::Entities::Error]]
+				end
 				params do
 					use :auth_header
 					requires :participant_id, type: Integer
@@ -188,11 +211,13 @@ module Api
 					end
 				end
 
-				desc 'Get products for an event', {
-					tags: ['Events'],
-					detail: 'Returns a list of active products for the event',
-					documentation: { operationId: 'getProducts' }
-				}
+				desc 'Get products for an event' do
+					summary 'Get products for an event'
+					detail 'Returns a list of active products for the event'
+					tags ['Events']
+					success Api::Entities::Product
+					failure [[401, 'Unauthorized', Api::Entities::Error], [404, 'Event not found', Api::Entities::Error]]
+				end
 				params do
 					use :auth_header
 				end
@@ -200,11 +225,13 @@ module Api
 					present @event.products.active, with: Api::Entities::Product
 				end
 
-				desc 'Create a product for an event', {
-					tags: ['Events'],
-					detail: 'Creates a new product for the event',
-					documentation: { operationId: 'postProducts' }
-				}
+				desc 'Create a product for an event' do
+					summary 'Create a product for an event'
+					detail 'Creates a new product for the event'
+					tags ['Events']
+					success Api::Entities::Product
+					failure [[401, 'Unauthorized', Api::Entities::Error], [422, 'Unprocessable Entity', Api::Entities::Error]]
+				end
 				params do
 					use :auth_header
 					requires :name, type: String
@@ -222,11 +249,13 @@ module Api
 					end
 				end
 
-				desc 'Update a product', {
-					tags: ['Events'],
-					detail: 'Updates details of a product',
-					documentation: { operationId: 'putProduct' }
-				}
+				desc 'Update a product' do
+					summary 'Update a product'
+					detail 'Updates details of a product'
+					tags ['Events']
+					success Api::Entities::Product
+					failure [[401, 'Unauthorized', Api::Entities::Error], [404, 'Product not found', Api::Entities::Error], [422, 'Unprocessable Entity', Api::Entities::Error]]
+				end
 				params do
 					use :auth_header
 					requires :id, type: Integer
@@ -246,11 +275,13 @@ module Api
 					end
 				end
 
-				desc 'Delete a product', {
-					tags: ['Events'],
-					detail: 'Deletes a product from the event',
-					documentation: { operationId: 'deleteProduct' }
-				}
+				desc 'Delete a product' do
+					summary 'Delete a product'
+					detail 'Deletes a product from the event'
+					tags ['Events']
+					success Api::Entities::Product
+					failure [[401, 'Unauthorized', Api::Entities::Error], [404, 'Product not found', Api::Entities::Error], [422, 'Unprocessable Entity', Api::Entities::Error]]
+				end
 				params do
 					use :auth_header
 					requires :id, type: Integer
@@ -267,11 +298,13 @@ module Api
 					end
 				end
 
-				desc 'Get event activity', {
-					tags: ['Events'],
-					detail: 'Returns a list of activities for the event',
-					documentation: { operationId: 'getActivity' }
-				}
+				desc 'Get event activity' do
+					summary 'Get event activity'
+					detail 'Returns a list of activities for the event'
+					tags ['Events']
+					success Api::Entities::Activity
+					failure [[401, 'Unauthorized', Api::Entities::Error], [404, 'Event not found', Api::Entities::Error]]
+				end
 				params do
 					use :auth_header
 				end
@@ -279,11 +312,13 @@ module Api
 					present @event.activities.order(created_at: :desc), with: Api::Entities::Activity
 				end
 
-				desc 'Get event transactions', {
-					tags: ['Events'],
-					detail: 'Returns a list of transactions for the event',
-					documentation: { operationId: 'getTransactions' }
-				}
+				desc 'Get event transactions' do
+					summary 'Get event transactions'
+					detail 'Returns a list of transactions for the event'
+					tags ['Events']
+					success Api::Entities::Transaction
+					failure [[401, 'Unauthorized', Api::Entities::Error], [404, 'Event not found', Api::Entities::Error]]
+				end
 				params do
 					use :auth_header
 				end

@@ -6,6 +6,9 @@ module Api
             expose :price, documentation: { type: 'Integer', desc: 'Transaction price' }
             expose :created_at, documentation: { type: 'DateTime', desc: 'Transaction date and time' }
             expose :participant, using: Api::Entities::Participant::Public, documentation: { type: 'Participant', desc: 'Participant involved in the transaction' }
+            def self.entity_name
+                'Transaction'
+            end
         end
     end
 end
