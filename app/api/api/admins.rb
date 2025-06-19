@@ -55,7 +55,6 @@ module Api
         require_admin!
       end
     end
-	#test
     resource :signup do
 		desc 'Create admin' do
 			summary 'Create a new admin account'
