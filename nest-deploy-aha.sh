@@ -48,6 +48,7 @@ if [ "$LOCAL_HASH" != "$REMOTE_HASH" ] || ! docker ps -q -f name=mattsoh_aha | g
     -e PGDATABASE=mattsoh_aha_production \
     -e PGPASSWORD=$DB_PASSWORD \
     -e RAILS_MASTER_KEY=$RAILS_MASTER_KEY \
+    -e SECRET_KEY_BASE=$SECRET_KEY_BASE
     aha 2>>"$ERROR_LOG"
 
   # Check if new container is running, restore backup if not
