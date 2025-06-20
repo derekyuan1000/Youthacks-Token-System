@@ -5,14 +5,14 @@ module Api
 			class Public < Grape::Entity
 				expose :name, documentation: { type: 'String', desc: 'Admin name' }
 				def self.entity_name
-					'Admin (public view)'
+					'Admin_Public'
 				end
 			end
 
 			class Full < Public
 				expose :email, documentation: { type: 'string', format: 'email', desc: 'Admin email' }
 				def self.entity_name
-					'Admin (full view)'
+					'Admin_Full'
 				end 
 			end
 		end

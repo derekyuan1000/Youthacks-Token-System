@@ -25,9 +25,9 @@ module Api
             expose :admin, using: Api::Entities::Admin::Public, documentation: { type: 'Admin', desc: 'Admin who performed the activity' } do |activity, _opts|
               activity.admin
             end
+            def self.entity_name
+                'Activity'
+            end 
         end
-        def self.entity_name
-            'Activity'
-        end 
     end
 end

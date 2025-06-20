@@ -8,7 +8,7 @@ module Api
                 expose :slug, documentation: { type: 'String', desc: 'Event slug' }
                 expose :manager, using: Api::Entities::Admin::Public, documentation: { type: 'Admin', desc: 'Event manager' }
                 def self.entity_name
-                    'Event (public view)'
+                    'Event_Public'
                 end
             end
 
@@ -16,7 +16,7 @@ module Api
                 expose :participants, using: Api::Entities::Participant::Public, documentation: { type: 'Array[Participant]', desc: 'List of participants in the event' }
                 expose :admins, using: Api::Entities::Admin::Public, documentation: { type: 'Array[Admin]', desc: 'List of admins managing the event' }
                 def self.entity_name
-                    'Event (admin view)'
+                    'Event_Admin'
                 end
             end
 
@@ -27,7 +27,7 @@ module Api
                 expose :airtable_table_name, documentation: { type: 'String', desc: 'Airtable table name' }
                 expose :name_column, documentation: { type: 'String', desc: 'Name column in Airtable' }
                 def self.entity_name
-                    'Event (manager view)'
+                    'Event_Manager'
                 end
             end
         end

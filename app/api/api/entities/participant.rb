@@ -5,7 +5,7 @@ module Api
                 expose :name, documentation: { type: 'String', desc: 'Participant name' }
                 expose :balance, documentation: { type: 'Integer', desc: 'Participant balance' }
                 def self.entity_name
-                    'Participant (public view)'
+                    'Participant_Public'
                 end
             end
             class Full < Public
@@ -15,7 +15,11 @@ module Api
                 expose :check_in_time, documentation: { type: 'DateTime', desc: 'Check-in time of the participant' }
                 expose :uuid, documentation: { type: 'String', desc: 'Unique identifier for the participant' }
                 def self.entity_name
-                    'Participant (admin view)'
+                'Participant_Admin'
+                end
+
+                def self.entity_description
+                    'Full view of a participant, including personal information and check-in status.'
                 end
             end
         end
