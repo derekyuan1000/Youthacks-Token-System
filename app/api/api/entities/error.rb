@@ -4,7 +4,7 @@ module Api
             expose :error, documentation: { type: 'String', desc: 'Error message' }
             expose :code, documentation: { type: 'Integer', desc: 'Error code' }
             def self.entity_name
-                'API Error'
+                'Error'
             end
         end
     end
