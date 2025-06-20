@@ -1,0 +1,104 @@
+/* Responsive styles */
+
+// Small devices (smartphones)
+@media (max-width: $breakpoint-sm - 1px) {
+  .container {
+    padding-left: $spacer * 0.5;
+    padding-right: $spacer * 0.5;
+  }
+
+  .navbar {
+    padding: $spacer * 0.5;
+
+    ul {
+      flex-wrap: wrap;
+      gap: $spacer * 0.5;
+    }
+  }
+
+  .event-navbar {
+    ul {
+      justify-content: center;
+    }
+  }
+
+  .admin-dropdown .admin-dropdown-menu {
+    right: 0;
+    left: auto;
+  }
+
+  .dashboard-stats .stat-card {
+    margin: $spacer * 0.5;
+    min-width: 100%;
+  }
+
+  .card-deck .card {
+    margin-bottom: $spacer;
+  }
+
+  h1 {
+    font-size: $font-size-lg * 1.5;
+  }
+
+  .home-container .hero-section {
+    padding: $spacer * 2 $spacer;
+
+    h1 {
+      font-size: 2rem;
+    }
+  }
+}
+
+// Medium devices (tablets)
+@media (min-width: $breakpoint-sm) and (max-width: $breakpoint-lg - 1px) {
+  .dashboard-stats .stat-card {
+    min-width: calc(50% - #{$spacer * 2});
+  }
+
+  .navbar ul {
+    flex-wrap: wrap;
+  }
+}
+
+// Large devices (desktops)
+@media (min-width: $breakpoint-lg) {
+  .container {
+    padding-left: $spacer;
+    padding-right: $spacer;
+  }
+
+  .dashboard-stats .stat-card {
+    min-width: calc(25% - #{$spacer * 2});
+  }
+}
+
+// Print styles
+@media print {
+  .navbar,
+  .event-navbar,
+  .btn,
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    font-size: 12pt;
+    background-color: $white !important;
+  }
+
+  .container,
+  .container-fluid {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+
+  .card {
+    box-shadow: none !important;
+    border: 1px solid #ddd !important;
+  }
+
+  a[href]:after {
+    content: " (" attr(href) ")";
+  }
+}

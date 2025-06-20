@@ -1,0 +1,90 @@
+/* Alert styles */
+.alert {
+  position: relative;
+  padding: $spacer;
+  margin-bottom: $spacer;
+  border: 1px solid transparent;
+  border-radius: $border-radius;
+
+  // Alert variants
+  &.alert-primary {
+    color: darken($primary-color, 30%);
+    background-color: lighten($primary-color, 35%);
+    border-color: lighten($primary-color, 30%);
+  }
+
+  &.alert-secondary {
+    color: darken($secondary-color, 30%);
+    background-color: lighten($secondary-color, 45%);
+    border-color: lighten($secondary-color, 40%);
+  }
+
+  &.alert-success {
+    color: darken($success-color, 30%);
+    background-color: lighten($success-color, 45%);
+    border-color: lighten($success-color, 40%);
+  }
+
+  &.alert-danger {
+    color: darken($danger-color, 10%);
+    background-color: lighten($danger-color, 38%);
+    border-color: lighten($danger-color, 33%);
+  }
+
+  &.alert-warning {
+    color: darken($warning-color, 30%);
+    background-color: lighten($warning-color, 38%);
+    border-color: lighten($warning-color, 33%);
+  }
+
+  &.alert-info {
+    color: darken($info-color, 30%);
+    background-color: lighten($info-color, 45%);
+    border-color: lighten($info-color, 40%);
+  }
+
+  &.alert-light {
+    color: darken($light-color, 30%);
+    background-color: $light-color;
+    border-color: darken($light-color, 5%);
+  }
+
+  &.alert-dark {
+    color: lighten($dark-color, 40%);
+    background-color: lighten($dark-color, 65%);
+    border-color: lighten($dark-color, 60%);
+  }
+
+  // Dismissible alerts
+  &.alert-dismissible {
+    padding-right: $spacer * 3;
+
+    .close {
+      position: absolute;
+      top: 0;
+      right: 0;
+      padding: $spacer;
+      color: inherit;
+      background-color: transparent;
+      border: 0;
+      cursor: pointer;
+
+      &:hover, &:focus {
+        color: $dark-color;
+      }
+    }
+  }
+
+  // Alert with heading
+  .alert-heading {
+    color: inherit;
+  }
+
+  // Alert links
+  a, a:hover, a:focus {
+    font-weight: $font-weight-bold;
+    color: inherit;
+    text-decoration: underline;
+  }
+}
+

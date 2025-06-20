@@ -1,0 +1,149 @@
+/* Navbar styling */
+.navbar {
+  background-color: $dark-color;
+  padding: $spacer;
+  box-shadow: $box-shadow;
+
+  ul {
+    list-style: none;
+    display: flex;
+    gap: $spacer;
+    margin: 0;
+    padding: 0;
+
+    li {
+      a {
+        color: $white;
+        text-decoration: none;
+        font-weight: $font-weight-bold;
+        @include transition;
+        padding: $spacer * 0.5;
+        border-radius: $border-radius;
+
+        &:hover, &:focus {
+          color: $secondary-color;
+          text-decoration: none;
+          background-color: rgba($white, 0.1);
+        }
+      }
+
+      &.active a {
+        color: $secondary-color;
+      }
+    }
+  }
+
+  .navbar-brand {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+    color: $white;
+    text-decoration: none;
+    margin-right: $spacer * 2;
+
+    &:hover, &:focus {
+      color: $secondary-color;
+    }
+  }
+
+  .navbar-nav {
+    display: flex;
+    flex-direction: row;
+    padding-left: 0;
+    margin-bottom: 0;
+    list-style: none;
+  }
+
+  .ml-auto {
+    margin-left: auto;
+  }
+}
+
+.event-navbar {
+  background-color: rgba($primary-color, 0.9);
+  padding: $spacer * 0.75;
+  box-shadow: $box-shadow-sm;
+
+  ul {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacer * 0.5;
+    margin: 0;
+    padding: 0;
+
+    li {
+      a {
+        color: $white;
+        text-decoration: none;
+        font-weight: $font-weight-normal;
+        @include transition;
+        padding: $spacer * 0.25 $spacer * 0.5;
+        border-radius: $border-radius;
+        font-size: $font-size-sm;
+
+        &:hover, &:focus {
+          background-color: rgba($white, 0.2);
+          color: $white;
+          text-decoration: none;
+        }
+      }
+
+      &.active a {
+        background-color: $white;
+        color: $primary-color;
+      }
+    }
+  }
+}
+
+// Admin dropdown styling
+.admin-dropdown {
+  display: inline-block;
+  position: relative;
+  color: $white;
+  cursor: pointer;
+
+  span {
+    padding: $spacer * 0.5;
+    border-radius: $border-radius;
+    @include transition;
+
+    &:hover {
+      background-color: rgba($white, 0.1);
+    }
+  }
+
+  .admin-dropdown-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    background: $dark-color;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    min-width: 180px;
+    border-radius: $border-radius;
+    box-shadow: $box-shadow;
+    z-index: 1000;
+
+    li {
+      a {
+        display: block;
+        padding: $spacer * 0.5 $spacer;
+        color: $white;
+        text-decoration: none;
+        @include transition;
+
+        &:hover, &:focus {
+          background-color: rgba($white, 0.1);
+          color: $secondary-color;
+        }
+      }
+    }
+  }
+
+  &:hover .admin-dropdown-menu {
+    display: block;
+  }
+}
+
