@@ -60,7 +60,7 @@ module Api
 				end
 				params do
 					use :auth_header
-					requires :name, type: String
+					requires :name, type: String, documentation: { hidden: true }
 				end
 				post 'participants' do
 					if @event.sync_with_airtable
@@ -105,8 +105,8 @@ module Api
 				end
 				params do
 					use :auth_header
-					requires :participant_id, type: Integer
-					requires :balance, type: Integer
+					requires :participant_id, type: Integer, documentation: { hidden: true }
+					requires :balance, type: Integer, documentation: { hidden: true }
 				end
 				post 'participants/:participant_id/set_balance' do
 					participant = @event.participants.find_by(id: params[:participant_id])
@@ -124,8 +124,8 @@ module Api
 				end
 				params do
 					use :auth_header
-					requires :participant_id, type: Integer
-					optional :amount, type: Integer, default: 1
+					requires :participant_id, type: Integer, documentation: { hidden: true }
+					optional :amount, type: Integer, default: 1, documentation: { hidden: true }
 				end
 				post 'participants/:participant_id/earn' do
 					participant = @event.participants.find_by(id: params[:participant_id])
@@ -149,9 +149,9 @@ module Api
 				end
 				params do
 					use :auth_header
-					requires :participant_id, type: Integer
-					requires :amount, type: Integer
-					requires :product_id, type: Integer
+					requires :participant_id, type: Integer, documentation: { hidden: true }
+					requires :amount, type: Integer, documentation: { hidden: true }
+					requires :product_id, type: Integer, documentation: { hidden: true }
 				end
 				post 'participants/:participant_id/buy' do
 					participant = @event.participants.find_by(id: params[:participant_id])
@@ -174,7 +174,7 @@ module Api
 				end
 				params do
 					use :auth_header
-					requires :participant_id, type: Integer
+					requires :participant_id, type: Integer, documentation: { hidden: true }
 				end
 				post 'participants/:participant_id/check_in' do
 					participant = @event.participants.find_by(id: params[:participant_id])
@@ -234,10 +234,10 @@ module Api
 				end
 				params do
 					use :auth_header
-					requires :name, type: String
-					requires :price, type: Numeric
-					optional :description, type: String
-					optional :quantity, type: Integer
+					requires :name, type: String, documentation: { hidden: true }
+					requires :price, type: Numeric, documentation: { hidden: true }
+					optional :description, type: String, documentation: { hidden: true }
+					optional :quantity, type: Integer, documentation: { hidden: true }
 				end
 				post 'products' do
 					result = Product.create(name: params[:name], price: params[:price], description: params[:description], quantity: params[:quantity], admin_id: @admin.id, event_slug: @event.id)
@@ -258,11 +258,11 @@ module Api
 				end
 				params do
 					use :auth_header
-					requires :id, type: Integer
-					optional :name, type: String
-					optional :price, type: Numeric
-					optional :description, type: String
-					optional :quantity, type: Integer
+					requires :id, type: Integer, documentation: { hidden: true }
+					optional :name, type: String, documentation: { hidden: true }
+					optional :price, type: Numeric, documentation: { hidden: true }
+					optional :description, type: String, documentation: { hidden: true }
+					optional :quantity, type: Integer, documentation: { hidden: true }
 				end
 				put 'products/:id' do
 					product = @event.products.find_by(id: params[:id])

@@ -46,6 +46,10 @@ module Api
 				description: ' token from pending signup step'
 			}
 		end
+
+    params :confirm_signup_code_params do
+      requires :code, type: String, documentation: { type: 'string', desc: 'Signup confirmation code' }
+    end
 	end
 
     before do
@@ -127,7 +131,7 @@ module Api
 			failure [[401, 'Invalid code or token', Api::Entities::Error], [422, 'Validation failed', Api::Entities::Error]]
 		end
 		params do
-			requires :code, type: String, documentation: { type: 'string', desc: 'Signup confirmation code', name: 'ConfirmCodeParams' }
+			use :confirm_signup_code_params
 		end
 		post :confirm_code do
 			header = headers['Authorization']
