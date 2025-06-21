@@ -6,7 +6,6 @@ module Api
             expose :price, documentation: { type: 'Integer', desc: 'Product price' }
             expose :description, documentation: { type: 'String', desc: 'Product description' }
             expose :quantity, documentation: { type: 'Integer', desc: 'Product quantity' }
-            expose :email, documentation: { type: 'String', desc: 'Admin email' }
             def self.entity_name
                 'Product'
             end

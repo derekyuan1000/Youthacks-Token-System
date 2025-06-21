@@ -1,9 +1,35 @@
 module Api
-	class Events < Admins
+	class Events < Grape::API
+
+		AUTH_HEADER_DOC = {
+			Authorization: {
+				required: true,
+				type: 'string',
+				description: ' token for admin authentication'
+			}
+		}.freeze
 
 		helpers do
+			def require_admin!
+				header = headers['Authorization']
+				token = header&.split(' ')&.last
 
+				error!({ error: 'Missing token' }, 401) if token.blank?
+
+				begin
+					decoded = JWT.decode(token, Rails.application.secret_key_base)[0]
+					error!({message: 'Invalid token type' }, 401) unless decoded['type'] == 'login'
+					@admin = Admin.find(decoded['user_id'])
+				rescue JWT::ExpiredSignature
+					error!({ error: 'Token expired' }, 401)
+				rescue JWT::DecodeError
+					error!({ error: 'Invalid token' }, 401)
+				rescue ActiveRecord::RecordNotFound
+					error!({ error: 'Admin not found' }, 401)
+				end
+			end
 			def require_event!(event_slug:)
+				
 				error!({ error: 'Event ID is required' }, 400) if event_slug.blank?
 
 				@event = Event.find_by(slug: event_slug)
@@ -12,13 +38,6 @@ module Api
 				unless @event.admins.include?(@admin) || @event.manager.id == @admin.id
 					error!({ error: 'Unauthorized access to event' }, 403)
 				end
-			end
-			params :auth_header do
-			requires :Authorization, type: String, documentation: {
-				param_type: 'header',
-				required: true,
-				description: 'Bearer token for admin authentication'
-			}
 			end
 		end
 
@@ -34,6 +53,7 @@ module Api
 			route_param :event_slug, type: String do
 		
 				before do
+					require_admin!
 					require_event!(event_slug: params[:event_slug])
 				end
 
@@ -41,14 +61,16 @@ module Api
 					summary 'Get participants for an event'
 					detail 'Returns a list of active participants for the specified event'
 					tags ['Events']
+					is_array true
 					success Api::Entities::Participant::Full
 					failure [[401, 'Unauthorized', Api::Entities::Error], [404, 'Event not found', Api::Entities::Error]] 
+					headers AUTH_HEADER_DOC
 				end
 				params do
-					use :auth_header
 				end
 				get 'participants' do
-					present participants: @event.participants.active, with: Api::Entities::Participant
+					# present( { message: "Successful log in", token: token, expires_at: Time.at(exp) }, with: Api::Entities::Token)
+					present @event.participants.active, with: Api::Entities::Participant::Full
 				end
 
 				desc 'Add a participant to an event' do
@@ -57,9 +79,9 @@ module Api
 					tags ['Events']
 					success Api::Entities::Participant::Public
 					failure [[401, 'Unauthorized', Api::Entities::Error], [422, 'Unprocessable Entity', Api::Entities::Error]]
+					headers AUTH_HEADER_DOC
 				end
 				params do
-					use :auth_header
 					requires :name, type: String, documentation: { hidden: true }
 				end
 				post 'participants' do
@@ -82,9 +104,9 @@ module Api
 					tags ['Events']
 					success Api::Entities::Participant::Public
 					failure [[401, 'Unauthorized', Api::Entities::Error], [422, 'Unprocessable Entity', Api::Entities::Error]]
+					headers AUTH_HEADER_DOC
 				end
 				params do
-					use :auth_header
 				end
 				post 'sync_participants' do
 					result = @event.sync
@@ -102,9 +124,9 @@ module Api
 					tags ['Events']
 					success Api::Entities::Participant::Public
 					failure [[401, 'Unauthorized', Api::Entities::Error], [404, 'Participant not found', Api::Entities::Error]]
+					headers AUTH_HEADER_DOC
 				end
 				params do
-					use :auth_header
 					requires :participant_id, type: Integer, documentation: { hidden: true }
 					requires :balance, type: Integer, documentation: { hidden: true }
 				end
@@ -121,9 +143,9 @@ module Api
 					tags ['Events']
 					success Api::Entities::Participant::Public
 					failure [[401, 'Unauthorized', Api::Entities::Error], [404, 'Participant not found', Api::Entities::Error], [422, 'Unprocessable Entity', Api::Entities::Error]]
+					headers AUTH_HEADER_DOC
 				end
 				params do
-					use :auth_header
 					requires :participant_id, type: Integer, documentation: { hidden: true }
 					optional :amount, type: Integer, default: 1, documentation: { hidden: true }
 				end
@@ -146,14 +168,13 @@ module Api
 					tags ['Events']
 					success Api::Entities::Transaction
 					failure [[401, 'Unauthorized', Api::Entities::Error], [404, 'Participant not found', Api::Entities::Error], [422, 'Unprocessable Entity', Api::Entities::Error]]
+					headers AUTH_HEADER_DOC
 				end
 				params do
-					use :auth_header
 					requires :participant_id, type: Integer, documentation: { hidden: true }
-					requires :amount, type: Integer, documentation: { hidden: true }
 					requires :product_id, type: Integer, documentation: { hidden: true }
 				end
-				post 'participants/:participant_id/buy' do
+				post 'participants/:participant_id/buy/:product_id' do
 					participant = @event.participants.find_by(id: params[:participant_id])
 					error!({ error: 'Participant not found' }, 404) unless participant
 					result = participant.buy!(params[:product_id], @admin.id)
@@ -171,9 +192,9 @@ module Api
 					tags ['Events']
 					success Api::Entities::Participant::Public
 					failure [[401, 'Unauthorized', Api::Entities::Error], [404, 'Participant not found', Api::Entities::Error], [422, 'Unprocessable Entity', Api::Entities::Error]]
+					headers AUTH_HEADER_DOC
 				end
 				params do
-					use :auth_header
 					requires :participant_id, type: Integer, documentation: { hidden: true }
 				end
 				post 'participants/:participant_id/check_in' do
@@ -194,9 +215,9 @@ module Api
 					tags ['Events']
 					success Api::Entities::Participant::Public
 					failure [[401, 'Unauthorized', Api::Entities::Error], [404, 'Participant not found', Api::Entities::Error], [422, 'Unprocessable Entity', Api::Entities::Error]]
+					headers AUTH_HEADER_DOC
 				end
 				params do
-					use :auth_header
 					requires :participant_id, type: Integer
 				end
 				delete 'participants/:participant_id' do
@@ -217,9 +238,9 @@ module Api
 					tags ['Events']
 					success Api::Entities::Product
 					failure [[401, 'Unauthorized', Api::Entities::Error], [404, 'Event not found', Api::Entities::Error]]
+					headers AUTH_HEADER_DOC
 				end
 				params do
-					use :auth_header
 				end
 				get 'products' do
 					present @event.products.active, with: Api::Entities::Product
@@ -231,13 +252,13 @@ module Api
 					tags ['Events']
 					success Api::Entities::Product
 					failure [[401, 'Unauthorized', Api::Entities::Error], [422, 'Unprocessable Entity', Api::Entities::Error]]
+					headers AUTH_HEADER_DOC
 				end
 				params do
-					use :auth_header
-					requires :name, type: String, documentation: { hidden: true }
-					requires :price, type: Numeric, documentation: { hidden: true }
-					optional :description, type: String, documentation: { hidden: true }
-					optional :quantity, type: Integer, documentation: { hidden: true }
+					requires :name, type: String
+					requires :price, type: Numeric
+					optional :description, type: String
+					optional :quantity, type: Integer
 				end
 				post 'products' do
 					result = Product.create(name: params[:name], price: params[:price], description: params[:description], quantity: params[:quantity], admin_id: @admin.id, event_slug: @event.id)
@@ -255,16 +276,16 @@ module Api
 					tags ['Events']
 					success Api::Entities::Product
 					failure [[401, 'Unauthorized', Api::Entities::Error], [404, 'Product not found', Api::Entities::Error], [422, 'Unprocessable Entity', Api::Entities::Error]]
+					headers AUTH_HEADER_DOC
 				end
 				params do
-					use :auth_header
-					requires :id, type: Integer, documentation: { hidden: true }
-					optional :name, type: String, documentation: { hidden: true }
-					optional :price, type: Numeric, documentation: { hidden: true }
-					optional :description, type: String, documentation: { hidden: true }
-					optional :quantity, type: Integer, documentation: { hidden: true }
+					requires :id, type: Integer
+					optional :name, type: String
+					optional :price, type: Numeric
+					optional :description, type: String
+					optional :quantity, type: Integer
 				end
-				put 'products/:id' do
+				patch 'products/:id' do
 					product = @event.products.find_by(id: params[:id])
 					error!({ error: 'Product not found' }, 404) unless product
 					result = product.change!(name: params[:name], price: params[:price], description: params[:description], quantity: params[:quantity], admin_id: @admin.id)
@@ -281,9 +302,9 @@ module Api
 					tags ['Events']
 					success Api::Entities::Product
 					failure [[401, 'Unauthorized', Api::Entities::Error], [404, 'Product not found', Api::Entities::Error], [422, 'Unprocessable Entity', Api::Entities::Error]]
+					headers AUTH_HEADER_DOC
 				end
 				params do
-					use :auth_header
 					requires :id, type: Integer
 				end
 				delete 'products/:id' do
@@ -304,9 +325,9 @@ module Api
 					tags ['Events']
 					success Api::Entities::Activity
 					failure [[401, 'Unauthorized', Api::Entities::Error], [404, 'Event not found', Api::Entities::Error]]
+					headers AUTH_HEADER_DOC
 				end
 				params do
-					use :auth_header
 				end
 				get 'activity' do
 					present @event.activities.order(created_at: :desc), with: Api::Entities::Activity
@@ -318,9 +339,9 @@ module Api
 					tags ['Events']
 					success Api::Entities::Transaction
 					failure [[401, 'Unauthorized', Api::Entities::Error], [404, 'Event not found', Api::Entities::Error]]
+					headers AUTH_HEADER_DOC
 				end
 				params do
-					use :auth_header
 				end
 				get 'transactions' do
 					present @event.transactions.order(created_at: :desc), with: Api::Entities::Transaction

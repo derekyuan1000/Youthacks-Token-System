@@ -82,16 +82,16 @@ module Api
 				error!({ message: 'Invalid email format' }, 422) unless email =~ URI::MailTo::EMAIL_REGEXP
 				code = rand(100_000..999_999)
 				AdminMailer.send_code(email, code).deliver_now
-				exp_time = 30.minutes.from_now.to_i
+				exp = 30.minutes.from_now
 				pending_token = JWT.encode({
 					type: "signup",
 					name: name,
 					email: email,
 					password: password,
 					code: code,
-					exp: exp_time
+					exp: exp.to_i
 				}, Rails.application.secret_key_base)
-				{ token: pending_token, message: 'Pending signup token created', expires_at: Time.at(exp_time) }
+				{ token: pending_token, message: 'Pending signup token created', expires_at: exp }
 			else
 				error!({ message: 'Name, password, and email cannot be blank' }, 422)
 			end
@@ -171,7 +171,7 @@ module Api
     desc 'Get pending invitations' do
       summary 'List all pending invitations for the current admin'
       detail 'Returns all invitations that are pending and require action from the admin'
-      tags ['Event Managers']
+      tags ['User']
       headers AUTH_HEADER_DOC
       success Api::Entities::Invitation
       failure [[401, 'Unauthorized', Api::Entities::Error]]
@@ -184,28 +184,28 @@ module Api
     end
 
     desc 'Accept invitation by ID' do
-      summary 'Accept a pending invitation by its ID'
-      detail 'Accepts the invitation and updates its status'
-      tags ['User']
-      headers AUTH_HEADER_DOC
-      success code: 200, message: 'Invitation accepted'
-      failure [[401, 'Unauthorized', Api::Entities::Error], [404, 'Invitation not found', Api::Entities::Error], [422, 'Failed to accept invitation', Api::Entities::Error]]
+		summary 'Accept a pending invitation by its ID'
+		detail 'Accepts the invitation and updates its status'
+		tags ['User']
+		headers AUTH_HEADER_DOC
+		success code: 200, message: 'Invitation accepted'
+		failure [[401, 'Unauthorized', Api::Entities::Error], [404, 'Invitation not found', Api::Entities::Error], [422, 'Failed to accept invitation', Api::Entities::Error]]
     end
     params do
-      requires :invitation_id, type: Integer
+		requires :invitation_id, type: Integer
     end
-    post :accept_invitation do
-      invitation = @admin.invitations.pending.find_by(id: params[:invitation_id])
-      if invitation
-        result = invitation.accept!
-        if result[:success]
-          { message: 'Invitation accepted' }
-        else
-          error!({ error: result[:message] || 'Failed to accept invitation' }, 422)
-        end
-      else
-        error!({ error: 'Invitation not found' }, 404)
-      end
+    post 'accept_invitation/:invitation_id' do
+		invitation = @admin.invitations.pending.find_by(id: params[:invitation_id])
+		if invitation
+			result = invitation.accept!
+			if result[:success]
+				{ message: 'Invitation accepted' }
+			else
+				error!({ error: result[:message] || 'Failed to accept invitation' }, 422)
+			end
+		else
+			error!({ error: 'Invitation not found' }, 404)
+		end
     end
 
     desc 'Reject invitation by ID' do
@@ -219,7 +219,7 @@ module Api
     params do
       requires :invitation_id, type: Integer
     end
-    post :reject_invitation do
+    post 'reject_invitation/:invitation_id' do
 		invitation = @admin.invitations.pending.find_by(id: params[:invitation_id])
 		if invitation
 			invitation.reject!
@@ -298,9 +298,10 @@ module Api
     post :login do
       admin = Admin.find_by(name: params[:name])
       if admin && admin.authenticate(params[:password])
-        payload = {type: "login", user_id: admin.id, exp: 2.days.from_now.to_i }
+		exp = 2.days.from_now
+        payload = {type: "login", user_id: admin.id, exp: exp.to_i }
         token = JWT.encode(payload, Rails.application.secret_key_base)
-        { message: "Successful log in", token: token }
+        present( { message: "Successful log in", token: token, expires_at: Time.at(exp) }, with: Api::Entities::Token)
       else
         error!({ error: 'Invalid email or password' }, 401)
       end
