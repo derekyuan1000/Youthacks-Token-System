@@ -52,7 +52,7 @@ if [ "$LOCAL_HASH" != "$REMOTE_HASH" ] || ! docker ps -q -f name=mattsoh_aha | g
 		echo "Stopping containers using port 3836: $CONTAINERS_ON_3836"
 		docker stop $CONTAINERS_ON_3836 2>>"$ERROR_LOG" || true
 	fi
-
+	
 	echo "[$(date '+%Y-%m-%d %H:%M:%S')] Running: docker run --name mattsoh_aha ..."
 	docker run --name mattsoh_aha -d \
 		-p 3836:3000 \
