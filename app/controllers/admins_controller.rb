@@ -7,7 +7,7 @@ class AdminsController < ApplicationController
     def new
         # Render the signup form
         if session[:admin_id].present?
-            redirect_to event_dashboard_path, notice: "You are already logged in."
+            redirect_to dashboard_path, alert: "You are already logged in."
         else
             @admin = Admin.new
         end
