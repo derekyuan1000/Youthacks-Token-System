@@ -1,0 +1,95 @@
+/* Typography styles */
+h1 {
+  @include heading($font-size-lg * 2);
+  color: $dark-color;
+}
+
+h2 {
+  @include heading($font-size-lg * 1.5);
+  color: $dark-color;
+}
+
+h3 {
+  @include heading($font-size-lg * 1.25);
+  color: $dark-color;
+}
+
+h4 {
+  @include heading($font-size-lg);
+  color: $dark-color;
+}
+
+h5 {
+  @include heading($font-size-base * 1.1);
+  color: $dark-color;
+}
+
+h6 {
+  @include heading($font-size-base);
+  color: $dark-color;
+}
+
+.text-primary {
+  color: $primary-color !important;
+}
+
+.text-secondary {
+  color: $secondary-color !important;
+}
+
+.text-success {
+  color: $success-color !important;
+}
+
+.text-warning {
+  color: $warning-color !important;
+}
+
+.text-danger {
+  color: $danger-color !important;
+}
+
+.text-info {
+  color: $info-color !important;
+}
+
+.text-light {
+  color: $light-color !important;
+}
+
+.text-dark {
+  color: $dark-color !important;
+}
+
+.text-white {
+  color: $white !important;
+}
+
+.text-center {
+  text-align: center !important;
+}
+
+.text-right {
+  text-align: right !important;
+}
+
+.text-left {
+  text-align: left !important;
+}
+
+.font-weight-bold {
+  font-weight: $font-weight-bold !important;
+}
+
+.font-weight-normal {
+  font-weight: $font-weight-normal !important;
+}
+
+.small {
+  font-size: $font-size-sm !important;
+}
+
+.lead {
+  font-size: $font-size-lg !important;
+  font-weight: 300;
+}

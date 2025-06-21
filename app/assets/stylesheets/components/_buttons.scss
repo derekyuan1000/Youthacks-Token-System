@@ -1,0 +1,117 @@
+/* Button styles */
+.btn {
+  display: inline-block;
+  font-weight: $font-weight-normal;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  user-select: none;
+  border: 1px solid transparent;
+  padding: $spacer * 0.5 $spacer;
+  font-size: $font-size-base;
+  line-height: 1.5;
+  border-radius: $border-radius;
+  @include transition;
+  cursor: pointer;
+
+  &:focus, &:hover {
+    text-decoration: none;
+    outline: 0;
+  }
+
+  &:disabled {
+    opacity: 0.65;
+    pointer-events: none;
+  }
+
+  // Button sizes
+  &.btn-lg {
+    padding: $spacer * 0.75 $spacer * 1.5;
+    font-size: $font-size-lg;
+    border-radius: $border-radius-lg;
+  }
+
+  &.btn-sm {
+    padding: $spacer * 0.25 $spacer * 0.5;
+    font-size: $font-size-sm;
+    border-radius: $border-radius-sm;
+  }
+
+  // Button block
+  &.btn-block {
+    display: block;
+    width: 100%;
+  }
+}
+
+// Button variants
+.btn-primary {
+  @include button-variant($primary-color, $primary-color, darken($primary-color, 10%), darken($primary-color, 12.5%));
+}
+
+.btn-secondary {
+  @include button-variant($secondary-color, $secondary-color, darken($secondary-color, 10%), darken($secondary-color, 12.5%));
+}
+
+.btn-success {
+  @include button-variant($success-color, $success-color, darken($success-color, 10%), darken($success-color, 12.5%));
+}
+
+.btn-danger {
+  @include button-variant($danger-color, $danger-color, darken($danger-color, 10%), darken($danger-color, 12.5%));
+}
+
+.btn-warning {
+  @include button-variant($warning-color, $warning-color, darken($warning-color, 10%), darken($warning-color, 12.5%), $dark-color);
+}
+
+.btn-info {
+  @include button-variant($info-color, $info-color, darken($info-color, 10%), darken($info-color, 12.5%));
+}
+
+.btn-light {
+  @include button-variant($light-color, $light-color, darken($light-color, 10%), darken($light-color, 12.5%), $dark-color);
+}
+
+.btn-dark {
+  @include button-variant($dark-color, $dark-color, darken($dark-color, 10%), darken($dark-color, 12.5%));
+}
+
+.btn-outline-primary {
+  @include button-variant(transparent, $primary-color, $primary-color, $primary-color, $primary-color);
+
+  &:hover, &:focus {
+    color: $white;
+  }
+}
+
+.btn-outline-secondary {
+  @include button-variant(transparent, $secondary-color, $secondary-color, $secondary-color, $secondary-color);
+
+  &:hover, &:focus {
+    color: $white;
+  }
+}
+
+// Button groups
+.btn-group {
+  position: relative;
+  display: inline-flex;
+  vertical-align: middle;
+
+  > .btn {
+    position: relative;
+    flex: 1 1 auto;
+
+    &:not(:first-child) {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+
+    &:not(:last-child) {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+  }
+}
+

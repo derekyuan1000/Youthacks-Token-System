@@ -1,0 +1,61 @@
+// Flexbox mixins
+@mixin flex($direction: row, $wrap: nowrap, $justify: flex-start, $align: stretch) {
+  display: flex;
+  flex-direction: $direction;
+  flex-wrap: $wrap;
+  justify-content: $justify;
+  align-items: $align;
+}
+
+// Media query mixins
+@mixin media-breakpoint-up($breakpoint) {
+  @if $breakpoint == sm {
+    @media (min-width: $breakpoint-sm) { @content; }
+  } @else if $breakpoint == md {
+    @media (min-width: $breakpoint-md) { @content; }
+  } @else if $breakpoint == lg {
+    @media (min-width: $breakpoint-lg) { @content; }
+  } @else if $breakpoint == xl {
+    @media (min-width: $breakpoint-xl) { @content; }
+  }
+}
+
+// Typography mixins
+@mixin heading($size, $weight: $font-weight-bold, $margin-bottom: $spacer) {
+  font-size: $size;
+  font-weight: $weight;
+  line-height: 1.2;
+  margin-bottom: $margin-bottom;
+}
+
+// Button mixins
+@mixin button-variant($background, $border, $hover-background, $hover-border, $color: $white) {
+  background-color: $background;
+  border-color: $border;
+  color: $color;
+
+  &:hover, &:focus {
+    background-color: $hover-background;
+    border-color: $hover-border;
+  }
+}
+
+// Card mixins
+@mixin card($padding: $spacer, $border-radius: $border-radius, $shadow: $box-shadow) {
+  background-color: $white;
+  border-radius: $border-radius;
+  box-shadow: $shadow;
+  padding: $padding;
+}
+
+// Transition mixin
+@mixin transition($property: all, $duration: 0.2s, $timing: ease-in-out) {
+  transition: $property $duration $timing;
+}
+
+// Truncate text
+@mixin text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

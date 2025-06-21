@@ -1,0 +1,173 @@
+/* Card styles */
+.card {
+  @include card;
+  margin-bottom: $spacer;
+
+  .card-header {
+    padding: $spacer;
+    margin-bottom: 0;
+    background-color: rgba($dark-color, 0.03);
+    border-bottom: 1px solid rgba($dark-color, 0.125);
+    font-weight: $font-weight-bold;
+
+    &:first-child {
+      border-radius: calc(#{$border-radius} - 1px) calc(#{$border-radius} - 1px) 0 0;
+    }
+  }
+
+  .card-footer {
+    padding: $spacer;
+    background-color: rgba($dark-color, 0.03);
+    border-top: 1px solid rgba($dark-color, 0.125);
+
+    &:last-child {
+      border-radius: 0 0 calc(#{$border-radius} - 1px) calc(#{$border-radius} - 1px);
+    }
+  }
+
+  .card-body {
+    padding: $spacer;
+    flex: 1 1 auto;
+  }
+
+  .card-title {
+    margin-bottom: $spacer * 0.75;
+    font-weight: $font-weight-bold;
+  }
+
+  .card-subtitle {
+    margin-top: -($spacer * 0.375);
+    margin-bottom: 0;
+  }
+
+  .card-text:last-child {
+    margin-bottom: 0;
+  }
+
+  .card-link {
+    + .card-link {
+      margin-left: $spacer;
+    }
+  }
+
+  .card-img-top {
+    width: 100%;
+    border-top-left-radius: calc(#{$border-radius} - 1px);
+    border-top-right-radius: calc(#{$border-radius} - 1px);
+  }
+
+  .card-img-bottom {
+    width: 100%;
+    border-bottom-right-radius: calc(#{$border-radius} - 1px);
+    border-bottom-left-radius: calc(#{$border-radius} - 1px);
+  }
+}
+
+// Card variants
+.card-primary {
+  border-color: $primary-color;
+
+  .card-header {
+    background-color: $primary-color;
+    color: $white;
+  }
+}
+
+.card-secondary {
+  border-color: $secondary-color;
+
+  .card-header {
+    background-color: $secondary-color;
+    color: $white;
+  }
+}
+
+.card-success {
+  border-color: $success-color;
+
+  .card-header {
+    background-color: $success-color;
+    color: $white;
+  }
+}
+
+.card-info {
+  border-color: $info-color;
+
+  .card-header {
+    background-color: $info-color;
+    color: $white;
+  }
+}
+
+.card-warning {
+  border-color: $warning-color;
+
+  .card-header {
+    background-color: $warning-color;
+    color: $dark-color;
+  }
+}
+
+.card-danger {
+  border-color: $danger-color;
+
+  .card-header {
+    background-color: $danger-color;
+    color: $white;
+  }
+}
+
+// Card deck
+.card-deck {
+  display: flex;
+  flex-direction: column;
+
+  @include media-breakpoint-up(md) {
+    flex-flow: row wrap;
+    margin-right: -$spacer;
+    margin-left: -$spacer;
+
+    .card {
+      display: flex;
+      flex: 1 0 0%;
+      flex-direction: column;
+      margin-right: $spacer;
+      margin-left: $spacer;
+    }
+  }
+}
+
+// Card group
+.card-group {
+  display: flex;
+  flex-direction: column;
+
+  @include media-breakpoint-up(md) {
+    flex-flow: row wrap;
+
+    .card {
+      flex: 1 0 0%;
+
+      + .card {
+        margin-left: 0;
+        border-left: 0;
+      }
+
+      &:first-child {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+      }
+
+      &:last-child {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+      }
+
+      &:not(:first-child):not(:last-child) {
+        border-radius: 0;
+      }
+    }
+  }
+}
+
