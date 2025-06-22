@@ -41,7 +41,7 @@ module Api
             mount_path: '/docs'
         )
         route :any, '*path' do
-            error!({ error: 'Not Found. Check aha.youthacks.org/docs/api for documentation.' }, 404)
+            error!({ message: 'Not Found. Check aha.youthacks.org/docs/api for documentation.' }, 404)
         end
     end
 end

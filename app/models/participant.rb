@@ -31,15 +31,20 @@ class Participant < ApplicationRecord
 		end
     end
 
-    def set_balance!(amount, admin_id)
-        Activity.create!(
-          subject: self,
-          action: "set_balance",
-          metadata: { amount: amount, old_balance:balance, new_balance:amount}.to_json,
-          admin_id: admin_id,
-		  event_id: event_id
-        )
-        update!(balance: amount)
+    def set_balance!(amount:, admin_id:)
+		if amount >= 0
+			Activity.create!(
+				subject: self,
+				action: "set_balance",
+				metadata: { amount: amount, old_balance:balance, new_balance:amount}.to_json,
+				admin_id: admin_id,
+				event_id: event_id
+			)
+			update!(balance: amount)
+			{ success: true, message: "Balance set to #{amount} successfully!" }
+		else
+			{ success: false, message: "Balance cannot be set to a negative value!" }
+		end
     end
 
     def buy!(product, admin_id)

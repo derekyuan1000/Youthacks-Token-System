@@ -17,18 +17,18 @@ module Api
 			header = headers['Authorization']
 			token = header&.split(' ')&.last
 
-			error!({ error: 'Missing token' }, 401) if token.blank?
+			error!({ message: 'Missing token' }, 401) if token.blank?
 
 			begin
 				decoded = JWT.decode(token, Rails.application.secret_key_base)[0]
 				error!({message: 'Invalid token type' }, 401) unless decoded['type'] == 'login'
 				@admin = Admin.find(decoded['user_id'])
 			rescue JWT::ExpiredSignature
-				error!({ error: 'Token expired' }, 401)
+				error!({ message: 'Token expired' }, 401)
 			rescue JWT::DecodeError
-				error!({ error: 'Invalid token' }, 401)
+				error!({ message: 'Invalid token' }, 401)
 			rescue ActiveRecord::RecordNotFound
-				error!({ error: 'Admin not found' }, 401)
+				error!({ message: 'Admin not found' }, 401)
 			end
 		end
 
@@ -107,7 +107,7 @@ module Api
 		end
 		post :resend_code do
 			header = headers['Authorization']
-			error!({ error: 'Missing token' }, 401) if header.blank?
+			error!({ message: 'Missing token' }, 401) if header.blank?
 			token = header&.split(' ')&.last
 		
 			begin
@@ -201,10 +201,10 @@ module Api
 			if result[:success]
 				{ message: 'Invitation accepted' }
 			else
-				error!({ error: result[:message] || 'Failed to accept invitation' }, 422)
+				error!({ message: result[:message] || 'Failed to accept invitation' }, 422)
 			end
 		else
-			error!({ error: 'Invitation not found' }, 404)
+			error!({ message: 'Invitation not found' }, 404)
 		end
     end
 
@@ -225,7 +225,7 @@ module Api
 			invitation.reject!
 			{ message: 'Invitation rejected' }
 		else
-			error!({ error: 'Invitation not found or already processed' }, 404)
+			error!({ message: 'Invitation not found or already processed' }, 404)
 		end
     end
 
@@ -255,19 +255,19 @@ module Api
       present event, with: Api::Entities::Event::Full
     end
 
-    desc 'List admin and managed events' do
-      summary 'List all events for which the admin is responsible'
+    desc 'List managed events' do
+      summary 'List managed events'
       detail 'Returns all events created or managed by the current admin'
       tags ['User']
       headers AUTH_HEADER_DOC
-      success Api::Entities::Event::Full
+      success Api::Entities::Event::Public
       failure [[401, 'Unauthorized', Api::Entities::Error]]
     end
     params do
     end
     get :events do
       events = @admin.events + @admin.managed_events
-      present events, with: Api::Entities::Event::Full
+      present events, with: Api::Entities::Event::Public
     end
 
     desc 'Get admin settings' do
@@ -303,7 +303,7 @@ module Api
         token = JWT.encode(payload, Rails.application.secret_key_base)
         present( { message: "Successful log in", token: token, expires_at: Time.at(exp) }, with: Api::Entities::Token)
       else
-        error!({ error: 'Invalid email or password' }, 401)
+        error!({ message: 'Invalid email or password' }, 401)
       end
     end
   end

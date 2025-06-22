@@ -7,7 +7,7 @@
 2025-06-04 14:07:58.396 UTC [1904] FATAL:  database "aha_development" does not exist
 2025-06-04 14:10:19.874 UTC [7720] LOG:  checkpoint starting: time
 2025-06-04 14:13:44.776 UTC [7720] LOG:  checkpoint complete: wrote 1876 buffers (11.5%); 1 WAL file(s) added, 0 removed, 0 recycled; write=204.310 s, sync=0.441 s, total=204.910 s; sync files=605, longest=0.006 s, average=0.001 s; distance=8697 kB, estimate=8697 kB; lsn=0/1D6E0B8, redo lsn=0/1D6E028
-2025-06-04 14:17:53.450 UTC [11784] ERROR:  relation "admins" does not exist at character 24
+2025-06-04 14:17:53.450 UTC [11784] message:  relation "admins" does not exist at character 24
 2025-06-04 14:17:53.450 UTC [11784] STATEMENT:  SELECT "admins".* FROM "admins" /* loading for pp */ LIMIT 11 /*application='Aha'*/
 2025-06-04 14:18:17.653 UTC [15812] LOG:  background worker "logical replication launcher" (PID 16252) was terminated by exception 0xC000013A
 2025-06-04 14:18:17.653 UTC [15812] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.

@@ -14,29 +14,29 @@ module Api
 				header = headers['Authorization']
 				token = header&.split(' ')&.last
 
-				error!({ error: 'Missing token' }, 401) if token.blank?
+				error!({ message: 'Missing token' }, 401) if token.blank?
 
 				begin
 					decoded = JWT.decode(token, Rails.application.secret_key_base)[0]
 					error!({message: 'Invalid token type' }, 401) unless decoded['type'] == 'login'
 					@admin = Admin.find(decoded['user_id'])
 				rescue JWT::ExpiredSignature
-					error!({ error: 'Token expired' }, 401)
+					error!({ message: 'Token expired' }, 401)
 				rescue JWT::DecodeError
-					error!({ error: 'Invalid token' }, 401)
+					error!({ message: 'Invalid token' }, 401)
 				rescue ActiveRecord::RecordNotFound
-					error!({ error: 'Admin not found' }, 401)
+					error!({ message: 'Admin not found' }, 401)
 				end
 			end
 			def require_event!(event_slug:)
 				
-				error!({ error: 'Event ID is required' }, 400) if event_slug.blank?
+				error!({ message: 'Event ID is required' }, 400) if event_slug.blank?
 
 				@event = Event.find_by(slug: event_slug)
-				error!({ error: 'Event not found' }, 404) if @event.nil?
+				error!({ message: 'Event not found' }, 404) if @event.nil?
 
 				unless @event.admins.include?(@admin) || @event.manager.id == @admin.id
-					error!({ error: 'Unauthorized access to event' }, 403)
+					error!({ message: 'Unauthorized access to event' }, 403)
 				end
 			end
 		end
@@ -101,6 +101,7 @@ module Api
 					summary 'Sync participants for an event'
 					detail 'Synchronizes participants data for the event'
 					tags ['Events']
+					is_array true
 					success Api::Entities::Participant::Public
 					failure [[401, 'Unauthorized', Api::Entities::Error], [422, 'Unprocessable Entity', Api::Entities::Error]]
 					headers AUTH_HEADER_DOC
@@ -113,7 +114,7 @@ module Api
 						status :ok
 						present participants: @event.participants.active, with: Api::Entities::Participant::Public
 					else
-						error!({ message: result[:message] || "Failed to sync participants" }, 422)
+						error!({ code:422,message: result[:message] || "Failed to sync participants" }, 422)
 					end
 				end
 
@@ -131,8 +132,8 @@ module Api
 				end
 				post 'participants/:participant_id/set_balance' do
 					participant = @event.participants.find_by(id: params[:participant_id])
-					error!({ error: 'Participant not found' }, 404) unless participant
-					participant.set_balance!(params[:balance], @admin.id)
+					error!({code:404, message: 'Participant not found' }, 404) unless participant
+					participant.set_balance!(balance: params[:balance],admin_id: @admin.id)
 					present participant: participant, with: Api::Entities::Participant::Public
 				end
 
@@ -150,7 +151,7 @@ module Api
 				end
 				post 'participants/:participant_id/earn' do
 					participant = @event.participants.find_by(id: params[:participant_id])
-					error!({ error: 'Participant not found' }, 404) unless participant
+					error!({ message: 'Participant not found' }, 404) unless participant
 					amount = params[:amount] || 1
 					result = participant.earn!(amount: amount, admin_id: @admin.id)
 					if result[:success]
@@ -175,7 +176,7 @@ module Api
 				end
 				post 'participants/:participant_id/buy/:product_id' do
 					participant = @event.participants.find_by(id: params[:participant_id])
-					error!({ error: 'Participant not found' }, 404) unless participant
+					error!({ message: 'Participant not found' }, 404) unless participant
 					result = participant.buy!(params[:product_id], @admin.id)
 					if result[:success]
 						status :ok
@@ -221,7 +222,7 @@ module Api
 				end
 				delete 'participants/:participant_id' do
 					participant = @event.participants.find_by(id: params[:participant_id])
-					error!({ error: 'Participant not found' }, 404) unless participant
+					error!({ message: 'Participant not found' }, 404) unless participant
 					result = participant.delete!(@admin.id)
 					if result[:success]
 						status :ok
@@ -286,7 +287,7 @@ module Api
 				end
 				patch 'products/:id' do
 					product = @event.products.find_by(id: params[:id])
-					error!({ error: 'Product not found' }, 404) unless product
+					error!({ message: 'Product not found' }, 404) unless product
 					result = product.change!(name: params[:name], price: params[:price], description: params[:description], quantity: params[:quantity], admin_id: @admin.id)
 					if result[:success]
 						present product: product, with: Api::Entities::Product
@@ -308,7 +309,7 @@ module Api
 				end
 				delete 'products/:id' do
 					product = @event.products.find_by(id: params[:id])
-					error!({ error: 'Product not found' }, 404) unless product
+					error!({ message: 'Product not found' }, 404) unless product
 					result = product.delete!(admin_id: @admin.id)
 					if result[:success]
 						status :ok
