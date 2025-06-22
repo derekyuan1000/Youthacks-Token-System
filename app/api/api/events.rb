@@ -69,7 +69,6 @@ module Api
 				params do
 				end
 				get 'participants' do
-					# present( { message: "Successful log in", token: token, expires_at: Time.at(exp) }, with: Api::Entities::Token)
 					present @event.participants.active, with: Api::Entities::Participant::Full
 				end
 
