@@ -8,6 +8,10 @@ module Api
             status 200
             { message: 'Welcome to the API. Docs at aha.youthacks.org/docs/api.' }
         end
+
+        rescue_from Grape::Exceptions::Base do |e|
+            error!({ message: e.message, code: e.status }, e.status)
+        end
        
 
         mount Api::Admins

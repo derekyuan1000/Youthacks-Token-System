@@ -133,8 +133,12 @@ module Api
 				post 'participants/:participant_id/set_balance' do
 					participant = @event.participants.find_by(id: params[:participant_id])
 					error!({code:404, message: 'Participant not found' }, 404) unless participant
-					participant.set_balance!(balance: params[:balance],admin_id: @admin.id)
-					present participant: participant, with: Api::Entities::Participant::Public
+					result = participant.set_balance!(amount: params[:balance],admin_id: @admin.id)
+					if result[:success]
+						present participant: participant, with: Api::Entities::Participant::Public
+					else
+						error!({ code:422, message: result[:message] }, 422)
+					end
 				end
 
 				desc 'Earn points for participant' do

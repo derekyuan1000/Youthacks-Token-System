@@ -1,7 +1,7 @@
 /* Home page styles */
 .home-container {
   .hero-section {
-    background: linear-gradient(135deg, $primary-color, darken($primary-color, 15%));
+    background: linear-gradient(135deg, #00c9ff, #92fe9d);
     color: $white;
     padding: $spacer * 4 0;
     text-align: center;
@@ -12,6 +12,7 @@
       font-size: 2.5rem;
       margin-bottom: $spacer * 1.5;
       font-weight: 700;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
     }
 
     p {
@@ -23,6 +24,11 @@
     .cta-buttons {
       .btn {
         margin: 0 $spacer * 0.5;
+
+        &:hover {
+          transform: scale(1.05);
+          transition: transform 0.2s ease-in-out;
+        }
       }
     }
   }
@@ -34,11 +40,18 @@
       text-align: center;
       padding: $spacer * 2;
       margin-bottom: $spacer * 2;
+      background-color: lighten($light-color, 10%);
+      border-radius: $border-radius;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 
       .feature-icon {
         font-size: 3rem;
-        color: $primary-color;
+        color: #00c9ff;
         margin-bottom: $spacer;
+
+        &:hover {
+          color: #0096c7;
+        }
       }
 
       h3 {
@@ -52,7 +65,7 @@
   }
 
   .testimonials-section {
-    background-color: lighten($light-color, 2%);
+    background-color: #fefae0;
     padding: $spacer * 3 0;
     margin: $spacer * 3 0;
 
@@ -66,11 +79,14 @@
       padding: $spacer * 2;
       margin-bottom: $spacer * 2;
       text-align: center;
+      border: 1px solid lighten($primary-color, 30%);
+      border-radius: $border-radius;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 
       .testimonial-text {
         font-style: italic;
         margin-bottom: $spacer * 1.5;
-        color: lighten($dark-color, 15%);
+        color: #5f5f5f;
       }
 
       .testimonial-author {
@@ -80,8 +96,8 @@
       .testimonial-role {
         font-size: $font-size-sm;
         color: lighten($dark-color, 30%);
+        font-style: italic;
       }
     }
   }
 }
-

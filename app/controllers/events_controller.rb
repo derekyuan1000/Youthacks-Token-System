@@ -66,8 +66,12 @@ class EventsController < AdminsController
         participant = @event.participants.find( params[:id])
         redirect_to event_dashboard_path, alert: "Participant not found." and return unless participant
         # participant.set_balance(params[:balance]) # If you have a set_balance method in the model
-        participant.set_balance!(balance: params[:balance],admin_id: @admin.id) # or just directly update
-        redirect_to event_dashboard_path, notice: "Balance updated for #{participant.name}"
+        result = participant.set_balance!(amount: params[:balance],admin_id: @admin.id) 
+        if result[:success]
+            redirect_to event_dashboard_path, notice: "Balance updated for #{participant.name}"
+        else
+            redirect_to event_dashboard_path, alert: result[:message] || "Failed to set balance for #{participant.name}"
+        end
     end
 
     def bulk_earn
