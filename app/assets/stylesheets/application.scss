@@ -21,9 +21,11 @@
 @import "components/dropdown";
 
 // Pages
-@import "pages/home";
-@import "pages/dashboard";
-@import "pages/events";
+@import "admins/home";
+@import "admins/dashboard";
+@import "admins/events";
+
+@import "sessions/auth";
 
 // Responsive styles
 @import "responsive/media_queries";

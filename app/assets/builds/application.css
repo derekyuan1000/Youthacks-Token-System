@@ -1559,7 +1559,7 @@ textarea.form-control {
 
 /* Home page styles */
 .home-container .hero-section {
-  background: linear-gradient(135deg, #4a6baf, rgb(51.265060241, 74.1265060241, 121.234939759));
+  background: linear-gradient(135deg, #00c9ff, #92fe9d);
   color: #ffffff;
   padding: 4rem 0;
   text-align: center;
@@ -1570,6 +1570,7 @@ textarea.form-control {
   font-size: 2.5rem;
   margin-bottom: 1.5rem;
   font-weight: 700;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
 }
 .home-container .hero-section p {
   font-size: 1.25rem;
@@ -1579,6 +1580,10 @@ textarea.form-control {
 .home-container .hero-section .cta-buttons .btn {
   margin: 0 0.5rem;
 }
+.home-container .hero-section .cta-buttons .btn:hover {
+  transform: scale(1.05);
+  transition: transform 0.2s ease-in-out;
+}
 .home-container .features-section {
   padding: 2rem 0;
 }
@@ -1586,11 +1591,17 @@ textarea.form-control {
   text-align: center;
   padding: 2rem;
   margin-bottom: 2rem;
+  background-color: white;
+  border-radius: 0.25rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 .home-container .features-section .feature-card .feature-icon {
   font-size: 3rem;
-  color: #4a6baf;
+  color: #00c9ff;
   margin-bottom: 1rem;
+}
+.home-container .features-section .feature-card .feature-icon:hover {
+  color: #0096c7;
 }
 .home-container .features-section .feature-card h3 {
   margin-bottom: 1rem;
@@ -1599,7 +1610,7 @@ textarea.form-control {
   color: rgb(80.1935483871, 113, 145.8064516129);
 }
 .home-container .testimonials-section {
-  background-color: rgb(253.95, 254.1, 254.25);
+  background-color: #fefae0;
   padding: 3rem 0;
   margin: 3rem 0;
 }
@@ -1615,11 +1626,14 @@ textarea.form-control {
   padding: 2rem;
   margin-bottom: 2rem;
   text-align: center;
+  border: 1px solid rgb(179.0963855422, 193.4096385542, 222.9036144578);
+  border-radius: 0.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 .home-container .testimonials-section .testimonial-card .testimonial-text {
   font-style: italic;
   margin-bottom: 1.5rem;
-  color: rgb(71.1451612903, 100.25, 129.3548387097);
+  color: #5f5f5f;
 }
 .home-container .testimonials-section .testimonial-card .testimonial-author {
   font-weight: 700;
@@ -1627,9 +1641,26 @@ textarea.form-control {
 .home-container .testimonials-section .testimonial-card .testimonial-role {
   font-size: 0.875rem;
   color: rgb(104.6774193548, 138.5, 172.3225806452);
+  font-style: italic;
 }
 
 /* Dashboard page styles */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(0, 201, 255, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(0, 201, 255, 0.6);
+  }
+}
 .dashboard-container {
   padding: 2rem 0;
 }
@@ -1650,16 +1681,27 @@ textarea.form-control {
   min-width: 200px;
   margin: 1rem;
   text-align: center;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background: rgba(255, 255, 255, 0.08);
+  background-image: linear-gradient(120deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.16) 50%, rgba(255, 255, 255, 0.08) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 2.5s infinite linear;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 15px rgba(0, 201, 255, 0.1);
 }
 .dashboard-container .dashboard-stats .stat-card:hover {
   transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 201, 255, 0.25);
 }
 .dashboard-container .dashboard-stats .stat-card .stat-value {
   font-size: 2.5rem;
   font-weight: 700;
   color: #4a6baf;
   margin-bottom: 0.5rem;
+  background: linear-gradient(90deg, #00c9ff, #92fe9d);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 .dashboard-container .dashboard-stats .stat-card .stat-label {
   color: rgb(80.1935483871, 113, 145.8064516129);
@@ -1672,23 +1714,30 @@ textarea.form-control {
   margin-bottom: 2rem;
 }
 .dashboard-container .recent-activities .activity-item {
-  padding: 1rem;
+  padding: 1.5rem;
   border-bottom: 1px solid rgb(236.2903225806, 240.5, 244.7096774194);
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
   justify-content: flex-start;
   align-items: center;
+  transition: background-color 0.3s ease;
+  border-radius: 0.25rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 .dashboard-container .recent-activities .activity-item:last-child {
   border-bottom: none;
+}
+.dashboard-container .recent-activities .activity-item:hover {
+  background-color: rgba(255, 255, 255, 0.03);
 }
 .dashboard-container .recent-activities .activity-item .activity-icon {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background-color: rgb(197.0180722892, 207.9518072289, 230.4819277108);
-  color: #4a6baf;
+  background: linear-gradient(135deg, #00c9ff, #92fe9d);
+  color: white;
+  box-shadow: 0 2px 10px rgba(0, 201, 255, 0.3);
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
@@ -1696,6 +1745,7 @@ textarea.form-control {
   align-items: center;
   margin-right: 1rem;
   flex-shrink: 0;
+  animation: pulse-glow 2s infinite ease-in-out;
 }
 .dashboard-container .recent-activities .activity-item .activity-content {
   flex-grow: 1;
@@ -1856,6 +1906,61 @@ textarea.form-control {
   border-top: none;
   border-bottom-left-radius: 0.25rem;
   border-bottom-right-radius: 0.25rem;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+.auth-form-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 400px;
+  width: 100%;
+  padding: 2rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #f9f9f9;
+}
+.auth-form-container h1 {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+.auth-form-container div {
+  margin-bottom: 1rem;
+}
+.auth-form-container label {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-weight: bold;
+}
+.auth-form-container input[type=text],
+.auth-form-container input[type=password] {
+  width: 100%;
+  padding: 0.5rem;
+}
+.auth-form-container input[type=submit] {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  background-color: #4CAF50;
+  color: #FFF;
+  border: none;
+  border-radius: 4px;
+}
+.auth-form-container input[type=submit]:hover {
+  background-color: #45a049;
+}
+.auth-form-container a {
+  text-decoration: underline;
+  color: blue;
+}
+.auth-form-container a:hover {
+  color: darkblue;
 }
 
 /* Responsive styles */
