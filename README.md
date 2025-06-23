@@ -111,4 +111,4 @@ You can deploy this app using:
 See [LICENSE](LICENSE).
 
 ## Help and Support
-Add and issue on GitHub or (contact us)[mailto:matthew@youthacks.org)
+Add and issue on GitHub or [contact us](mailto:matthew@youthacks.org)
