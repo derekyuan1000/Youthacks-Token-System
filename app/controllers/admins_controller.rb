@@ -70,7 +70,7 @@ class AdminsController < ApplicationController
             else
                 code = rand(100_000..999_999)
                 begin
-                    AdminMailer.send_code(email, code)
+                    AdminMailer.send_code(email, code).deliver_now
                 rescue => e
                     redirect_to signup_path, alert: "Failed to send verification email: #{e.message}"
                     return
