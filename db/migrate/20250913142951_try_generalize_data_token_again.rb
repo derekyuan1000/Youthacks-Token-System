@@ -8,5 +8,3 @@ class TryGeneralizeDataTokenAgain < ActiveRecord::Migration[8.0]
     add_column :data_tokens, :data, :json
   end
 end
-  end
-end
